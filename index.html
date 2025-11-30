@@ -81,7 +81,7 @@
         .s-nav-btn.active { background: var(--primary); color: white; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
 
         .sidebar-content { list-style: none; padding: 0; margin: 0; overflow-y: auto; flex-grow: 1; }
-        
+
         .sidebar-item { display: flex; align-items: center; padding: 14px 20px; cursor: pointer; border-bottom: 1px solid rgba(51, 65, 85, 0.3); transition: all 0.2s; gap: 12px; }
         .sidebar-item:hover { background-color: rgba(59, 130, 246, 0.1); }
         .sidebar-item.active { background-color: rgba(59, 130, 246, 0.15); border-left: 4px solid var(--primary); }
@@ -125,7 +125,7 @@
         }
         .viewport-container iframe { width: 100%; height: 100%; border: none; position: absolute; top: 0; left: 0; }
 
-        /* Quiz Screen */
+        /* Quiz/Status Screen */
         .quiz-start-screen {
             display: none; width: 100%; height: 100%;
             background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
@@ -136,15 +136,16 @@
         .quiz-title-display { font-size: 2rem; color: white; margin-bottom: 10px; }
         .quiz-desc-display { color: var(--text-muted); margin-bottom: 30px; max-width: 400px; }
         .start-quiz-btn { background-color: var(--quiz-accent); color: #000; padding: 15px 40px; font-size: 1.1rem; font-weight: 700; border: none; border-radius: 8px; cursor: pointer; text-decoration: none; }
+        .start-quiz-btn:hover { opacity: 0.9; }
 
         .current-video-title { margin-top: 25px; font-size: 1.5rem; color: #fff; opacity: 0; animation: fadeIn 0.5s forwards 0.3s; }
 
         /* --- Resources Section --- */
         .resources-section { margin-top: 30px; background: var(--panel-bg); border-radius: 12px; border: 1px solid var(--border); overflow: hidden; opacity: 0; animation: fadeIn 0.5s forwards 0.5s; }
-        
+
         /* Scrollable Tabs for Mobile */
-        .tabs-header { 
-            display: flex; border-bottom: 1px solid var(--border); background: rgba(15, 23, 42, 0.5); 
+        .tabs-header {
+            display: flex; border-bottom: 1px solid var(--border); background: rgba(15, 23, 42, 0.5);
             overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; /* Hide scrollbar */
         }
         .tabs-header::-webkit-scrollbar { display: none; }
@@ -192,7 +193,7 @@
                 border-right: none;
             }
             .sidebar.open { transform: translateX(0); }
-            
+
             /* Show overlay when sidebar is open */
             .sidebar-overlay.active { display: block; opacity: 1; }
 
@@ -220,7 +221,7 @@
                 margin: 20px;
                 border-radius: 8px;
             }
-            
+
             .tab-btn {
                 padding: 12px 20px; /* Slightly smaller tabs */
             }
@@ -255,15 +256,15 @@
 
     <main class="main-stage">
         <div class="content-wrapper">
-            
+
             <div class="viewport-container">
                 <iframe id="course-player" src="" title="Course Content" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
                 <div id="quiz-screen" class="quiz-start-screen">
-                    <div class="quiz-icon-large">📝</div>
+                    <div class="quiz-icon-large" id="statusIcon">📝</div>
                     <h2 class="quiz-title-display" id="quizTitleDisplay">Quiz Name</h2>
-                    <p class="quiz-desc-display">This assessment will open in a new dedicated window.</p>
-                    <button id="launchQuizBtn" class="start-quiz-btn">Open Quiz ➜</button>
+                    <p class="quiz-desc-display" id="statusDesc"></p>
+                    <button id="launchQuizBtn" class="start-quiz-btn">Start Quiz</button>
                 </div>
             </div>
 
@@ -303,29 +304,42 @@
         };
 
         const courseContent = [
+            // L1 & L2: Same Video
             { title: "Lecture 1: Rigid Body Dynamics", type: "video", id: "Nj3Ntg_QupA", resources: { notes: [ { name: "Lecture 1 PDF", type: "PDF", size: "915 KB", url: "files/Lecture1_Rigid body dynamics.pdf" } ], slides: resources.day1, tutes: [] } },
-            { title: "Lecture 2: Time Rate of Vector", type: "video", id: "DccSNMkR3dI", resources: { notes: [ { name: "Lecture 2 PDF", type: "PDF", size: "434 KB", url: "files/Lecture2_Time rate of vector in rotational motion.pdf" } ], slides: resources.day1, tutes: [] } },
-            { title: "Lecture 3: Intermediate Frames", type: "video", id: "hZ2ODrVfj3g", resources: { notes: [ { name: "Lecture 3 PDF", type: "PDF", size: "536 KB", url: "files/Lecture3_Intermediate frames.pdf" } ], slides: resources.day1, tutes: [] } },
-            { title: "Lecture 4: Kinematic Expressions", type: "video", id: "sIpWLFL5E-s", resources: { notes: [ { name: "Lecture 4 PDF", type: "PDF", size: "873 KB", url: "files/Lecture4_Generalizations of kinematic expressions.pdf" } ], slides: resources.day1, tutes: [] } },
-            { title: "Lecture 5: Momentum Analysis", type: "video", id: "cwx5lCeYKqM", resources: { notes: [ { name: "Lecture 5 PDF", type: "PDF", size: "1.28 MB", url: "files/Lecture5_Momentum analysis.pdf" } ], slides: resources.day1, tutes: [] } },
+            { title: "Lecture 2: Time Rate of Vector", type: "video", id: "Nj3Ntg_QupA", resources: { notes: [ { name: "Lecture 2 PDF", type: "PDF", size: "434 KB", url: "files/Lecture2_Time rate of vector in rotational motion.pdf" } ], slides: resources.day1, tutes: [] } },
+            // L3, L4, L5: Same Video
+            { title: "Lecture 3: Intermediate Frames", type: "video", id: "DccSNMkR3dI", resources: { notes: [ { name: "Lecture 3 PDF", type: "PDF", size: "536 KB", url: "files/Lecture3_Intermediate frames.pdf" } ], slides: resources.day1, tutes: [] } },
+            { title: "Lecture 4: Kinematic Expressions", type: "video", id: "DccSNMkR3dI", resources: { notes: [ { name: "Lecture 4 PDF", type: "PDF", size: "873 KB", url: "files/Lecture4_Generalizations of kinematic expressions.pdf" } ], slides: resources.day1, tutes: [] } },
+            { title: "Lecture 5: Momentum Analysis", type: "video", id: "DccSNMkR3dI", resources: { notes: [ { name: "Lecture 5 PDF", type: "PDF", size: "1.28 MB", url: "files/Lecture5_Momentum analysis.pdf" } ], slides: resources.day1, tutes: [] } },
+            // L6 & L7: Same Video
             { title: "Lecture 6: Inertia Tensor", type: "video", id: "hZ2ODrVfj3g", resources: { notes: [ { name: "Lecture 6 PDF", type: "PDF", size: "1.05 MB", url: "files/Lecture6_Inertia tensor.pdf" } ], slides: resources.day1, tutes: [] } },
             { title: "Lecture 7: Parallel Axes Theorem", type: "video", id: "hZ2ODrVfj3g", resources: { notes: [ { name: "Lecture 7 PDF", type: "PDF", size: "455 KB", url: "files/Lecture7_Parallel axes theorem.pdf" } ], slides: resources.day1, tutes: [] } },
             { title: "Quiz 01: Checkpoint", type: "quiz", url: "quiz/quiz1.html", resources: resources.empty },
+            // L8
             { title: "Lecture 8: Coordinate Frames", type: "video", id: "sIpWLFL5E-s", resources: { notes: [ { name: "Lecture 8 PDF", type: "PDF", size: "606 KB", url: "files/Lecture8_Coordinate frames, Mapping and Transformation matrix.pdf" } ], slides: resources.day2, tutes: [] } },
-            { title: "Lecture 9: Fundamental Rotation Matrices", type: "video", id: "sIpWLFL5E-s", resources: { notes: [ { name: "Lecture 9 PDF", type: "PDF", size: "941 KB", url: "files/Lecture9_Fundamental rotation matrices.pdf" } ], slides: resources.day2, tutes: [] } },
+            // L9
+            { title: "Lecture 9: Fundamental Rotation Matrices", type: "video", id: "cwx5lCeYKqM", resources: { notes: [ { name: "Lecture 9 PDF", type: "PDF", size: "941 KB", url: "files/Lecture9_Fundamental rotation matrices.pdf" } ], slides: resources.day2, tutes: [] } },
             { title: "Quiz 02: Rotation Matrices", type: "quiz", url: "quiz/quiz2.html", resources: resources.empty },
+            // L10
             { title: "Lecture 10: Linkage Mechanisms", type: "video", id: "9ZrshlMcU8w", resources: { notes: [ { name: "Lecture 10 PDF", type: "PDF", size: "2.25 MB", url: "files/Lecture10_Linkage mechanisms.pdf" } ], slides: resources.day3, tutes: resources.day3_tute } },
             { title: "Quiz 03: Mechanisms", type: "quiz", url: "quiz/quiz3.html", resources: resources.empty },
-            { title: "Lecture 11: Velocity Analysis (ICM)", type: "video", id: "C-Le56Nvhr8", resources: { notes: [ { name: "Lecture 11 PDF", type: "PDF", size: "882 KB", url: "files/Lecture11_Velocity analysis_ICM.pdf" } ], slides: resources.day3, tutes: resources.day3_tute } },
+            // L11: Not Available
+            { title: "Lecture 11: Velocity Analysis (ICM)", type: "video", id: null, resources: { notes: [ { name: "Lecture 11 PDF", type: "PDF", size: "882 KB", url: "files/Lecture11_Velocity analysis_ICM.pdf" } ], slides: resources.day3, tutes: resources.day3_tute } },
+            // L12
             { title: "Lecture 12: Velocity Analysis (VVD)", type: "video", id: "C-Le56Nvhr8", resources: { notes: [ { name: "Lecture 12 PDF", type: "PDF", size: "3.91 MB", url: "files/Lecture12_Velocity analysis_VVD.pdf" } ], slides: resources.day3, tutes: resources.day3_tute } },
+            // L13
             { title: "Lecture 13: Acceleration Vector Diagram", type: "video", id: "QTHzsPW3Tdg", resources: { notes: [ { name: "Lecture 13 PDF", type: "PDF", size: "684 KB", url: "files/Lecture13_Acceleration Vector Diagram.pdf" } ], slides: resources.day3, tutes: resources.day3_tute } },
+            // L14
             { title: "Lecture 14: Gears", type: "video", id: "ZOvJ40aZlC8", resources: { notes: [ { name: "Lecture 14 PDF", type: "PDF", size: "2.41 MB", url: "files/Lecture14_Gears.pdf" } ], slides: [ ...resources.day4, { name: "Gear Full Slide", type: "PDF", size: "3.2 MB", url: "slides/Gear full.pdf" } ], tutes: resources.day4_tute } },
+            // L15
             { title: "Lecture 15: Gear Trains", type: "video", id: "Mg2bmKAvHZI", resources: { notes: [ { name: "Lecture 15 PDF", type: "PDF", size: "2.0 MB", url: "files/Lecture15_Gear Trains.pdf" } ], slides: resources.day4, tutes: resources.day4_tute } },
             { title: "Quiz 04: Gears", type: "quiz", url: "quiz/quiz4.html", resources: resources.empty },
+            // L16 & L17: Same Video
             { title: "Lecture 16: Cams", type: "video", id: "GV1tlgHpMs0", resources: { notes: [ { name: "Lecture 16 PDF", type: "PDF", size: "983 KB", url: "files/Lecture16_Cams.pdf" } ], slides: resources.day5, tutes: [] } },
             { title: "Lecture 17: Cam Profile", type: "video", id: "GV1tlgHpMs0", resources: { notes: [ { name: "Lecture 17 PDF", type: "PDF", size: "2.07 MB", url: "files/Lecture17_Cam profile.pdf" } ], slides: resources.day5, tutes: [] } },
-            { title: "Lecture 18: Gyroscope", type: "video", id: "GV1tlgHpMs0", resources: { notes: [ { name: "Lecture 18 PDF (Updated)", type: "PDF", size: "2.70 MB", url: "files/Lecture18_Gyroscope_updated.pdf" } ], slides: [], tutes: [] } },
-            { title: "Lecture 19: Introduction to MEMS", type: "video", id: "GV1tlgHpMs0", resources: { notes: [ { name: "Lecture 19 PDF", type: "PDF", size: "433 KB", url: "files/Lecture19_Introduction to MEMS.pdf" } ], slides: [], tutes: [] } },
+            // L18 & L19: Not Available
+            { title: "Lecture 18: Gyroscope", type: "video", id: null, resources: { notes: [ { name: "Lecture 18 PDF (Updated)", type: "PDF", size: "2.70 MB", url: "files/Lecture18_Gyroscope_updated.pdf" } ], slides: [], tutes: [] } },
+            { title: "Lecture 19: Introduction to MEMS", type: "video", id: null, resources: { notes: [ { name: "Lecture 19 PDF", type: "PDF", size: "433 KB", url: "files/Lecture19_Introduction to MEMS.pdf" } ], slides: [], tutes: [] } },
             { title: "Quiz 05: Advanced Topics", type: "quiz", url: "quiz/quiz5.html", resources: resources.empty }
         ];
 
@@ -335,8 +349,12 @@
         const sidebarList = document.getElementById('sidebar-list');
         const titleEl = document.getElementById('videoTitle');
         const iframeEl = document.getElementById('course-player');
+        
+        // Quiz & Status Screen Elements
         const quizScreen = document.getElementById('quiz-screen');
         const quizTitleDisplay = document.getElementById('quizTitleDisplay');
+        const statusIcon = document.getElementById('statusIcon');
+        const statusDesc = document.getElementById('statusDesc');
         const launchQuizBtn = document.getElementById('launchQuizBtn');
 
         let currentMode = 'lessons';
@@ -366,7 +384,7 @@
                 let icon, sub, type;
                 if (item.type === 'quiz') { icon = '📝'; sub = 'Assessment'; type='quiz'; }
                 else { icon = '▶'; sub = 'Video Lesson'; type='video'; }
-                
+
                 if (mode === 'slides') {
                     const count = item.resources.notes.length + item.resources.slides.length + item.resources.tutes.length;
                     icon = '📑'; sub = count > 0 ? `${count} File(s)` : 'No Files';
@@ -406,16 +424,37 @@
         function loadContent(index, autoPlay) {
             const item = courseContent[index];
             titleEl.textContent = item.title;
-            
+
             if (item.type === 'quiz') {
+                // Show Quiz Mode
                 iframeEl.style.display = 'none';
                 iframeEl.src = "";
+                
                 quizScreen.style.display = 'flex';
+                statusIcon.textContent = '📝';
                 quizTitleDisplay.textContent = item.title;
+                statusDesc.textContent = ""; // Clear text as requested
+                
+                launchQuizBtn.style.display = 'inline-block';
+                launchQuizBtn.textContent = "Start Quiz"; // Updated button text
                 launchQuizBtn.onclick = function() { window.open(item.url, '_blank'); };
+            
+            } else if (item.type === 'video' && !item.id) {
+                // Show "Video Coming Soon" Mode (Lectures 11, 18, 19)
+                iframeEl.style.display = 'none';
+                iframeEl.src = "";
+
+                quizScreen.style.display = 'flex';
+                statusIcon.textContent = '⏳';
+                quizTitleDisplay.textContent = item.title;
+                statusDesc.textContent = "Video is not available yet.";
+                launchQuizBtn.style.display = 'none';
+
             } else {
+                // Show Video Mode
                 quizScreen.style.display = 'none';
                 iframeEl.style.display = 'block';
+                
                 let originParam = (window.location.protocol !== 'file:') ? `&origin=${window.location.origin}` : '';
                 const autoPlayParam = autoPlay ? '&autoplay=1' : '';
                 iframeEl.src = `https://www.youtube.com/embed/${item.id}?rel=0${originParam}${autoPlayParam}`;
