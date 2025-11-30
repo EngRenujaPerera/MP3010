@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="referrer" content="origin-when-cross-origin">
     <title>MP3010 - Kinematics and Dynamics</title>
 
@@ -17,17 +17,41 @@
             --text-muted: #94a3b8;
             --border: #334155;
             --quiz-accent: #fbbf24;
+            --header-height: 60px;
         }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
         body {
             margin: 0;
-            font-family: 'Segoe UI', Roboto, sans-serif;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             background-color: var(--dark-bg);
             color: var(--text-main);
             height: 100vh;
             display: flex;
             overflow: hidden;
         }
+
+        /* --- Mobile Header (Hidden on Desktop) --- */
+        .mobile-header {
+            display: none;
+            height: var(--header-height);
+            background: var(--panel-bg);
+            border-bottom: 1px solid var(--border);
+            align-items: center;
+            padding: 0 15px;
+            justify-content: space-between;
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 50;
+        }
+
+        .mobile-menu-btn {
+            background: none; border: none; color: white;
+            font-size: 24px; cursor: pointer; padding: 5px;
+        }
+
+        .mobile-title { font-size: 1rem; font-weight: 700; color: white; }
 
         /* --- Sidebar --- */
         .sidebar {
@@ -37,103 +61,55 @@
             display: flex;
             flex-direction: column;
             flex-shrink: 0;
-            z-index: 10;
-            box-shadow: 2px 0 10px rgba(0,0,0,0.2);
+            z-index: 100; /* Higher z-index for mobile overlay */
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .sidebar-header {
             padding: 20px;
             border-bottom: 1px solid var(--border);
             background: rgba(15, 23, 42, 0.3);
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
+            display: flex; flex-direction: column; gap: 15px;
         }
 
-        .course-meta h2 {
-            margin: 0;
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: #fff;
-        }
+        .course-meta h2 { margin: 0; font-size: 1.1rem; font-weight: 700; color: #fff; }
+        .course-meta span { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--primary); font-weight: 700; }
 
-        .course-meta span {
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            color: var(--primary);
-            font-weight: 700;
-        }
-
-        .sidebar-nav {
-            display: flex;
-            background: rgba(0,0,0,0.2);
-            border-radius: 6px;
-            padding: 4px;
-            gap: 4px;
-        }
-
-        .s-nav-btn {
-            flex: 1;
-            background: none;
-            border: none;
-            color: var(--text-muted);
-            padding: 8px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: all 0.2s;
-            text-align: center;
-        }
-
+        .sidebar-nav { display: flex; background: rgba(0,0,0,0.2); border-radius: 6px; padding: 4px; gap: 4px; }
+        .s-nav-btn { flex: 1; background: none; border: none; color: var(--text-muted); padding: 8px; font-size: 0.8rem; font-weight: 600; border-radius: 4px; cursor: pointer; transition: all 0.2s; text-align: center; }
         .s-nav-btn:hover { color: #fff; background: rgba(255,255,255,0.05); }
         .s-nav-btn.active { background: var(--primary); color: white; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
 
-        .sidebar-content {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            overflow-y: auto;
-            flex-grow: 1;
-        }
-
-        .sidebar-item {
-            display: flex;
-            align-items: center;
-            padding: 14px 20px;
-            cursor: pointer;
-            border-bottom: 1px solid rgba(51, 65, 85, 0.3);
-            transition: all 0.2s;
-            gap: 12px;
-        }
-
+        .sidebar-content { list-style: none; padding: 0; margin: 0; overflow-y: auto; flex-grow: 1; }
+        
+        .sidebar-item { display: flex; align-items: center; padding: 14px 20px; cursor: pointer; border-bottom: 1px solid rgba(51, 65, 85, 0.3); transition: all 0.2s; gap: 12px; }
         .sidebar-item:hover { background-color: rgba(59, 130, 246, 0.1); }
         .sidebar-item.active { background-color: rgba(59, 130, 246, 0.15); border-left: 4px solid var(--primary); }
-
         .sidebar-item.is-quiz .item-icon { background: rgba(234, 179, 8, 0.1); color: var(--quiz-accent); }
         .sidebar-item.active.is-quiz .item-icon { background: var(--quiz-accent); color: #000; }
 
-        .item-icon {
-            width: 32px; height: 32px; border-radius: 6px;
-            background: rgba(255,255,255,0.05); color: var(--text-muted);
-            display: flex; align-items: center; justify-content: center;
-            font-size: 14px; flex-shrink: 0;
-        }
-
+        .item-icon { width: 32px; height: 32px; border-radius: 6px; background: rgba(255,255,255,0.05); color: var(--text-muted); display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
         .sidebar-item.active .item-icon { background: var(--primary); color: white; }
         .item-info { flex-grow: 1; }
         .item-info h4 { margin: 0; font-size: 0.9rem; font-weight: 500; color: var(--text-main); line-height: 1.4; }
         .item-info span { font-size: 0.75rem; color: var(--text-muted); }
 
+        /* --- Overlay for Mobile Sidebar --- */
+        .sidebar-overlay {
+            display: none;
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.7); z-index: 90;
+            backdrop-filter: blur(2px);
+            opacity: 0; transition: opacity 0.3s;
+        }
+
         /* --- Main Content --- */
         .main-stage {
             flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-            padding: 0;
+            display: flex; flex-direction: column; padding: 0;
             background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
             overflow-y: auto;
+            position: relative;
         }
 
         .content-wrapper {
@@ -141,177 +117,153 @@
             flex-grow: 1; display: flex; flex-direction: column;
         }
 
-        /* --- Viewport Container (Handles both Video and Quiz Start Screen) --- */
         .viewport-container {
-            width: 100%;
-            aspect-ratio: 16 / 9;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
-            background: #000;
-            position: relative;
+            width: 100%; aspect-ratio: 16 / 9; border-radius: 12px;
+            overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+            background: #000; position: relative;
             animation: slideUp 0.6s ease forwards;
         }
+        .viewport-container iframe { width: 100%; height: 100%; border: none; position: absolute; top: 0; left: 0; }
 
-        .viewport-container iframe {
-            width: 100%; height: 100%; border: none;
-            position: absolute; top: 0; left: 0;
-        }
-
-        /* --- Quiz Start Screen (Replaces Iframe) --- */
+        /* Quiz Screen */
         .quiz-start-screen {
-            display: none; /* Hidden by default */
-            width: 100%; height: 100%;
+            display: none; width: 100%; height: 100%;
             background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            padding: 40px;
-            box-sizing: border-box;
-            border: 1px solid var(--border);
+            flex-direction: column; align-items: center; justify-content: center;
+            text-align: center; padding: 40px; box-sizing: border-box;
         }
-
-        .quiz-icon-large {
-            font-size: 4rem; margin-bottom: 20px;
-            background: rgba(251, 191, 36, 0.1);
-            width: 100px; height: 100px;
-            display: flex; align-items: center; justify-content: center;
-            border-radius: 50%; color: var(--quiz-accent);
-        }
-
+        .quiz-icon-large { font-size: 4rem; margin-bottom: 20px; background: rgba(251, 191, 36, 0.1); width: 100px; height: 100px; display: flex; align-items: center; justify-content: center; border-radius: 50%; color: var(--quiz-accent); }
         .quiz-title-display { font-size: 2rem; color: white; margin-bottom: 10px; }
         .quiz-desc-display { color: var(--text-muted); margin-bottom: 30px; max-width: 400px; }
+        .start-quiz-btn { background-color: var(--quiz-accent); color: #000; padding: 15px 40px; font-size: 1.1rem; font-weight: 700; border: none; border-radius: 8px; cursor: pointer; text-decoration: none; }
 
-        .start-quiz-btn {
-            background-color: var(--quiz-accent);
-            color: #000;
-            padding: 15px 40px;
-            font-size: 1.1rem;
-            font-weight: 700;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-            text-decoration: none;
-            display: inline-block;
-        }
-
-        .start-quiz-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(251, 191, 36, 0.2);
-            background-color: #f59e0b;
-        }
-
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Title below video */
-        .current-video-title {
-            margin-top: 25px; font-size: 1.5rem; color: #fff;
-            opacity: 0; animation: fadeIn 0.5s forwards 0.3s;
-        }
+        .current-video-title { margin-top: 25px; font-size: 1.5rem; color: #fff; opacity: 0; animation: fadeIn 0.5s forwards 0.3s; }
 
         /* --- Resources Section --- */
-        .resources-section {
-            margin-top: 30px; background: var(--panel-bg);
-            border-radius: 12px; border: 1px solid var(--border);
-            overflow: hidden; opacity: 0; animation: fadeIn 0.5s forwards 0.5s;
+        .resources-section { margin-top: 30px; background: var(--panel-bg); border-radius: 12px; border: 1px solid var(--border); overflow: hidden; opacity: 0; animation: fadeIn 0.5s forwards 0.5s; }
+        
+        /* Scrollable Tabs for Mobile */
+        .tabs-header { 
+            display: flex; border-bottom: 1px solid var(--border); background: rgba(15, 23, 42, 0.5); 
+            overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; /* Hide scrollbar */
         }
-
-        .tabs-header { display: flex; border-bottom: 1px solid var(--border); background: rgba(15, 23, 42, 0.5); }
+        .tabs-header::-webkit-scrollbar { display: none; }
 
         .tab-btn {
-            background: none; border: none; padding: 16px 24px;
-            color: var(--text-muted); font-family: inherit; font-weight: 600;
-            cursor: pointer; transition: all 0.2s; position: relative;
+            background: none; border: none; padding: 16px 24px; color: var(--text-muted);
+            font-family: inherit; font-weight: 600; cursor: pointer; transition: all 0.2s;
+            position: relative; white-space: nowrap; flex-shrink: 0;
         }
-
         .tab-btn:hover { color: var(--text-main); background: rgba(255,255,255,0.05); }
         .tab-btn.active { color: var(--primary); }
-        .tab-btn.active::after {
-            content: ''; position: absolute; bottom: 0; left: 0; right: 0;
-            height: 3px; background: var(--primary);
-        }
+        .tab-btn.active::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: var(--primary); }
 
         .tab-content { padding: 24px; display: none; }
         .tab-content.active { display: block; animation: fadeIn 0.3s ease; }
 
         .resource-list { list-style: none; padding: 0; margin: 0; }
-        .resource-item {
-            display: flex; align-items: center; padding: 12px;
-            border-radius: 8px; background: rgba(15, 23, 42, 0.3);
-            margin-bottom: 10px; border: 1px solid transparent; transition: all 0.2s;
-        }
-        .resource-item:hover { border-color: var(--border); background: rgba(15, 23, 42, 0.5); }
-        .resource-icon {
-            width: 40px; height: 40px; background: rgba(59, 130, 246, 0.1);
-            color: var(--primary); border-radius: 8px; display: flex;
-            align-items: center; justify-content: center; margin-right: 15px;
-            font-weight: bold; font-size: 0.8rem;
-        }
-        .resource-details { flex-grow: 1; }
-        .resource-name { display: block; font-weight: 500; color: var(--text-main); margin-bottom: 2px; }
+        .resource-item { display: flex; align-items: center; padding: 12px; border-radius: 8px; background: rgba(15, 23, 42, 0.3); margin-bottom: 10px; border: 1px solid transparent; transition: all 0.2s; }
+        .resource-icon { width: 40px; height: 40px; background: rgba(59, 130, 246, 0.1); color: var(--primary); border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-right: 15px; font-weight: bold; font-size: 0.8rem; flex-shrink: 0;}
+        .resource-details { flex-grow: 1; min-width: 0; /* Fix flex text overflow */ }
+        .resource-name { display: block; font-weight: 500; color: var(--text-main); margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .resource-meta { font-size: 0.8rem; color: var(--text-muted); }
+        .view-btn { background: var(--primary); color: white; text-decoration: none; padding: 8px 16px; border-radius: 6px; font-size: 0.85rem; font-weight: 500; cursor: pointer; flex-shrink: 0; }
 
-        .view-btn {
-            background: var(--primary); color: white; text-decoration: none;
-            padding: 8px 16px; border-radius: 6px; font-size: 0.85rem;
-            font-weight: 500; transition: background 0.2s; cursor: pointer;
-        }
-        .view-btn:hover { background: var(--primary-hover); }
-
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes fadeIn { to { opacity: 1; } }
 
-        /* Mobile */
+        /* --- MOBILE OPTIMIZATIONS --- */
         @media (max-width: 900px) {
-            body { flex-direction: column; height: auto; overflow-y: auto; }
-            .sidebar { width: 100%; height: auto; max-height: 40vh; order: 2; }
-            .main-stage { overflow-y: visible; order: 1; }
-            .content-wrapper { padding: 15px; }
-            .viewport-container { border-radius: 0; }
+            /* Fix layout */
+            body { flex-direction: column; overflow: hidden; }
+
+            /* Show Mobile Header */
+            .mobile-header { display: flex; }
+
+            /* Hide Sidebar Off-screen */
+            .sidebar {
+                position: fixed;
+                top: 0; left: 0; bottom: 0;
+                width: 85%; /* Drawer width */
+                max-width: 320px;
+                transform: translateX(-100%); /* Hidden by default */
+                box-shadow: 4px 0 15px rgba(0,0,0,0.5);
+                height: 100%;
+                border-right: none;
+            }
+            .sidebar.open { transform: translateX(0); }
+            
+            /* Show overlay when sidebar is open */
+            .sidebar-overlay.active { display: block; opacity: 1; }
+
+            /* Main Stage Adjustments */
+            .main-stage {
+                padding-top: var(--header-height); /* Push down for header */
+            }
+
+            .content-wrapper {
+                padding: 0; /* Remove padding for edge-to-edge feel */
+                width: 100%;
+            }
+
+            .viewport-container {
+                border-radius: 0; /* Full width video */
+            }
+
+            .current-video-title {
+                padding: 0 20px;
+                font-size: 1.2rem;
+                margin-top: 20px;
+            }
+
+            .resources-section {
+                margin: 20px;
+                border-radius: 8px;
+            }
+            
+            .tab-btn {
+                padding: 12px 20px; /* Slightly smaller tabs */
+            }
+
+            .quiz-title-display { font-size: 1.5rem; }
+            .quiz-desc-display { font-size: 0.9rem; }
         }
     </style>
 </head>
 <body>
 
-    <aside class="sidebar">
+    <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+    <header class="mobile-header">
+        <button class="mobile-menu-btn" onclick="toggleSidebar()">☰</button>
+        <div class="mobile-title">Kinematics & Dynamics</div>
+        <div style="width: 24px;"></div> </header>
+
+    <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <div class="course-meta">
                 <span>Course Module</span>
                 <h2>Kinematics & Dynamics</h2>
             </div>
-
             <div class="sidebar-nav">
                 <button class="s-nav-btn active" onclick="renderSidebar('lessons')">Lessons</button>
                 <button class="s-nav-btn" onclick="renderSidebar('slides')">Files</button>
             </div>
         </div>
-
-        <ul class="sidebar-content" id="sidebar-list">
-            </ul>
+        <ul class="sidebar-content" id="sidebar-list"></ul>
     </aside>
 
     <main class="main-stage">
         <div class="content-wrapper">
-
+            
             <div class="viewport-container">
-                <iframe
-                    id="course-player"
-                    src=""
-                    title="Course Content"
-                    allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                    referrerpolicy="strict-origin-when-cross-origin"
-                    allowfullscreen>
-                </iframe>
+                <iframe id="course-player" src="" title="Course Content" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
                 <div id="quiz-screen" class="quiz-start-screen">
                     <div class="quiz-icon-large">📝</div>
                     <h2 class="quiz-title-display" id="quizTitleDisplay">Quiz Name</h2>
-                    <p class="quiz-desc-display">This assessment will open in a new dedicated window to ensure all questions and diagrams load correctly.</p>
-                    <button id="launchQuizBtn" class="start-quiz-btn">Open Quiz Session ➜</button>
+                    <p class="quiz-desc-display">This assessment will open in a new dedicated window.</p>
+                    <button id="launchQuizBtn" class="start-quiz-btn">Open Quiz ➜</button>
                 </div>
             </div>
 
@@ -319,19 +271,17 @@
 
             <div class="resources-section">
                 <div class="tabs-header">
-                    <button class="tab-btn active" onclick="switchTab('notes')">Lecture Notes</button>
-                    <button class="tab-btn" onclick="switchTab('slides')">Presentation Slides</button>
+                    <button class="tab-btn active" onclick="switchTab('notes')">Notes</button>
+                    <button class="tab-btn" onclick="switchTab('slides')">Slides</button>
                     <button class="tab-btn" onclick="switchTab('tutes')">Tutorials</button>
                 </div>
 
                 <div id="tab-notes" class="tab-content active">
                     <ul class="resource-list" id="list-notes"></ul>
                 </div>
-
                 <div id="tab-slides" class="tab-content">
                     <ul class="resource-list" id="list-slides"></ul>
                 </div>
-
                 <div id="tab-tutes" class="tab-content">
                     <ul class="resource-list" id="list-tutes"></ul>
                 </div>
@@ -342,38 +292,17 @@
     <script>
         // --- Shared Resource Definitions ---
         const resources = {
-            day1: [
-                { name: "Day 01 Presentation", type: "PPTX", size: "3.2 MB", url: "slides/Day 01.pptx" },
-                { name: "Day 01 PDF View", type: "PDF", size: "2.1 MB", url: "slides/Day 01.pdf" }
-            ],
-            day2: [
-                { name: "Day 02 Presentation", type: "PPTX", size: "3.1 MB", url: "slides/Day 02.pptx" },
-                { name: "Day 02 PDF View", type: "PDF", size: "1.4 MB", url: "slides/Day 02.pdf" }
-            ],
-            day3: [
-                { name: "Day 03 Presentation", type: "PPTX", size: "17.8 MB", url: "slides/Day 03.pptx" },
-                { name: "Day 03 PDF View", type: "PDF", size: "2.2 MB", url: "slides/Day 03.pdf" }
-            ],
-            day3_tute: [
-                { name: "Day 03 Tutorial", type: "PDF", size: "458 KB", url: "slides/Day 03 Tute.pdf" }
-            ],
-            day4: [
-                { name: "Day 04 Presentation", type: "PPTX", size: "6.3 MB", url: "slides/Day 04.pptx" },
-                { name: "Day 04 PDF View", type: "PDF", size: "3.2 MB", url: "slides/Day 04.pdf" }
-            ],
-            day4_tute: [
-                { name: "Day 04 Tutorial", type: "PDF", size: "340 KB", url: "slides/Day 4 Tute.pdf" }
-            ],
-            day5: [
-                { name: "Day 05 Presentation", type: "PPTX", size: "3.3 MB", url: "slides/Day 05.pptx" },
-                { name: "Day 05 PDF View", type: "PDF", size: "2.3 MB", url: "slides/Day 05.pdf" }
-            ],
+            day1: [ { name: "Day 01 Presentation", type: "PPTX", size: "3.2 MB", url: "slides/Day 01.pptx" }, { name: "Day 01 PDF View", type: "PDF", size: "2.1 MB", url: "slides/Day 01.pdf" } ],
+            day2: [ { name: "Day 02 Presentation", type: "PPTX", size: "3.1 MB", url: "slides/Day 02.pptx" }, { name: "Day 02 PDF View", type: "PDF", size: "1.4 MB", url: "slides/Day 02.pdf" } ],
+            day3: [ { name: "Day 03 Presentation", type: "PPTX", size: "17.8 MB", url: "slides/Day 03.pptx" }, { name: "Day 03 PDF View", type: "PDF", size: "2.2 MB", url: "slides/Day 03.pdf" } ],
+            day3_tute: [ { name: "Day 03 Tutorial", type: "PDF", size: "458 KB", url: "slides/Day 03 Tute.pdf" } ],
+            day4: [ { name: "Day 04 Presentation", type: "PPTX", size: "6.3 MB", url: "slides/Day 04.pptx" }, { name: "Day 04 PDF View", type: "PDF", size: "3.2 MB", url: "slides/Day 04.pdf" } ],
+            day4_tute: [ { name: "Day 04 Tutorial", type: "PDF", size: "340 KB", url: "slides/Day 4 Tute.pdf" } ],
+            day5: [ { name: "Day 05 Presentation", type: "PPTX", size: "3.3 MB", url: "slides/Day 05.pptx" }, { name: "Day 05 PDF View", type: "PDF", size: "2.3 MB", url: "slides/Day 05.pdf" } ],
             empty: { notes: [], slides: [], tutes: [] }
         };
 
-        // --- Course Content ---
         const courseContent = [
-            // --- Day 01 ---
             { title: "Lecture 1: Rigid Body Dynamics", type: "video", id: "Nj3Ntg_QupA", resources: { notes: [ { name: "Lecture 1 PDF", type: "PDF", size: "915 KB", url: "files/Lecture1_Rigid body dynamics.pdf" } ], slides: resources.day1, tutes: [] } },
             { title: "Lecture 2: Time Rate of Vector", type: "video", id: "DccSNMkR3dI", resources: { notes: [ { name: "Lecture 2 PDF", type: "PDF", size: "434 KB", url: "files/Lecture2_Time rate of vector in rotational motion.pdf" } ], slides: resources.day1, tutes: [] } },
             { title: "Lecture 3: Intermediate Frames", type: "video", id: "hZ2ODrVfj3g", resources: { notes: [ { name: "Lecture 3 PDF", type: "PDF", size: "536 KB", url: "files/Lecture3_Intermediate frames.pdf" } ], slides: resources.day1, tutes: [] } },
@@ -381,47 +310,28 @@
             { title: "Lecture 5: Momentum Analysis", type: "video", id: "cwx5lCeYKqM", resources: { notes: [ { name: "Lecture 5 PDF", type: "PDF", size: "1.28 MB", url: "files/Lecture5_Momentum analysis.pdf" } ], slides: resources.day1, tutes: [] } },
             { title: "Lecture 6: Inertia Tensor", type: "video", id: "hZ2ODrVfj3g", resources: { notes: [ { name: "Lecture 6 PDF", type: "PDF", size: "1.05 MB", url: "files/Lecture6_Inertia tensor.pdf" } ], slides: resources.day1, tutes: [] } },
             { title: "Lecture 7: Parallel Axes Theorem", type: "video", id: "hZ2ODrVfj3g", resources: { notes: [ { name: "Lecture 7 PDF", type: "PDF", size: "455 KB", url: "files/Lecture7_Parallel axes theorem.pdf" } ], slides: resources.day1, tutes: [] } },
-
-            // --- QUIZ 1 ---
             { title: "Quiz 01: Checkpoint", type: "quiz", url: "quiz/quiz1.html", resources: resources.empty },
-
-            // --- Day 02 ---
             { title: "Lecture 8: Coordinate Frames", type: "video", id: "sIpWLFL5E-s", resources: { notes: [ { name: "Lecture 8 PDF", type: "PDF", size: "606 KB", url: "files/Lecture8_Coordinate frames, Mapping and Transformation matrix.pdf" } ], slides: resources.day2, tutes: [] } },
             { title: "Lecture 9: Fundamental Rotation Matrices", type: "video", id: "sIpWLFL5E-s", resources: { notes: [ { name: "Lecture 9 PDF", type: "PDF", size: "941 KB", url: "files/Lecture9_Fundamental rotation matrices.pdf" } ], slides: resources.day2, tutes: [] } },
-
-            // --- QUIZ 2 ---
             { title: "Quiz 02: Rotation Matrices", type: "quiz", url: "quiz/quiz2.html", resources: resources.empty },
-
-            // --- Day 03 ---
             { title: "Lecture 10: Linkage Mechanisms", type: "video", id: "9ZrshlMcU8w", resources: { notes: [ { name: "Lecture 10 PDF", type: "PDF", size: "2.25 MB", url: "files/Lecture10_Linkage mechanisms.pdf" } ], slides: resources.day3, tutes: resources.day3_tute } },
-
-            // --- QUIZ 3 ---
             { title: "Quiz 03: Mechanisms", type: "quiz", url: "quiz/quiz3.html", resources: resources.empty },
-
             { title: "Lecture 11: Velocity Analysis (ICM)", type: "video", id: "C-Le56Nvhr8", resources: { notes: [ { name: "Lecture 11 PDF", type: "PDF", size: "882 KB", url: "files/Lecture11_Velocity analysis_ICM.pdf" } ], slides: resources.day3, tutes: resources.day3_tute } },
             { title: "Lecture 12: Velocity Analysis (VVD)", type: "video", id: "C-Le56Nvhr8", resources: { notes: [ { name: "Lecture 12 PDF", type: "PDF", size: "3.91 MB", url: "files/Lecture12_Velocity analysis_VVD.pdf" } ], slides: resources.day3, tutes: resources.day3_tute } },
             { title: "Lecture 13: Acceleration Vector Diagram", type: "video", id: "QTHzsPW3Tdg", resources: { notes: [ { name: "Lecture 13 PDF", type: "PDF", size: "684 KB", url: "files/Lecture13_Acceleration Vector Diagram.pdf" } ], slides: resources.day3, tutes: resources.day3_tute } },
-
-            // --- Day 04 ---
             { title: "Lecture 14: Gears", type: "video", id: "ZOvJ40aZlC8", resources: { notes: [ { name: "Lecture 14 PDF", type: "PDF", size: "2.41 MB", url: "files/Lecture14_Gears.pdf" } ], slides: [ ...resources.day4, { name: "Gear Full Slide", type: "PDF", size: "3.2 MB", url: "slides/Gear full.pdf" } ], tutes: resources.day4_tute } },
             { title: "Lecture 15: Gear Trains", type: "video", id: "Mg2bmKAvHZI", resources: { notes: [ { name: "Lecture 15 PDF", type: "PDF", size: "2.0 MB", url: "files/Lecture15_Gear Trains.pdf" } ], slides: resources.day4, tutes: resources.day4_tute } },
-
-            // --- QUIZ 4 ---
             { title: "Quiz 04: Gears", type: "quiz", url: "quiz/quiz4.html", resources: resources.empty },
-
-            // --- Day 05 ---
             { title: "Lecture 16: Cams", type: "video", id: "GV1tlgHpMs0", resources: { notes: [ { name: "Lecture 16 PDF", type: "PDF", size: "983 KB", url: "files/Lecture16_Cams.pdf" } ], slides: resources.day5, tutes: [] } },
             { title: "Lecture 17: Cam Profile", type: "video", id: "GV1tlgHpMs0", resources: { notes: [ { name: "Lecture 17 PDF", type: "PDF", size: "2.07 MB", url: "files/Lecture17_Cam profile.pdf" } ], slides: resources.day5, tutes: [] } },
-
-            // --- Others ---
             { title: "Lecture 18: Gyroscope", type: "video", id: "GV1tlgHpMs0", resources: { notes: [ { name: "Lecture 18 PDF (Updated)", type: "PDF", size: "2.70 MB", url: "files/Lecture18_Gyroscope_updated.pdf" } ], slides: [], tutes: [] } },
             { title: "Lecture 19: Introduction to MEMS", type: "video", id: "GV1tlgHpMs0", resources: { notes: [ { name: "Lecture 19 PDF", type: "PDF", size: "433 KB", url: "files/Lecture19_Introduction to MEMS.pdf" } ], slides: [], tutes: [] } },
-
-            // --- QUIZ 5 ---
             { title: "Quiz 05: Advanced Topics", type: "quiz", url: "quiz/quiz5.html", resources: resources.empty }
         ];
 
-        // --- Globals ---
+        // --- Logic ---
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.querySelector('.sidebar-overlay');
         const sidebarList = document.getElementById('sidebar-list');
         const titleEl = document.getElementById('videoTitle');
         const iframeEl = document.getElementById('course-player');
@@ -437,68 +347,46 @@
             loadContent(0, false);
         });
 
-        // --- Sidebar Logic ---
+        // Mobile Menu Toggle
+        function toggleSidebar() {
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('active');
+        }
+
         function renderSidebar(mode) {
             currentMode = mode;
             document.querySelectorAll('.s-nav-btn').forEach(btn => {
                 const btnMode = btn.innerText.toLowerCase();
-                if(btnMode === mode || (btnMode === 'lessons' && mode === 'lessons')) {
-                    btn.classList.add('active');
-                } else {
-                    btn.classList.remove('active');
-                }
+                if(btnMode === mode || (btnMode === 'lessons' && mode === 'lessons')) btn.classList.add('active');
+                else btn.classList.remove('active');
             });
 
             sidebarList.innerHTML = '';
-
-            if (mode === 'lessons') {
-                courseContent.forEach((item, index) => {
-                    let icon, sub;
-                    if (item.type === 'quiz') {
-                        icon = '📝'; // Quiz Icon
-                        sub = 'Assessment';
-                    } else {
-                        icon = '▶'; // Video Icon
-                        sub = 'Video Lesson';
-                    }
-
-                    const li = createSidebarItem(index, icon, item.title, sub, item.type);
-                    sidebarList.appendChild(li);
-                });
-            }
-            else if (mode === 'slides') {
-                courseContent.forEach((item, index) => {
+            courseContent.forEach((item, index) => {
+                let icon, sub, type;
+                if (item.type === 'quiz') { icon = '📝'; sub = 'Assessment'; type='quiz'; }
+                else { icon = '▶'; sub = 'Video Lesson'; type='video'; }
+                
+                if (mode === 'slides') {
                     const count = item.resources.notes.length + item.resources.slides.length + item.resources.tutes.length;
-                    const subtitle = count > 0 ? `${count} File(s)` : 'No Files';
-                    const li = createSidebarItem(index, '📑', `Files: ${item.title}`, subtitle, item.type);
-                    sidebarList.appendChild(li);
-                });
-            }
-            updateSidebarHighlight();
-        }
+                    icon = '📑'; sub = count > 0 ? `${count} File(s)` : 'No Files';
+                }
 
-        function createSidebarItem(index, icon, title, subtitle, type) {
-            const li = document.createElement('li');
-            li.className = 'sidebar-item';
-            if(type === 'quiz') li.classList.add('is-quiz');
-            li.dataset.index = index;
-            li.innerHTML = `
-                <div class="item-icon">${icon}</div>
-                <div class="item-info">
-                    <h4>${title}</h4>
-                    <span>${subtitle}</span>
-                </div>
-            `;
-            li.onclick = () => handleSidebarClick(index);
-            return li;
+                const li = document.createElement('li');
+                li.className = 'sidebar-item';
+                if(type === 'quiz') li.classList.add('is-quiz');
+                li.dataset.index = index;
+                li.innerHTML = `<div class="item-icon">${icon}</div><div class="item-info"><h4>${item.title}</h4><span>${sub}</span></div>`;
+                li.onclick = () => handleSidebarClick(index);
+                sidebarList.appendChild(li);
+            });
+            updateSidebarHighlight();
         }
 
         function updateSidebarHighlight() {
             document.querySelectorAll('.sidebar-item').forEach(item => {
                 item.classList.remove('active');
-                if (parseInt(item.dataset.index) === activeIndex) {
-                    item.classList.add('active');
-                }
+                if (parseInt(item.dataset.index) === activeIndex) item.classList.add('active');
             });
         }
 
@@ -506,56 +394,32 @@
             activeIndex = index;
             loadContent(index, true);
             updateSidebarHighlight();
+            if(window.innerWidth <= 900) toggleSidebar(); // Close menu on mobile selection
 
             if (currentMode === 'slides') {
-                if (courseContent[index].resources.notes.length === 0 && courseContent[index].resources.slides.length > 0) {
-                     switchTab('slides');
-                } else {
-                     switchTab('notes');
-                }
+                if (courseContent[index].resources.notes.length === 0 && courseContent[index].resources.slides.length > 0) switchTab('slides');
+                else switchTab('notes');
                 document.querySelector('.resources-section').scrollIntoView({behavior: 'smooth'});
             }
         }
 
-        // --- Content Loading Logic (Fixing the Quiz Display) ---
         function loadContent(index, autoPlay) {
             const item = courseContent[index];
-
-            // 1. Update Title text
             titleEl.textContent = item.title;
-            titleEl.style.animation = 'none';
-            titleEl.offsetHeight; // Trigger reflow
-            titleEl.style.animation = 'fadeIn 0.5s forwards';
-
-            // 2. Logic to Switch between Video and Quiz Screen
+            
             if (item.type === 'quiz') {
-                // HIDE Video Player
                 iframeEl.style.display = 'none';
-                iframeEl.src = ""; // Stop video audio if playing
-
-                // SHOW Quiz Screen
+                iframeEl.src = "";
                 quizScreen.style.display = 'flex';
                 quizTitleDisplay.textContent = item.title;
-
-                // Set the button to open the local HTML file in a new tab
-                launchQuizBtn.onclick = function() {
-                    window.open(item.url, '_blank');
-                };
-
+                launchQuizBtn.onclick = function() { window.open(item.url, '_blank'); };
             } else {
-                // SHOW Video Player
                 quizScreen.style.display = 'none';
                 iframeEl.style.display = 'block';
-
-                let originParam = '';
-                if (window.location.protocol !== 'file:') {
-                     originParam = `&origin=${window.location.origin}`;
-                }
+                let originParam = (window.location.protocol !== 'file:') ? `&origin=${window.location.origin}` : '';
                 const autoPlayParam = autoPlay ? '&autoplay=1' : '';
                 iframeEl.src = `https://www.youtube.com/embed/${item.id}?rel=0${originParam}${autoPlayParam}`;
             }
-
-            // 3. Update Resource Tabs
             updateResources(item.resources);
         }
 
@@ -565,15 +429,11 @@
                 return items.map(item => `
                     <li class="resource-item">
                         <div class="resource-icon">${typeIcon}</div>
-                        <div class="resource-details">
-                            <span class="resource-name">${item.name}</span>
-                            <span class="resource-meta">${item.type} • ${item.size}</span>
-                        </div>
+                        <div class="resource-details"><span class="resource-name">${item.name}</span><span class="resource-meta">${item.type} • ${item.size}</span></div>
                         <a href="${item.url || '#'}" class="view-btn" target="_blank">View</a>
                     </li>
                 `).join('');
             };
-
             document.getElementById('list-notes').innerHTML = generateList(resources.notes, 'DOC');
             document.getElementById('list-slides').innerHTML = generateList(resources.slides, 'PPT');
             document.getElementById('list-tutes').innerHTML = generateList(resources.tutes, 'TUT');
