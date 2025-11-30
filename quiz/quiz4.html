@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Gears Master Quiz: Shuffled</title>
     <style>
         :root {
@@ -18,7 +18,10 @@
             --theory-text: #1565c0;
             --calc-bg: #fff3e0;
             --calc-text: #e65100;
+            --header-height: 60px;
         }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -28,9 +31,39 @@
             display: flex;
             height: 100vh;
             color: #37474f;
+            overflow: hidden;
         }
 
-        /* Sidebar */
+        /* --- Mobile Header (Hidden on Desktop) --- */
+        .mobile-header {
+            display: none;
+            height: var(--header-height);
+            background: var(--primary);
+            align-items: center;
+            padding: 0 15px;
+            justify-content: space-between;
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 50;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            color: white;
+        }
+
+        .mobile-menu-btn {
+            background: none; border: none; color: white;
+            font-size: 24px; cursor: pointer; padding: 5px;
+        }
+
+        .mobile-timer {
+            font-weight: bold;
+            font-variant-numeric: tabular-nums;
+            background: rgba(255,255,255,0.1);
+            padding: 4px 10px;
+            border-radius: 4px;
+            color: #80cbc4;
+        }
+
+        /* --- Sidebar --- */
         .sidebar {
             width: 300px;
             background-color: var(--primary);
@@ -40,7 +73,16 @@
             padding: 20px;
             box-shadow: 4px 0 10px rgba(0,0,0,0.15);
             overflow-y: auto;
-            z-index: 10;
+            z-index: 100;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Overlay */
+        .sidebar-overlay {
+            display: none;
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5); z-index: 90;
+            backdrop-filter: blur(2px);
         }
 
         .timer-box {
@@ -81,7 +123,7 @@
         .nav-btn.answered { background: var(--success); border-color: var(--success); }
         .nav-btn.flagged { border-color: var(--accent); color: var(--accent); background: rgba(255, 152, 0, 0.2); }
 
-        /* Main Content */
+        /* --- Main Content --- */
         .main-content {
             flex: 1;
             padding: 40px;
@@ -158,7 +200,7 @@
         .option-label:hover { border-color: var(--secondary); background: #e0f2f1; transform: translateX(5px); }
         .option-label.selected { border-color: var(--secondary); background-color: #b2dfdb; box-shadow: 0 4px 10px rgba(0, 137, 123, 0.15); }
 
-        input[type="radio"] { margin-right: 20px; transform: scale(1.3); accent-color: var(--secondary); }
+        input[type="radio"] { margin-right: 20px; transform: scale(1.3); accent-color: var(--secondary); flex-shrink: 0; }
 
         .controls {
             display: flex;
@@ -178,52 +220,36 @@
             transition: all 0.2s;
             display: flex;
             align-items: center;
+            justify-content: center;
             gap: 8px;
         }
 
         .btn:active { transform: scale(0.96); }
         .btn-secondary { background: #cfd8dc; color: #455a64; }
+        .btn-secondary:hover { background: #b0bec5; }
         .btn-primary { background: var(--secondary); color: white; box-shadow: 0 4px 15px rgba(0, 137, 123, 0.3); }
         .btn-accent { background: white; border: 2px solid var(--accent); color: var(--accent); }
         .btn-success { background: var(--success); color: white; }
 
         /* Modal */
         .modal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: rgba(38, 50, 56, 0.95);
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            backdrop-filter: blur(5px);
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(38, 50, 56, 0.95); justify-content: center; align-items: center;
+            z-index: 1000; backdrop-filter: blur(5px);
         }
 
         .modal-content {
-            background: white;
-            padding: 50px;
-            border-radius: 20px;
-            text-align: center;
-            max-width: 550px;
-            width: 90%;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            background: white; padding: 50px; border-radius: 20px; text-align: center;
+            max-width: 550px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.3);
             animation: slideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            max-height: 90vh; overflow-y: auto;
         }
 
         .score-circle {
-            width: 180px;
-            height: 180px;
-            border-radius: 50%;
-            border: 12px solid var(--secondary);
-            margin: 30px auto;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            font-size: 3.5em;
-            font-weight: 800;
-            color: var(--primary);
+            width: 180px; height: 180px; border-radius: 50%;
+            border: 12px solid var(--secondary); margin: 30px auto;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            font-size: 3.5em; font-weight: 800; color: var(--primary);
         }
 
         .score-sub { font-size: 14px; text-transform: uppercase; color: #78909c; font-weight: normal; margin-top: -10px; }
@@ -232,46 +258,91 @@
         @keyframes slideUp { from { transform: translateY(100px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
 
-        /* MathJax override */
         .mjx-chtml { outline: 0; }
+
+        /* --- MOBILE OPTIMIZATIONS --- */
+        @media (max-width: 900px) {
+            body { flex-direction: column; }
+
+            /* Show Mobile Header */
+            .mobile-header { display: flex; }
+
+            /* Sidebar becomes a drawer */
+            .sidebar {
+                position: fixed; top: 0; left: 0; bottom: 0;
+                width: 85%; max-width: 320px;
+                transform: translateX(-100%);
+                border-right: none;
+            }
+            .sidebar.open { transform: translateX(0); }
+            .sidebar-overlay.active { display: block; }
+
+            /* Main Content Adjustments */
+            .main-content {
+                padding: 20px;
+                padding-top: calc(var(--header-height) + 20px);
+            }
+
+            .quiz-container {
+                padding: 25px;
+                border-radius: 8px;
+            }
+
+            .question-text { font-size: 1.1em; }
+            .option-label { padding: 15px; font-size: 0.95em; }
+
+            /* Responsive Controls */
+            .controls { flex-direction: column; gap: 15px; }
+            .controls > button { width: 100%; }
+            .controls > div { display: flex; width: 100%; gap: 10px; }
+            .controls > div > button { flex: 1; }
+
+            /* Hide Desktop Timer */
+            .sidebar .timer-box { display: none; }
+        }
     </style>
     <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </head>
 <body>
 
-<div class="sidebar">
+<div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+<header class="mobile-header">
+    <button class="mobile-menu-btn" onclick="toggleSidebar()">☰</button>
+    <span style="font-weight:700; font-size: 1.1em;">Gears Master Quiz</span>
+    <div class="mobile-timer" id="mobileTimer">60:00</div>
+</header>
+
+<div class="sidebar" id="sidebar">
     <div class="timer-box">
         <div>Time Remaining</div>
         <div class="timer-display" id="timer">60:00</div>
     </div>
 
     <div class="nav-label">Question Map (Randomized)</div>
-    <div class="question-nav" id="navGrid">
-        </div>
+    <div class="question-nav" id="navGrid"></div>
 </div>
 
 <div class="main-content">
     <div class="quiz-container" id="quizContainer">
         <div class="question-header">
-            <h2 style="margin:0; font-weight: 700; color: var(--primary);">Question <span id="currentQNum">1</span><span style="color:#b0bec5; font-weight:300;"> / 50</span></h2>
+            <h2 style="margin:0; font-weight: 700; color: var(--primary); font-size: 1.2rem;">Question <span id="currentQNum">1</span><span style="color:#b0bec5; font-weight:300;"> / 50</span></h2>
             <div class="badge">5 Marks Each</div>
         </div>
 
         <div id="sectionTag" class="section-tag tag-theory">Theoretical</div>
 
-        <div class="question-text" id="questionText">
-            </div>
+        <div class="question-text" id="questionText"></div>
 
-        <div class="options-grid" id="optionsContainer">
-            </div>
+        <div class="options-grid" id="optionsContainer"></div>
 
         <div class="controls">
             <button class="btn btn-accent" id="flagBtn" onclick="toggleFlag()">
                 <span id="flagIcon">⚑</span> <span id="flagText">Flag</span>
             </button>
             <div style="display: flex; gap: 10px;">
-                <button class="btn btn-secondary" id="prevBtn" onclick="changeQuestion(-1)">Previous</button>
+                <button class="btn btn-secondary" id="prevBtn" onclick="changeQuestion(-1)">Prev</button>
                 <button class="btn btn-primary" id="nextBtn" onclick="changeQuestion(1)">Next</button>
                 <button class="btn btn-success" id="submitBtn" style="display:none;" onclick="submitQuiz()">Submit</button>
             </div>
@@ -289,9 +360,9 @@
             <span class="score-sub">Total Score</span>
         </div>
 
-        <p id="feedbackText" style="font-size: 1.1em; margin-bottom: 30px; padding: 0 20px;"></p>
+        <p id="feedbackText" style="font-size: 1.1em; margin-bottom: 30px; padding: 0 10px;"></p>
 
-        <div style="display:flex; justify-content: center; gap: 15px;">
+        <div style="display:flex; justify-content: center; gap: 15px; flex-wrap: wrap;">
             <button class="btn btn-secondary" onclick="location.reload()">Close</button>
             <button class="btn btn-primary" onclick="location.reload()">Retake Quiz</button>
         </div>
@@ -299,7 +370,7 @@
 </div>
 
 <script>
-    // --- Quiz Data: Theory (type: 'theory') and Calculations (type: 'calc') ---
+    // --- Quiz Data ---
     const rawQuizData = [
         // === THEORETICAL QUESTIONS ===
         { type: 'theory', q: "According to the Law of Gearing, what condition must be met to maintain a constant velocity ratio?", options: ["The pitch circles must be tangent", "The common normal at the point of contact must pass through the pitch point", "The addendum must equal the dedendum", "The pressure angle must be zero"], correct: 1 },
@@ -364,6 +435,12 @@
     let timeLeft = 60 * 60;
     let timerInterval;
 
+    // --- DOM Elements ---
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.querySelector('.sidebar-overlay');
+    const mobileTimer = document.getElementById('mobileTimer');
+    const desktopTimer = document.getElementById('timer');
+
     // --- Shuffle Function ---
     function shuffleArray(array) {
         for (let i = array.length - 1; i > 0; i--) {
@@ -385,18 +462,27 @@
         startTimer();
     });
 
-    // --- Functions ---
+    // --- Sidebar / Mobile Functions ---
+    function toggleSidebar() {
+        sidebar.classList.toggle('open');
+        overlay.classList.toggle('active');
+        overlay.style.display = sidebar.classList.contains('open') ? 'block' : 'none';
+    }
+
+    // --- Core Logic ---
     function startTimer() {
         timerInterval = setInterval(() => {
             timeLeft--;
             const minutes = Math.floor(timeLeft / 60);
             const seconds = timeLeft % 60;
+            const timeString = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 
-            const display = document.getElementById('timer');
-            display.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            desktopTimer.textContent = timeString;
+            mobileTimer.textContent = timeString;
 
             if (timeLeft <= 300) {
-                display.classList.add('timer-warning');
+                desktopTimer.classList.add('timer-warning');
+                mobileTimer.style.color = 'var(--accent)';
             }
 
             if (timeLeft <= 0) {
@@ -414,7 +500,10 @@
             const btn = document.createElement('button');
             btn.className = 'nav-btn';
             btn.textContent = index + 1;
-            btn.onclick = () => loadQuestion(index);
+            btn.onclick = () => {
+                loadQuestion(index);
+                if(window.innerWidth <= 900) toggleSidebar();
+            };
             btn.id = `nav-${index}`;
             navGrid.appendChild(btn);
         });
