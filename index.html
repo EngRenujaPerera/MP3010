@@ -3,12 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Referrer Policy for YouTube Stability -->
     <meta name="referrer" content="origin-when-cross-origin">
     <title>Advanced Dynamics Course</title>
-
-    <!-- 1. Load Plyr CSS -->
-    <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
-
+    
     <style>
         /* --- General Page Styles --- */
         :root {
@@ -19,8 +17,6 @@
             --text-main: #f1f5f9;
             --text-muted: #94a3b8;
             --border: #334155;
-
-            --plyr-color-main: #3b82f6;
         }
 
         body {
@@ -60,7 +56,7 @@
             font-weight: 700;
             color: #fff;
         }
-
+        
         .course-meta span {
             font-size: 0.75rem;
             text-transform: uppercase;
@@ -160,7 +156,7 @@
             color: var(--text-main);
             line-height: 1.4;
         }
-
+        
         .item-info span {
             font-size: 0.75rem;
             color: var(--text-muted);
@@ -175,7 +171,7 @@
             background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
             overflow-y: auto;
         }
-
+        
         .content-wrapper {
             width: 100%;
             max-width: 1100px;
@@ -185,6 +181,8 @@
 
         .video-container {
             width: 100%;
+            /* 16:9 Aspect Ratio */
+            aspect-ratio: 16 / 9;
             border-radius: 12px;
             overflow: hidden;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
@@ -193,21 +191,19 @@
             opacity: 0;
             animation: slideUp 0.6s ease forwards;
         }
+        
+        /* Iframe Styles */
+        .video-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            position: relative;
+            z-index: 1;
+        }
 
         @keyframes slideUp {
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Plyr Customizations */
-        .plyr {
-            --plyr-color-main: var(--primary);
-            font-family: 'Segoe UI', sans-serif;
-            border-radius: 12px;
-        }
-
-        .plyr--full-ui input[type=range] {
-            color: var(--primary);
         }
 
         /* Error Overlay Styles */
@@ -330,18 +326,18 @@
             font-weight: bold;
             font-size: 0.8rem;
         }
-
+        
         .resource-details {
             flex-grow: 1;
         }
-
+        
         .resource-name {
             display: block;
             font-weight: 500;
             color: var(--text-main);
             margin-bottom: 2px;
         }
-
+        
         .resource-meta {
             font-size: 0.8rem;
             color: var(--text-muted);
@@ -383,7 +379,7 @@
                 <span>Course Module</span>
                 <h2>Kinematics & Dynamics</h2>
             </div>
-
+            
             <!-- Sidebar Navigation Tabs -->
             <div class="sidebar-nav">
                 <button class="s-nav-btn active" onclick="renderSidebar('lessons')">Lessons</button>
@@ -404,21 +400,21 @@
                 <!-- Error Overlay -->
                 <div id="fileProtocolError" class="error-overlay">
                     <h3>⚠️ Setup Required</h3>
-                    <p>The Custom Player cannot run directly from a file (<span class="error-code">file://</span>).</p>
+                    <p>The Standard Player cannot run reliably directly from a file (<span class="error-code">file://</span>).</p>
                     <p>Please continue running this on your Local Server (localhost).</p>
                 </div>
 
-                <!-- Plyr Video Element -->
-                <div class="plyr__video-embed" id="player">
-                    <iframe
-                        src=""
-                        allowfullscreen
-                        allowtransparency
-                        allow="autoplay"
-                    ></iframe>
-                </div>
+                <!-- Standard YouTube Embed -->
+                <iframe 
+                    id="course-player"
+                    src="" 
+                    title="YouTube video player" 
+                    allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                    referrerpolicy="strict-origin-when-cross-origin"
+                    allowfullscreen>
+                </iframe>
             </div>
-
+            
             <h2 class="current-video-title" id="videoTitle">Select a Lesson</h2>
 
             <!-- RESOURCES SECTION -->
@@ -447,14 +443,11 @@
         </div>
     </main>
 
-    <!-- 2. Load Plyr JS -->
-    <script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
-
     <script>
         // --- Full Data Structure ---
         const videos = [
-            {
-                title: "Introduction to Rigid Body Dynamics",
+            { 
+                title: "Introduction to Rigid Body Dynamics", 
                 id: "Nj3Ntg_QupA",
                 resources: {
                     materials: [ { name: "Rigid Body Basics Notes", type: "PDF", size: "2.4 MB" }, { name: "Chapter 1 Reading", type: "PDF", size: "1.1 MB" } ],
@@ -462,8 +455,8 @@
                     papers: [ { name: "2023 Quiz 1 - Rigid Bodies", type: "PDF", size: "0.5 MB" }, { name: "Quiz 1 Solutions", type: "PDF", size: "0.2 MB" } ]
                 }
             },
-            {
-                title: "Motion Analysis Between Two Frames",
+            { 
+                title: "Motion Analysis Between Two Frames", 
                 id: "DccSNMkR3dI",
                 resources: {
                     materials: [ { name: "Relative Motion Notes", type: "PDF", size: "1.8 MB" } ],
@@ -471,8 +464,8 @@
                     papers: [ { name: "2022 Mid-Term Q3", type: "PDF", size: "0.4 MB" }, { name: "Mid-Term Answer Key", type: "PDF", size: "0.8 MB" } ]
                 }
             },
-            {
-                title: "Inertia Tensor",
+            { 
+                title: "Inertia Tensor", 
                 id: "hZ2ODrVfj3g",
                 resources: {
                     materials: [ { name: "Inertia Tensor Calculus", type: "PDF", size: "3.2 MB" } ],
@@ -480,8 +473,8 @@
                     papers: [ { name: "2021 Final Exam - Inertia Q", type: "PDF", size: "0.6 MB" } ]
                 }
             },
-            {
-                title: "Translated Frames and Rotation Matrix",
+            { 
+                title: "Translated Frames and Rotation Matrix", 
                 id: "sIpWLFL5E-s",
                 resources: {
                     materials: [ { name: "Rotation Matrix Cheat Sheet", type: "PDF", size: "0.5 MB" } ],
@@ -489,8 +482,8 @@
                     papers: [ { name: "Practice Problem Set A", type: "PDF", size: "1.1 MB" } ]
                 }
             },
-            {
-                title: "Fixed Angle and Euler Representations",
+            { 
+                title: "Fixed Angle and Euler Representations", 
                 id: "cwx5lCeYKqM",
                 resources: {
                     materials: [ { name: "Euler Angles Visualization", type: "PDF", size: "2.1 MB" } ],
@@ -498,8 +491,8 @@
                     papers: [ { name: "2020 Quiz 2 - Angles", type: "PDF", size: "0.4 MB" }, { name: "Quiz 2 Solutions", type: "PDF", size: "0.2 MB" } ]
                 }
             },
-            {
-                title: "Linkage Mechanisms",
+            { 
+                title: "Linkage Mechanisms", 
                 id: "9ZrshlMcU8w",
                 resources: {
                     materials: [ { name: "4-Bar Linkage Diagrams", type: "PDF", size: "5.0 MB" }, { name: "Grashof's Law Notes", type: "PDF", size: "1.2 MB" } ],
@@ -507,8 +500,8 @@
                     papers: [ { name: "2019 Final Exam - Mechanisms", type: "PDF", size: "0.9 MB" } ]
                 }
             },
-            {
-                title: "Velocity Vector Diagrams",
+            { 
+                title: "Velocity Vector Diagrams", 
                 id: "C-Le56Nvhr8",
                 resources: {
                     materials: [ { name: "Vector Workbook", type: "PDF", size: "1.5 MB" } ],
@@ -516,8 +509,8 @@
                     papers: [ { name: "Velocity Analysis Problem Set", type: "PDF", size: "0.8 MB" } ]
                 }
             },
-            {
-                title: "Acceleration Vector Diagrams",
+            { 
+                title: "Acceleration Vector Diagrams", 
                 id: "QTHzsPW3Tdg",
                 resources: {
                     materials: [ { name: "Acceleration Analysis Guide", type: "PDF", size: "1.9 MB" } ],
@@ -525,8 +518,8 @@
                     papers: [ { name: "2019 Quiz 3 - Vectors", type: "PDF", size: "0.3 MB" }, { name: "Quiz 3 Answers", type: "PDF", size: "0.1 MB" } ]
                 }
             },
-            {
-                title: "Toothed Gears",
+            { 
+                title: "Toothed Gears", 
                 id: "ZOvJ40aZlC8",
                 resources: {
                     materials: [ { name: "Gear Ratio Formulas", type: "PDF", size: "0.8 MB" } ],
@@ -534,8 +527,8 @@
                     papers: [ { name: "Gear Design Project Spec", type: "PDF", size: "1.1 MB" } ]
                 }
             },
-            {
-                title: "Gear Trains",
+            { 
+                title: "Gear Trains", 
                 id: "Mg2bmKAvHZI",
                 resources: {
                     materials: [ { name: "Planetary Gear Sets", type: "PDF", size: "2.2 MB" } ],
@@ -543,8 +536,8 @@
                     papers: [ { name: "2018 Final - Gear Train Q", type: "PDF", size: "0.5 MB" } ]
                 }
             },
-            {
-                title: "Development of Cam Profile",
+            { 
+                title: "Development of Cam Profile", 
                 id: "GV1tlgHpMs0",
                 resources: {
                     materials: [ { name: "Cam Profile Template", type: "DXF", size: "0.2 MB" } ],
@@ -558,18 +551,13 @@
         const sidebarList = document.getElementById('sidebar-list');
         const titleEl = document.getElementById('videoTitle');
         const errorOverlay = document.getElementById('fileProtocolError');
-
-        let player = null;
+        const iframeEl = document.getElementById('course-player');
+        
         let currentMode = 'lessons'; // lessons, slides, papers
         let activeVideoIndex = 0;
 
         document.addEventListener('DOMContentLoaded', () => {
             if (window.location.protocol === 'file:') errorOverlay.style.display = 'flex';
-
-            player = new Plyr('#player', {
-                controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'captions', 'settings', 'pip', 'airplay', 'fullscreen'],
-                youtube: { noCookie: true, rel: 0, showinfo: 0, iv_load_policy: 3, modestbranding: 1, origin: window.location.origin }
-            });
 
             // Initial Render
             renderSidebar('lessons');
@@ -579,7 +567,7 @@
         // --- Sidebar Logic ---
         function renderSidebar(mode) {
             currentMode = mode;
-
+            
             // Update Tab UI
             document.querySelectorAll('.s-nav-btn').forEach(btn => {
                 const btnMode = btn.innerText.toLowerCase();
@@ -598,7 +586,7 @@
                     const li = createSidebarItem(index, '▶', video.title, 'Video Lesson');
                     sidebarList.appendChild(li);
                 });
-            }
+            } 
             else if (mode === 'slides') {
                 videos.forEach((video, index) => {
                     // Check if slides exist
@@ -664,13 +652,22 @@
         // --- Video & Content Logic ---
         function loadVideo(index, autoPlay) {
             const video = videos[index];
-            player.source = { type: 'video', sources: [ { src: video.id, provider: 'youtube' } ] };
-            if (autoPlay) player.play();
+
+            // Construct Standard YouTube URL with Origin Fix
+            let originParam = '';
+            if (window.location.protocol !== 'file:') {
+                 originParam = `&origin=${window.location.origin}`;
+            }
+            
+            // Note: We use &autoplay=1 if autoPlay is requested (like from clicking a sidebar item)
+            // But we keep ?rel=0 to hide related videos
+            const autoPlayParam = autoPlay ? '&autoplay=1' : '';
+            iframeEl.src = `https://www.youtube.com/embed/${video.id}?rel=0${originParam}${autoPlayParam}`;
 
             // Update Title
             titleEl.textContent = video.title;
             titleEl.style.animation = 'none';
-            titleEl.offsetHeight;
+            titleEl.offsetHeight; 
             titleEl.style.animation = 'fadeIn 0.5s forwards';
 
             // Populate Resources Section
@@ -701,9 +698,9 @@
         window.switchTab = function(tabName) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-
+            
             document.getElementById('tab-' + tabName).classList.add('active');
-
+            
             // Highlight active button
             const buttons = document.querySelectorAll('.tab-btn');
             buttons.forEach(btn => {
