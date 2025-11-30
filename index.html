@@ -6,7 +6,7 @@
     <meta name="referrer" content="origin-when-cross-origin">
     <title>Advanced Dynamics Course</title>
     
-    <!-- 1. Load Plyr CSS (The Custom Player Skin) -->
+    <!-- 1. Load Plyr CSS -->
     <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
     
     <style>
@@ -20,7 +20,6 @@
             --text-muted: #94a3b8;
             --border: #334155;
             
-            /* Plyr Overrides to match theme */
             --plyr-color-main: #3b82f6;
         }
 
@@ -36,7 +35,7 @@
 
         /* --- Sidebar --- */
         .sidebar {
-            width: 320px;
+            width: 360px;
             background-color: var(--panel-bg);
             border-right: 1px solid var(--border);
             display: flex;
@@ -47,28 +46,65 @@
         }
 
         .sidebar-header {
-            padding: 24px;
+            padding: 20px;
             border-bottom: 1px solid var(--border);
             background: rgba(15, 23, 42, 0.3);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
         }
 
-        .course-tag {
+        .course-meta h2 {
+            margin: 0;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #fff;
+        }
+        
+        .course-meta span {
             font-size: 0.75rem;
             text-transform: uppercase;
             letter-spacing: 1.5px;
             color: var(--primary);
             font-weight: 700;
-            display: block;
-            margin-bottom: 5px;
         }
 
-        .course-title {
-            margin: 0;
-            font-size: 1.2rem;
+        /* Sidebar Navigation Tabs */
+        .sidebar-nav {
+            display: flex;
+            background: rgba(0,0,0,0.2);
+            border-radius: 6px;
+            padding: 4px;
+            gap: 4px;
+        }
+
+        .s-nav-btn {
+            flex: 1;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            padding: 8px;
+            font-size: 0.8rem;
             font-weight: 600;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
         }
 
-        .lesson-list {
+        .s-nav-btn:hover {
+            color: #fff;
+            background: rgba(255,255,255,0.05);
+        }
+
+        .s-nav-btn.active {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        /* Sidebar List */
+        .sidebar-content {
             list-style: none;
             padding: 0;
             margin: 0;
@@ -76,50 +112,58 @@
             flex-grow: 1;
         }
 
-        .lesson-item {
+        .sidebar-item {
             display: flex;
             align-items: center;
-            padding: 16px 24px;
+            padding: 14px 20px;
             cursor: pointer;
-            border-bottom: 1px solid rgba(51, 65, 85, 0.5);
+            border-bottom: 1px solid rgba(51, 65, 85, 0.3);
             transition: all 0.2s;
             gap: 12px;
         }
 
-        .lesson-item:hover {
+        .sidebar-item:hover {
             background-color: rgba(59, 130, 246, 0.1);
         }
 
-        .lesson-item.active {
+        .sidebar-item.active {
             background-color: rgba(59, 130, 246, 0.15);
             border-left: 4px solid var(--primary);
         }
 
-        .status-icon {
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            border: 2px solid var(--text-muted);
+        .item-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            background: rgba(255,255,255,0.05);
+            color: var(--text-muted);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 10px;
+            font-size: 14px;
             flex-shrink: 0;
-            color: transparent;
         }
 
-        .lesson-item.active .status-icon {
-            border-color: var(--primary);
+        .sidebar-item.active .item-icon {
             background: var(--primary);
             color: white;
-            box-shadow: 0 0 10px rgba(59,130,246,0.4);
         }
 
-        .lesson-info h4 {
+        .item-info {
+            flex-grow: 1;
+        }
+
+        .item-info h4 {
             margin: 0;
             font-size: 0.9rem;
             font-weight: 500;
             color: var(--text-main);
+            line-height: 1.4;
+        }
+        
+        .item-info span {
+            font-size: 0.75rem;
+            color: var(--text-muted);
         }
 
         /* --- Main Content --- */
@@ -127,21 +171,25 @@
             flex-grow: 1;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 40px;
+            padding: 0;
             background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
+            overflow-y: auto;
+        }
+        
+        .content-wrapper {
+            width: 100%;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 40px;
         }
 
         .video-container {
             width: 100%;
-            max-width: 900px;
             border-radius: 12px;
             overflow: hidden;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
             background: #000;
             position: relative;
-            /* Animation for smooth loading */
             opacity: 0;
             animation: slideUp 0.6s ease forwards;
         }
@@ -185,9 +233,133 @@
             margin-top: 25px;
             font-size: 1.5rem;
             color: #fff;
-            text-align: center;
             opacity: 0;
             animation: fadeIn 0.5s forwards 0.3s;
+        }
+
+        /* --- Resources Section (Tabs) --- */
+        .resources-section {
+            margin-top: 30px;
+            background: var(--panel-bg);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+            opacity: 0;
+            animation: fadeIn 0.5s forwards 0.5s;
+        }
+
+        .tabs-header {
+            display: flex;
+            border-bottom: 1px solid var(--border);
+            background: rgba(15, 23, 42, 0.5);
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            padding: 16px 24px;
+            color: var(--text-muted);
+            font-family: inherit;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .tab-btn:hover {
+            color: var(--text-main);
+            background: rgba(255,255,255,0.05);
+        }
+
+        .tab-btn.active {
+            color: var(--primary);
+        }
+
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--primary);
+        }
+
+        .tab-content {
+            padding: 24px;
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .resource-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .resource-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            border-radius: 8px;
+            background: rgba(15, 23, 42, 0.3);
+            margin-bottom: 10px;
+            border: 1px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .resource-item:hover {
+            border-color: var(--border);
+            background: rgba(15, 23, 42, 0.5);
+        }
+
+        .resource-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--primary);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-weight: bold;
+            font-size: 0.8rem;
+        }
+        
+        .resource-details {
+            flex-grow: 1;
+        }
+        
+        .resource-name {
+            display: block;
+            font-weight: 500;
+            color: var(--text-main);
+            margin-bottom: 2px;
+        }
+        
+        .resource-meta {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .download-btn {
+            background: var(--primary);
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+
+        .download-btn:hover {
+            background: var(--primary-hover);
         }
 
         @keyframes fadeIn { to { opacity: 1; } }
@@ -195,8 +367,9 @@
         /* Mobile */
         @media (max-width: 900px) {
             body { flex-direction: column; height: auto; overflow-y: auto; }
-            .sidebar { width: 100%; height: 350px; order: 2; }
-            .main-stage { padding: 10px; min-height: 50vh; order: 1; }
+            .sidebar { width: 100%; height: auto; max-height: 40vh; order: 2; }
+            .main-stage { overflow-y: visible; order: 1; }
+            .content-wrapper { padding: 15px; }
             .video-container { border-radius: 0; }
         }
     </style>
@@ -206,135 +379,337 @@
     <!-- SIDEBAR -->
     <aside class="sidebar">
         <div class="sidebar-header">
-            <span class="course-tag">Course Module</span>
-            <h2 class="course-title">Kinematics & Dynamics</h2>
+            <div class="course-meta">
+                <span>Course Module</span>
+                <h2>Kinematics & Dynamics</h2>
+            </div>
+            
+            <!-- Sidebar Navigation Tabs -->
+            <div class="sidebar-nav">
+                <button class="s-nav-btn active" onclick="renderSidebar('lessons')">Lessons</button>
+                <button class="s-nav-btn" onclick="renderSidebar('slides')">Slides</button>
+                <button class="s-nav-btn" onclick="renderSidebar('papers')">Papers</button>
+            </div>
         </div>
-        <ul class="lesson-list" id="playlist">
+
+        <ul class="sidebar-content" id="sidebar-list">
             <!-- Items injected by JS -->
         </ul>
     </aside>
 
-    <!-- MAIN PLAYER -->
+    <!-- MAIN PLAYER STAGE -->
     <main class="main-stage">
-        <div class="video-container">
-            <!-- Error Overlay -->
-            <div id="fileProtocolError" class="error-overlay">
-                <h3>⚠️ Setup Required</h3>
-                <p>The Custom Player cannot run directly from a file (<span class="error-code">file://</span>).</p>
-                <p>Please continue running this on your Local Server (localhost).</p>
-            </div>
+        <div class="content-wrapper">
+            <div class="video-container">
+                <!-- Error Overlay -->
+                <div id="fileProtocolError" class="error-overlay">
+                    <h3>⚠️ Setup Required</h3>
+                    <p>The Custom Player cannot run directly from a file (<span class="error-code">file://</span>).</p>
+                    <p>Please continue running this on your Local Server (localhost).</p>
+                </div>
 
-            <!-- Plyr Video Element -->
-            <div class="plyr__video-embed" id="player">
-                <iframe
-                    src=""
-                    allowfullscreen
-                    allowtransparency
-                    allow="autoplay"
-                ></iframe>
+                <!-- Plyr Video Element -->
+                <div class="plyr__video-embed" id="player">
+                    <iframe
+                        src=""
+                        allowfullscreen
+                        allowtransparency
+                        allow="autoplay"
+                    ></iframe>
+                </div>
+            </div>
+            
+            <h2 class="current-video-title" id="videoTitle">Select a Lesson</h2>
+
+            <!-- RESOURCES SECTION -->
+            <div class="resources-section">
+                <div class="tabs-header">
+                    <button class="tab-btn active" onclick="switchTab('materials')">Lecture Materials</button>
+                    <button class="tab-btn" onclick="switchTab('slides')">Lecture Slides</button>
+                    <button class="tab-btn" onclick="switchTab('papers')">Past Papers & Answers</button>
+                </div>
+
+                <!-- Tab 1: Lecture Materials -->
+                <div id="tab-materials" class="tab-content active">
+                    <ul class="resource-list" id="list-materials"></ul>
+                </div>
+
+                <!-- Tab 2: Slides -->
+                <div id="tab-slides" class="tab-content">
+                    <ul class="resource-list" id="list-slides"></ul>
+                </div>
+
+                <!-- Tab 3: Past Papers -->
+                <div id="tab-papers" class="tab-content">
+                    <ul class="resource-list" id="list-papers"></ul>
+                </div>
             </div>
         </div>
-        <h2 class="current-video-title" id="videoTitle">Select a Lesson</h2>
     </main>
 
     <!-- 2. Load Plyr JS -->
     <script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
 
     <script>
-        // --- Configuration ---
+        // --- Full Data Structure ---
         const videos = [
-            { title: "Introduction to Rigid Body Dynamics", id: "Nj3Ntg_QupA" },
-            { title: "Motion Analysis Between Two Frames", id: "DccSNMkR3dI" },
-            { title: "Inertia Tensor", id: "hZ2ODrVfj3g" },
-            { title: "Translated Frames and Rotation Matrix", id: "sIpWLFL5E-s" },
-            { title: "Fixed Angle and Euler Representations", id: "cwx5lCeYKqM" },
-            { title: "Linkage Mechanisms", id: "9ZrshlMcU8w" },
-            { title: "Velocity Vector Diagrams", id: "C-Le56Nvhr8" },
-            { title: "Acceleration Vector Diagrams", id: "QTHzsPW3Tdg" },
-            { title: "Toothed Gears", id: "ZOvJ40aZlC8" },
-            { title: "Gear Trains", id: "Mg2bmKAvHZI" },
-            { title: "Development of Cam Profile", id: "GV1tlgHpMs0" }
+            { 
+                title: "Introduction to Rigid Body Dynamics", 
+                id: "Nj3Ntg_QupA",
+                resources: {
+                    materials: [ { name: "Rigid Body Basics Notes", type: "PDF", size: "2.4 MB" }, { name: "Chapter 1 Reading", type: "PDF", size: "1.1 MB" } ],
+                    slides: [ { name: "Lecture 1 Slides - Intro", type: "PPTX", size: "5.5 MB" } ],
+                    papers: [ { name: "2023 Quiz 1 - Rigid Bodies", type: "PDF", size: "0.5 MB" }, { name: "Quiz 1 Solutions", type: "PDF", size: "0.2 MB" } ]
+                }
+            },
+            { 
+                title: "Motion Analysis Between Two Frames", 
+                id: "DccSNMkR3dI",
+                resources: {
+                    materials: [ { name: "Relative Motion Notes", type: "PDF", size: "1.8 MB" } ],
+                    slides: [ { name: "Lecture 2 Slides - Motion", type: "PPTX", size: "4.2 MB" } ],
+                    papers: [ { name: "2022 Mid-Term Q3", type: "PDF", size: "0.4 MB" }, { name: "Mid-Term Answer Key", type: "PDF", size: "0.8 MB" } ]
+                }
+            },
+            { 
+                title: "Inertia Tensor", 
+                id: "hZ2ODrVfj3g",
+                resources: {
+                    materials: [ { name: "Inertia Tensor Calculus", type: "PDF", size: "3.2 MB" } ],
+                    slides: [ { name: "Lecture 3 Slides - Inertia", type: "PPTX", size: "6.1 MB" } ],
+                    papers: [ { name: "2021 Final Exam - Inertia Q", type: "PDF", size: "0.6 MB" } ]
+                }
+            },
+            { 
+                title: "Translated Frames and Rotation Matrix", 
+                id: "sIpWLFL5E-s",
+                resources: {
+                    materials: [ { name: "Rotation Matrix Cheat Sheet", type: "PDF", size: "0.5 MB" } ],
+                    slides: [ { name: "Lecture 4 Slides - Matrices", type: "PPTX", size: "3.9 MB" } ],
+                    papers: [ { name: "Practice Problem Set A", type: "PDF", size: "1.1 MB" } ]
+                }
+            },
+            { 
+                title: "Fixed Angle and Euler Representations", 
+                id: "cwx5lCeYKqM",
+                resources: {
+                    materials: [ { name: "Euler Angles Visualization", type: "PDF", size: "2.1 MB" } ],
+                    slides: [ { name: "Lecture 5 Slides - Euler", type: "PPTX", size: "7.0 MB" } ],
+                    papers: [ { name: "2020 Quiz 2 - Angles", type: "PDF", size: "0.4 MB" }, { name: "Quiz 2 Solutions", type: "PDF", size: "0.2 MB" } ]
+                }
+            },
+            { 
+                title: "Linkage Mechanisms", 
+                id: "9ZrshlMcU8w",
+                resources: {
+                    materials: [ { name: "4-Bar Linkage Diagrams", type: "PDF", size: "5.0 MB" }, { name: "Grashof's Law Notes", type: "PDF", size: "1.2 MB" } ],
+                    slides: [ { name: "Lecture 6 Slides - Linkages", type: "PPTX", size: "8.2 MB" } ],
+                    papers: [ { name: "2019 Final Exam - Mechanisms", type: "PDF", size: "0.9 MB" } ]
+                }
+            },
+            { 
+                title: "Velocity Vector Diagrams", 
+                id: "C-Le56Nvhr8",
+                resources: {
+                    materials: [ { name: "Vector Workbook", type: "PDF", size: "1.5 MB" } ],
+                    slides: [ { name: "Lecture 7 Slides - Velocity", type: "PPTX", size: "3.5 MB" } ],
+                    papers: [ { name: "Velocity Analysis Problem Set", type: "PDF", size: "0.8 MB" } ]
+                }
+            },
+            { 
+                title: "Acceleration Vector Diagrams", 
+                id: "QTHzsPW3Tdg",
+                resources: {
+                    materials: [ { name: "Acceleration Analysis Guide", type: "PDF", size: "1.9 MB" } ],
+                    slides: [ { name: "Lecture 8 Slides - Acceleration", type: "PPTX", size: "4.1 MB" } ],
+                    papers: [ { name: "2019 Quiz 3 - Vectors", type: "PDF", size: "0.3 MB" }, { name: "Quiz 3 Answers", type: "PDF", size: "0.1 MB" } ]
+                }
+            },
+            { 
+                title: "Toothed Gears", 
+                id: "ZOvJ40aZlC8",
+                resources: {
+                    materials: [ { name: "Gear Ratio Formulas", type: "PDF", size: "0.8 MB" } ],
+                    slides: [ { name: "Lecture 9 Slides - Gears", type: "PPTX", size: "5.5 MB" } ],
+                    papers: [ { name: "Gear Design Project Spec", type: "PDF", size: "1.1 MB" } ]
+                }
+            },
+            { 
+                title: "Gear Trains", 
+                id: "Mg2bmKAvHZI",
+                resources: {
+                    materials: [ { name: "Planetary Gear Sets", type: "PDF", size: "2.2 MB" } ],
+                    slides: [ { name: "Lecture 10 Slides - Trains", type: "PPTX", size: "4.8 MB" } ],
+                    papers: [ { name: "2018 Final - Gear Train Q", type: "PDF", size: "0.5 MB" } ]
+                }
+            },
+            { 
+                title: "Development of Cam Profile", 
+                id: "GV1tlgHpMs0",
+                resources: {
+                    materials: [ { name: "Cam Profile Template", type: "DXF", size: "0.2 MB" } ],
+                    slides: [ { name: "Lecture 11 Slides - Cams", type: "PPTX", size: "6.2 MB" } ],
+                    papers: [ { name: "2023 Final Exam - Cam Design", type: "PDF", size: "0.7 MB" }, { name: "Final Exam Answers", type: "PDF", size: "1.5 MB" } ]
+                }
+            }
         ];
 
-        // --- Initialization ---
-        const playlistEl = document.getElementById('playlist');
+        // --- Globals ---
+        const sidebarList = document.getElementById('sidebar-list');
         const titleEl = document.getElementById('videoTitle');
         const errorOverlay = document.getElementById('fileProtocolError');
         
         let player = null;
+        let currentMode = 'lessons'; // lessons, slides, papers
+        let activeVideoIndex = 0;
 
         document.addEventListener('DOMContentLoaded', () => {
-            // Safety Check
-            if (window.location.protocol === 'file:') {
-                errorOverlay.style.display = 'flex';
-            }
+            if (window.location.protocol === 'file:') errorOverlay.style.display = 'flex';
 
-            // Initialize Plyr
-            // We set 'origin' here to ensure YouTube API accepts the connection
             player = new Plyr('#player', {
                 controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'captions', 'settings', 'pip', 'airplay', 'fullscreen'],
-                youtube: { 
-                    noCookie: true, 
-                    rel: 0, 
-                    showinfo: 0, 
-                    iv_load_policy: 3, 
-                    modestbranding: 1,
-                    origin: window.location.origin 
-                }
+                youtube: { noCookie: true, rel: 0, showinfo: 0, iv_load_policy: 3, modestbranding: 1, origin: window.location.origin }
             });
 
-            buildPlaylist();
-            // Load first video but don't auto-play immediately to be polite
+            // Initial Render
+            renderSidebar('lessons');
             loadVideo(0, false);
         });
 
-        function buildPlaylist() {
-            playlistEl.innerHTML = '';
-            videos.forEach((video, index) => {
-                const li = document.createElement('li');
-                li.className = 'lesson-item';
-                if (index === 0) li.classList.add('active');
-                
-                li.innerHTML = `
-                    <div class="status-icon">▶</div>
-                    <div class="lesson-info">
-                        <h4>${index + 1}. ${video.title}</h4>
-                    </div>
-                `;
-                li.onclick = () => loadVideo(index, true);
-                playlistEl.appendChild(li);
+        // --- Sidebar Logic ---
+        function renderSidebar(mode) {
+            currentMode = mode;
+            
+            // Update Tab UI
+            document.querySelectorAll('.s-nav-btn').forEach(btn => {
+                const btnMode = btn.innerText.toLowerCase();
+                if(btnMode === mode || (btnMode === 'lessons' && mode === 'lessons')) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+
+            sidebarList.innerHTML = '';
+
+            // Generate Content based on Mode
+            if (mode === 'lessons') {
+                videos.forEach((video, index) => {
+                    const li = createSidebarItem(index, '▶', video.title, 'Video Lesson');
+                    sidebarList.appendChild(li);
+                });
+            } 
+            else if (mode === 'slides') {
+                videos.forEach((video, index) => {
+                    // Check if slides exist
+                    const slideCount = video.resources.slides.length;
+                    const subtitle = slideCount > 0 ? `${slideCount} File(s)` : 'No Slides';
+                    const li = createSidebarItem(index, '📑', `Slides: ${video.title}`, subtitle);
+                    sidebarList.appendChild(li);
+                });
+            }
+            else if (mode === 'papers') {
+                videos.forEach((video, index) => {
+                    const paperCount = video.resources.papers.length;
+                    const subtitle = paperCount > 0 ? `${paperCount} File(s)` : 'No Papers';
+                    const li = createSidebarItem(index, '📝', `Papers: ${video.title}`, subtitle);
+                    sidebarList.appendChild(li);
+                });
+            }
+
+            // Highlight active item
+            updateSidebarHighlight();
+        }
+
+        function createSidebarItem(index, icon, title, subtitle) {
+            const li = document.createElement('li');
+            li.className = 'sidebar-item';
+            li.dataset.index = index;
+            li.innerHTML = `
+                <div class="item-icon">${icon}</div>
+                <div class="item-info">
+                    <h4>${title}</h4>
+                    <span>${subtitle}</span>
+                </div>
+            `;
+            li.onclick = () => handleSidebarClick(index);
+            return li;
+        }
+
+        function updateSidebarHighlight() {
+            document.querySelectorAll('.sidebar-item').forEach(item => {
+                item.classList.remove('active');
+                if (parseInt(item.dataset.index) === activeVideoIndex) {
+                    item.classList.add('active');
+                }
             });
         }
 
+        function handleSidebarClick(index) {
+            activeVideoIndex = index;
+            loadVideo(index, true);
+            updateSidebarHighlight();
+
+            // If in resource mode, automatically switch the bottom tab to match
+            if (currentMode === 'slides') {
+                switchTab('slides');
+                // Scroll to resources
+                document.querySelector('.resources-section').scrollIntoView({behavior: 'smooth'});
+            } else if (currentMode === 'papers') {
+                switchTab('papers');
+                document.querySelector('.resources-section').scrollIntoView({behavior: 'smooth'});
+            }
+        }
+
+        // --- Video & Content Logic ---
         function loadVideo(index, autoPlay) {
             const video = videos[index];
+            player.source = { type: 'video', sources: [ { src: video.id, provider: 'youtube' } ] };
+            if (autoPlay) player.play();
 
-            // 1. Update Plyr Source
-            player.source = {
-                type: 'video',
-                sources: [
-                    {
-                        src: video.id,
-                        provider: 'youtube',
-                    },
-                ],
-            };
-
-            // 2. Play if requested
-            if (autoPlay) {
-                player.play();
-            }
-
-            // 3. Update Title & Sidebar
+            // Update Title
             titleEl.textContent = video.title;
             titleEl.style.animation = 'none';
             titleEl.offsetHeight; 
             titleEl.style.animation = 'fadeIn 0.5s forwards';
 
-            const items = document.querySelectorAll('.lesson-item');
-            items.forEach(i => i.classList.remove('active'));
-            if(items[index]) items[index].classList.add('active');
+            // Populate Resources Section
+            updateResources(video.resources);
         }
+
+        function updateResources(resources) {
+            const generateList = (items, typeIcon) => {
+                if (!items || items.length === 0) return `<li style="padding:15px; color:#94a3b8; text-align:center;">No items available.</li>`;
+                return items.map(item => `
+                    <li class="resource-item">
+                        <div class="resource-icon">${typeIcon}</div>
+                        <div class="resource-details">
+                            <span class="resource-name">${item.name}</span>
+                            <span class="resource-meta">${item.type} • ${item.size}</span>
+                        </div>
+                        <a href="#" class="download-btn">Download</a>
+                    </li>
+                `).join('');
+            };
+
+            document.getElementById('list-materials').innerHTML = generateList(resources.materials, 'DOC');
+            document.getElementById('list-slides').innerHTML = generateList(resources.slides, 'PPT');
+            document.getElementById('list-papers').innerHTML = generateList(resources.papers, 'EXAM');
+        }
+
+        // Tab Switching
+        window.switchTab = function(tabName) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            
+            document.getElementById('tab-' + tabName).classList.add('active');
+            
+            // Highlight active button
+            const buttons = document.querySelectorAll('.tab-btn');
+            buttons.forEach(btn => {
+                if(btn.getAttribute('onclick').includes(tabName)) btn.classList.add('active');
+            });
+        };
 
     </script>
 </body>
