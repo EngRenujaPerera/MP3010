@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gears Master Quiz: Shuffled</title>
+    <style>
+        :root {
+            /* Teal/Slate Theme */
+            --primary: #263238;
+            --secondary: #009688;
+            --accent: #ff9800;
+            --light: #eceff1;
+            --success: #4caf50;
+            --danger: #f44336;
+            --surface: #ffffff;
+            --theory-bg: #e3f2fd;
+            --theory-text: #1565c0;
+            --calc-bg: #fff3e0;
+            --calc-text: #e65100;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f6f8;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            height: 100vh;
+            color: #37474f;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 300px;
+            background-color: var(--primary);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            box-shadow: 4px 0 10px rgba(0,0,0,0.15);
+            overflow-y: auto;
+            z-index: 10;
+        }
+
+        .timer-box {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .timer-display { font-size: 2.2em; font-weight: bold; font-variant-numeric: tabular-nums; margin-top: 5px; color: #80cbc4; }
+        .timer-warning { color: var(--accent); animation: pulse 1s infinite; }
+
+        .nav-label {
+            font-size: 0.8em; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; opacity: 0.7;
+        }
+
+        .question-nav {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 6px;
+        }
+
+        .nav-btn {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: white;
+            padding: 10px 0;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.85em;
+        }
+
+        .nav-btn:hover { background: var(--secondary); transform: translateY(-2px); }
+        .nav-btn.active { background: var(--secondary); font-weight: bold; border-color: #b2dfdb; box-shadow: 0 0 8px rgba(0, 150, 136, 0.6); }
+        .nav-btn.answered { background: var(--success); border-color: var(--success); }
+        .nav-btn.flagged { border-color: var(--accent); color: var(--accent); background: rgba(255, 152, 0, 0.2); }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 40px;
+            overflow-y: auto;
+            position: relative;
+            background: linear-gradient(135deg, #eceff1 0%, #cfd8dc 100%);
+        }
+
+        .quiz-container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: var(--surface);
+            padding: 50px;
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.08);
+            animation: fadeIn 0.5s ease;
+            border-top: 6px solid var(--secondary);
+        }
+
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            border-bottom: 2px solid var(--light);
+            padding-bottom: 20px;
+        }
+
+        .badge {
+            background: #e0f2f1;
+            color: var(--secondary);
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9em;
+            border: 1px solid #b2dfdb;
+        }
+
+        /* Section differentiation */
+        .section-tag {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .tag-theory { background: var(--theory-bg); color: var(--theory-text); border: 1px solid #90caf9; }
+        .tag-calc { background: var(--calc-bg); color: var(--calc-text); border: 1px solid #ffcc80; }
+
+        .question-text {
+            font-size: 1.25em;
+            margin-bottom: 35px;
+            line-height: 1.6;
+            color: #263238;
+        }
+
+        .options-grid { display: grid; gap: 15px; }
+
+        .option-label {
+            display: flex;
+            align-items: center;
+            padding: 18px 25px;
+            border: 2px solid var(--light);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: white;
+        }
+
+        .option-label:hover { border-color: var(--secondary); background: #e0f2f1; transform: translateX(5px); }
+        .option-label.selected { border-color: var(--secondary); background-color: #b2dfdb; box-shadow: 0 4px 10px rgba(0, 137, 123, 0.15); }
+
+        input[type="radio"] { margin-right: 20px; transform: scale(1.3); accent-color: var(--secondary); }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 50px;
+            padding-top: 25px;
+            border-top: 1px solid var(--light);
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 6px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn:active { transform: scale(0.96); }
+        .btn-secondary { background: #cfd8dc; color: #455a64; }
+        .btn-primary { background: var(--secondary); color: white; box-shadow: 0 4px 15px rgba(0, 137, 123, 0.3); }
+        .btn-accent { background: white; border: 2px solid var(--accent); color: var(--accent); }
+        .btn-success { background: var(--success); color: white; }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(38, 50, 56, 0.95);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: white;
+            padding: 50px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 550px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: slideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .score-circle {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            border: 12px solid var(--secondary);
+            margin: 30px auto;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-size: 3.5em;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        .score-sub { font-size: 14px; text-transform: uppercase; color: #78909c; font-weight: normal; margin-top: -10px; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideUp { from { transform: translateY(100px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+
+        /* MathJax override */
+        .mjx-chtml { outline: 0; }
+    </style>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+
+<div class="sidebar">
+    <div class="timer-box">
+        <div>Time Remaining</div>
+        <div class="timer-display" id="timer">60:00</div>
+    </div>
+
+    <div class="nav-label">Question Map (Randomized)</div>
+    <div class="question-nav" id="navGrid">
+        </div>
+</div>
+
+<div class="main-content">
+    <div class="quiz-container" id="quizContainer">
+        <div class="question-header">
+            <h2 style="margin:0; font-weight: 700; color: var(--primary);">Question <span id="currentQNum">1</span><span style="color:#b0bec5; font-weight:300;"> / 50</span></h2>
+            <div class="badge">5 Marks Each</div>
+        </div>
+
+        <div id="sectionTag" class="section-tag tag-theory">Theoretical</div>
+
+        <div class="question-text" id="questionText">
+            </div>
+
+        <div class="options-grid" id="optionsContainer">
+            </div>
+
+        <div class="controls">
+            <button class="btn btn-accent" id="flagBtn" onclick="toggleFlag()">
+                <span id="flagIcon">⚑</span> <span id="flagText">Flag</span>
+            </button>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn btn-secondary" id="prevBtn" onclick="changeQuestion(-1)">Previous</button>
+                <button class="btn btn-primary" id="nextBtn" onclick="changeQuestion(1)">Next</button>
+                <button class="btn btn-success" id="submitBtn" style="display:none;" onclick="submitQuiz()">Submit</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="resultModal">
+    <div class="modal-content">
+        <h2 style="color: var(--primary); margin-bottom: 10px;">Quiz Submitted</h2>
+        <p style="color: #78909c;">Here is the analysis of your performance.</p>
+
+        <div class="score-circle">
+            <span id="finalScore">0</span>
+            <span class="score-sub">Total Score</span>
+        </div>
+
+        <p id="feedbackText" style="font-size: 1.1em; margin-bottom: 30px; padding: 0 20px;"></p>
+
+        <div style="display:flex; justify-content: center; gap: 15px;">
+            <button class="btn btn-secondary" onclick="location.reload()">Close</button>
+            <button class="btn btn-primary" onclick="location.reload()">Retake Quiz</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // --- Quiz Data: Theory (type: 'theory') and Calculations (type: 'calc') ---
+    const rawQuizData = [
+        // === THEORETICAL QUESTIONS ===
+        { type: 'theory', q: "According to the Law of Gearing, what condition must be met to maintain a constant velocity ratio?", options: ["The pitch circles must be tangent", "The common normal at the point of contact must pass through the pitch point", "The addendum must equal the dedendum", "The pressure angle must be zero"], correct: 1 },
+        { type: 'theory', q: "Which type of gear is used to connect two intersecting shafts?", options: ["Spur Gear", "Helical Gear", "Bevel Gear", "Rack and Pinion"], correct: 2 },
+        { type: 'theory', q: "What defines the 'Addendum' of a gear tooth?", options: ["Radial distance from pitch circle to the bottom of the tooth", "Radial distance from pitch circle to the top of the tooth", "Total depth of the tooth", "Width of the tooth along the pitch circle"], correct: 1 },
+        { type: 'theory', q: "The circle which by pure rolling action would give the same motion as the actual gear is called the:", options: ["Base circle", "Root circle", "Pitch circle", "Addendum circle"], correct: 2 },
+        { type: 'theory', q: "In an 'Internal Gearing' system, the driver and follower rotate in:", options: ["Opposite directions", "The same direction", "Perpendicular directions", "Variable directions"], correct: 1 },
+        { type: 'theory', q: "What is the 'Pressure Angle' (\\(\\phi\\))?", options: ["Angle between the pitch line and the tooth face", "Angle between the common normal at the point of contact and the common tangent at the pitch point", "Angle subtended by the circular pitch", "Angle between the shaft axes"], correct: 1 },
+        { type: 'theory', q: "What is a 'Reverted Gear Train'?", options: ["A train where the last gear rotates in reverse", "A train where the axes of the first and last gears are co-axial", "A train using only internal gears", "A train used only in reverse gears of cars"], correct: 1 },
+        { type: 'theory', q: "Which curve is generated by a point on a string unwrapping from a base circle?", options: ["Cycloid", "Epicycloid", "Involute", "Hypocycloid"], correct: 2 },
+        { type: 'theory', q: "The 'Module' (m) is defined as the ratio of:", options: ["Number of teeth to Pitch Circle Diameter", "Pitch Circle Diameter (mm) to Number of Teeth", "Circular Pitch to \\(\\pi\\)", "Addendum to Dedendum"], correct: 1 },
+        { type: 'theory', q: "What is the theoretical minimum value for the Contact Ratio to ensure continuous action?", options: ["0.5", "1.0", "1.5", "2.0"], correct: 1 },
+        { type: 'theory', q: "In a 'Compound Gear Train':", options: ["Each shaft carries only one gear", "At least one shaft carries two or more gears rigidly fixed to it", "All gears rotate on the same axis", "There is no fixed frame"], correct: 1 },
+        { type: 'theory', q: "The 'Diametral Pitch' (\\(p_d\\)) is the reciprocal of:", options: ["Circular Pitch", "Module (if units match)", "Pressure Angle", "Velocity Ratio"], correct: 1 },
+        { type: 'theory', q: "An 'Epicyclic Gear Train' is characterized by:", options: ["Fixed axes for all gears", "Axes of some gears moving relative to a fixed axis", "High friction losses", "Using only friction wheels"], correct: 1 },
+        { type: 'theory', q: "Where is the velocity of sliding between gear teeth zero?", options: ["At the tip of the tooth", "At the root of the tooth", "At the pitch point", "At the base circle"], correct: 2 },
+        { type: 'theory', q: "The 'Dedendum' corresponds to the radial distance from the pitch circle to the:", options: ["Top of the tooth", "Bottom of the tooth", "Center of the gear", "Base circle"], correct: 1 },
+        { type: 'theory', q: "What is 'Backlash' in gears?", options: ["The distance between the top land and the bottom land", "The difference between the tooth space and the tooth thickness", "The sliding velocity at the pitch point", "The angle of recess"], correct: 1 },
+        { type: 'theory', q: "A 'Rack' can be technically described as:", options: ["A gear with infinite radius", "A gear with zero radius", "An internal gear", "A bevel gear"], correct: 0 },
+        { type: 'theory', q: "The 'Arc of Contact' consists of:", options: ["Arc of Approach + Arc of Recess", "Path of Contact / cos(\\(\\phi\\))", "Addendum + Dedendum", "Circular Pitch × Contact Ratio"], correct: 0 },
+        { type: 'theory', q: "Which gear arrangement is commonly used in clocks and simple speed reducers?", options: ["Simple gear train", "Reverted gear train", "Differential gear", "Rack and pinion"], correct: 1 },
+        { type: 'theory', q: "The standard pressure angle commonly used in modern gears is:", options: ["14.5°", "20°", "25°", "10°"], correct: 1 },
+        { type: 'theory', q: "In an involute gear, the base circle diameter is related to the pitch circle diameter (D) by:", options: ["\\( D \\tan \\phi \\)", "\\( D \\sin \\phi \\)", "\\( D \\cos \\phi \\)", "\\( D / \\cos \\phi \\)"], correct: 2 },
+        { type: 'theory', q: "A 'Simple Gear Train' has:", options: ["Multiple gears on a single shaft", "One gear on each shaft", "Co-axial input and output shafts only", "Moving axes"], correct: 1 },
+        { type: 'theory', q: "The advantage of a Double Helical (Herringbone) gear over a Single Helical gear is:", options: ["It is cheaper", "It eliminates axial thrust", "It has a smaller module", "It can be cast easily"], correct: 1 },
+        { type: 'theory', q: "In gear terminology, 'Clearance' is:", options: ["The distance between centers", "The amount by which the Dedendum exceeds the Addendum of the mating gear", "The working depth", "The face width"], correct: 1 },
+        { type: 'theory', q: "The 'Train Value' is defined as:", options: ["Speed of Driver / Speed of Driven", "Speed of Driven / Speed of Driver", "Number of Idlers", "Input Torque / Output Torque"], correct: 1 },
+
+        // === CALCULATION QUESTIONS ===
+        { type: 'calc', q: "A gear has a Pitch Circle Diameter (D) of 200 mm and 40 teeth. Calculate the Module (m).", options: ["2 mm", "4 mm", "5 mm", "8 mm"], correct: 2 },
+        { type: 'calc', q: "If the Circular Pitch (\\(p_c\\)) is 15.7 mm, what is the approximate Module? (Take \\(\\pi \\approx 3.14\\))", options: ["3 mm", "5 mm", "4 mm", "6 mm"], correct: 1 },
+        { type: 'calc', q: "Two gears mesh in a simple train. The driver has 20 teeth and rotates at 1000 rpm. The follower has 50 teeth. What is the speed of the follower?", options: ["2000 rpm", "400 rpm", "500 rpm", "2500 rpm"], correct: 1 },
+        { type: 'calc', q: "In a Reverted Gear Train, Gear 1 meshes with Gear 2, and Gear 3 meshes with Gear 4. If all modules are equal and the center distance is fixed, what is the condition for the number of teeth?", options: ["\\( T_1 + T_2 = T_3 + T_4 \\)", "\\( T_1 \\times T_2 = T_3 \\times T_4 \\)", "\\( T_1 - T_2 = T_3 - T_4 \\)", "\\( T_1 / T_2 = T_3 / T_4 \\)"], correct: 0 },
+        { type: 'calc', q: "Calculate the center distance (x) between two meshing spur gears if Module m = 4 mm, \\(T_1 = 20\\), and \\(T_2 = 30\\).", options: ["100 mm", "200 mm", "50 mm", "120 mm"], correct: 0 },
+        { type: 'calc', q: "An epicyclic train has a fixed Sun gear (40 teeth) and a Planet gear (20 teeth). If the Arm rotates +1 revolution, how many revolutions does the Planet gear make relative to the Arm?", options: ["+2", "-2", "+1", "-1"], correct: 1 },
+        { type: 'calc', q: "In the previous question (Sun fixed, Arm +1), what is the absolute number of revolutions of the Planet gear? (Hint: Total = Relative + Arm)", options: ["+3", "-1", "+2", "0"], correct: 0 },
+        { type: 'calc', q: "A compound train has drivers with 20 and 30 teeth, and followers with 40 and 60 teeth. What is the Train Value?", options: ["1/4", "4", "1/2", "2"], correct: 0 },
+        { type: 'calc', q: "Calculate the Torque on a gear shaft if the Tangential Force (\\(F_T\\)) is 500 N and the Pitch Circle Diameter is 200 mm.", options: ["100 N-m", "50 N-m", "1000 N-m", "25 N-m"], correct: 1 },
+        { type: 'calc', q: "If the angular velocities of a driver and follower are 10 rad/s and 5 rad/s, and the distance of the contact point from the pitch point is 10 mm, what is the velocity of sliding? (Assume external gearing)", options: ["50 mm/s", "150 mm/s", "100 mm/s", "5 mm/s"], correct: 1 },
+        { type: 'calc', q: "Ferguson's Paradox is a specific type of gear train used to:", options: ["Obtain three different outputs (forward, reverse, stationary) from one input", "Achieve 100% efficiency", "Eliminate backlash", "Connect non-parallel shafts"], correct: 0 },
+        { type: 'calc', q: "A machine tool gearbox uses a compound train. If the input is 1000 rpm and the total speed reduction is 20:1, what is the output speed?", options: ["500 rpm", "200 rpm", "50 rpm", "20 rpm"], correct: 2 },
+        { type: 'calc', q: "In a Sun and Planet system, if the Annulus (Ring) is fixed and the Sun is the input, the Planet Carrier (Arm) acts as:", options: ["A stationary element", "The high-speed output", "The low-speed output", "An idler"], correct: 2 },
+        { type: 'calc', q: "For a gear with 20 teeth and Module 5 mm, what is the Pitch Circle Diameter?", options: ["4 mm", "25 mm", "100 mm", "10 mm"], correct: 2 },
+        { type: 'calc', q: "If the Path of Contact is 30 mm and the Pressure Angle is 20°, what is the Arc of Contact? (cos 20° ≈ 0.94)", options: ["28.2 mm", "31.9 mm", "60 mm", "15 mm"], correct: 1 },
+        { type: 'calc', q: "Calculate the Contact Ratio if the Arc of Contact is 35 mm and the Circular Pitch is 20 mm.", options: ["0.57", "1.75", "1.0", "700"], correct: 1 },
+        { type: 'calc', q: "In a compound epicyclic train, the input A rotates at 1 r.p.s. and output D rotates at 5 r.p.s. in opposite directions. The relative velocity is:", options: ["4 r.p.s.", "6 r.p.s.", "1 r.p.s.", "5 r.p.s."], correct: 1 },
+        { type: 'calc', q: "If a gear has an Addendum of 5 mm and Module of 5 mm, this is a:", options: ["Standard tooth", "Stub tooth", "Corrected tooth", "Helical tooth"], correct: 0 },
+        { type: 'calc', q: "Find the Pitch Circle Radius of a pinion with 24 teeth and Module 2 mm.", options: ["48 mm", "12 mm", "24 mm", "96 mm"], correct: 2 },
+        { type: 'calc', q: "In the Tabular method for epicyclic gears, if 'x' represents the rotation of the fixed gear relative to the arm, and 'y' is the arm's rotation, the total motion of the fixed gear is:", options: ["x", "y", "x + y = 0", "y - x"], correct: 2 },
+        { type: 'calc', q: "Calculate the train value if a driver has 40 teeth and the follower has 20 teeth.", options: ["0.5", "2.0", "20", "800"], correct: 1 },
+        { type: 'calc', q: "A motor provides 100 N-m torque to a Sun gear. If the gear reduction is 5:1 (output is slower), what is the theoretical output torque (ignoring losses)?", options: ["20 N-m", "100 N-m", "500 N-m", "250 N-m"], correct: 2 },
+        { type: 'calc', q: "If a gear train has 4 gears in series (Simple train) A-B-C-D, and A rotates clockwise, in which direction does D rotate?", options: ["Clockwise", "Counter-Clockwise", "Stationary", "Oscillating"], correct: 1 },
+        { type: 'calc', q: "Calculate the speed of the arm in an epicyclic train if Gear A (fixed) = 0 rpm, Gear B (output) = 200 rpm, and the ratio determined by the table method is \\( N_B = y(1 + T_A/T_B) \\). (Assume \\(T_A=T_B\\)).", options: ["100 rpm", "200 rpm", "400 rpm", "50 rpm"], correct: 0 },
+        { type: 'calc', q: "Design problem: You need a speed ratio of exactly 12 using a two-stage compound train. Which combination works?", options: ["Stage 1 (3:1), Stage 2 (3:1)", "Stage 1 (4:1), Stage 2 (3:1)", "Stage 1 (6:1), Stage 2 (1:1)", "Stage 1 (10:1), Stage 2 (2:1)"], correct: 1 }
+    ];
+
+    // --- Variables ---
+    let quizData = [];
+    let currentQuestion = 0;
+    let userAnswers = [];
+    let flaggedQuestions = [];
+    let timeLeft = 60 * 60;
+    let timerInterval;
+
+    // --- Shuffle Function ---
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
+
+    // --- Initialization ---
+    document.addEventListener('DOMContentLoaded', () => {
+        // Shuffle the data once on load
+        quizData = shuffleArray([...rawQuizData]);
+        userAnswers = new Array(quizData.length).fill(null);
+        flaggedQuestions = new Array(quizData.length).fill(false);
+
+        initNavigation();
+        loadQuestion(0);
+        startTimer();
+    });
+
+    // --- Functions ---
+    function startTimer() {
+        timerInterval = setInterval(() => {
+            timeLeft--;
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+
+            const display = document.getElementById('timer');
+            display.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+            if (timeLeft <= 300) {
+                display.classList.add('timer-warning');
+            }
+
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                submitQuiz();
+            }
+        }, 1000);
+    }
+
+    function initNavigation() {
+        const navGrid = document.getElementById('navGrid');
+        navGrid.innerHTML = '';
+
+        quizData.forEach((_, index) => {
+            const btn = document.createElement('button');
+            btn.className = 'nav-btn';
+            btn.textContent = index + 1;
+            btn.onclick = () => loadQuestion(index);
+            btn.id = `nav-${index}`;
+            navGrid.appendChild(btn);
+        });
+    }
+
+    function loadQuestion(index) {
+        currentQuestion = index;
+
+        // Update Header & Tags
+        document.getElementById('currentQNum').textContent = index + 1;
+        const tagEl = document.getElementById('sectionTag');
+        const qObj = quizData[index];
+
+        if (qObj.type === 'theory') {
+            tagEl.textContent = "THEORETICAL";
+            tagEl.className = "section-tag tag-theory";
+        } else {
+            tagEl.textContent = "REAL WORLD / CALCULATION";
+            tagEl.className = "section-tag tag-calc";
+        }
+
+        // Update Text
+        const qTextEl = document.getElementById('questionText');
+        qTextEl.textContent = qObj.q;
+
+        // Update Options
+        const optionsContainer = document.getElementById('optionsContainer');
+        optionsContainer.innerHTML = '';
+
+        qObj.options.forEach((opt, optIndex) => {
+            const label = document.createElement('label');
+            label.className = 'option-label';
+            if (userAnswers[index] === optIndex) label.classList.add('selected');
+
+            const input = document.createElement('input');
+            input.type = 'radio';
+            input.name = 'quizOption';
+            input.value = optIndex;
+            input.checked = userAnswers[index] === optIndex;
+            input.onchange = () => selectOption(optIndex);
+
+            const span = document.createElement('span');
+            if (opt.includes("\\(")) {
+                span.innerHTML = opt;
+            } else {
+                span.textContent = opt;
+            }
+
+            label.appendChild(input);
+            label.appendChild(span);
+            optionsContainer.appendChild(label);
+        });
+
+        // Typeset MathJax
+        if (window.MathJax) {
+            MathJax.typesetPromise([qTextEl, optionsContainer]);
+        }
+
+        // Controls
+        document.getElementById('prevBtn').disabled = index === 0;
+
+        const nextBtn = document.getElementById('nextBtn');
+        const submitBtn = document.getElementById('submitBtn');
+
+        if (index === quizData.length - 1) {
+            nextBtn.style.display = 'none';
+            submitBtn.style.display = 'flex';
+        } else {
+            nextBtn.style.display = 'flex';
+            submitBtn.style.display = 'none';
+        }
+
+        // Flag State
+        const flagBtn = document.getElementById('flagBtn');
+        const flagText = document.getElementById('flagText');
+        if (flaggedQuestions[index]) {
+            flagBtn.classList.add('active');
+            flagText.textContent = 'Flagged';
+        } else {
+            flagBtn.classList.remove('active');
+            flagText.textContent = 'Flag';
+        }
+
+        updateNavStyles();
+    }
+
+    function selectOption(optIndex) {
+        userAnswers[currentQuestion] = optIndex;
+        const labels = document.querySelectorAll('.option-label');
+        labels.forEach((l, i) => {
+            if (i === optIndex) l.classList.add('selected');
+            else l.classList.remove('selected');
+        });
+        updateNavStyles();
+    }
+
+    function changeQuestion(delta) {
+        const newIndex = currentQuestion + delta;
+        if (newIndex >= 0 && newIndex < quizData.length) {
+            loadQuestion(newIndex);
+        }
+    }
+
+    function toggleFlag() {
+        flaggedQuestions[currentQuestion] = !flaggedQuestions[currentQuestion];
+        loadQuestion(currentQuestion);
+    }
+
+    function updateNavStyles() {
+        quizData.forEach((_, i) => {
+            const btn = document.getElementById(`nav-${i}`);
+            btn.className = 'nav-btn';
+
+            if (i === currentQuestion) btn.classList.add('active');
+            if (userAnswers[i] !== null) btn.classList.add('answered');
+            if (flaggedQuestions[i]) btn.classList.add('flagged');
+        });
+    }
+
+    function submitQuiz() {
+        clearInterval(timerInterval);
+
+        let score = 0;
+
+        userAnswers.forEach((ans, index) => {
+            if (ans === quizData[index].correct) {
+                score += 5;
+            }
+        });
+
+        const scoreElement = document.getElementById('finalScore');
+        const feedbackElement = document.getElementById('feedbackText');
+
+        // Animation
+        let currentDisplayScore = 0;
+        const scoreAnimation = setInterval(() => {
+            if (currentDisplayScore < score) {
+                currentDisplayScore += 5;
+                if(currentDisplayScore > score) currentDisplayScore = score;
+                scoreElement.textContent = currentDisplayScore;
+            } else {
+                clearInterval(scoreAnimation);
+            }
+        }, 20);
+
+        // Feedback
+        const maxScore = 50 * 5;
+        const percentage = (score / maxScore) * 100;
+
+        if (percentage >= 90) {
+            feedbackElement.innerHTML = `<strong>Expert Level!</strong><br>You have a commanding grasp of both Gear Theory and Calculations.`;
+            document.querySelector('.score-circle').style.borderColor = "var(--success)";
+        } else if (percentage >= 70) {
+            feedbackElement.innerHTML = `<strong>Strong Performance!</strong><br>Good understanding. Review the specific calculation formulas to reach expert level.`;
+            document.querySelector('.score-circle').style.borderColor = "var(--secondary)";
+        } else if (percentage >= 50) {
+            feedbackElement.innerHTML = `<strong>Good Start.</strong><br>You know the basics, but the Epicyclic Gear Train calculations need more practice.`;
+            document.querySelector('.score-circle').style.borderColor = "var(--accent)";
+        } else {
+            feedbackElement.innerHTML = `<strong>Keep Studying.</strong><br>Focus on definitions first, then move to the Laws of Gearing.`;
+            document.querySelector('.score-circle').style.borderColor = "var(--danger)";
+        }
+
+        document.getElementById('resultModal').style.display = 'flex';
+    }
+</script>
+
+</body>
+</html>

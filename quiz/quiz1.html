@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Kinematics & Dynamics Quiz</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #2980b9;
+            --accent: #e67e22;
+            --light: #ecf0f1;
+            --success: #27ae60;
+            --danger: #c0392b;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            height: 100vh;
+            color: #333;
+        }
+
+        /* Sidebar for Navigation */
+        .sidebar {
+            width: 280px;
+            background-color: var(--primary);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            box-shadow: 4px 0 10px rgba(0,0,0,0.1);
+            overflow-y: auto;
+            z-index: 10;
+        }
+
+        .timer-box {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255,255,255,0.2);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .timer-label { font-size: 0.85em; text-transform: uppercase; letter-spacing: 1px; opacity: 0.8; }
+        .timer-display { font-size: 2.2em; font-weight: bold; font-variant-numeric: tabular-nums; margin-top: 5px; }
+        .timer-warning { color: var(--accent); animation: pulse 1s infinite; }
+
+        .question-nav {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+        }
+
+        .nav-btn {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: white;
+            padding: 10px 0;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.9em;
+        }
+
+        .nav-btn:hover { background: var(--secondary); transform: translateY(-2px); }
+        .nav-btn.active { background: var(--secondary); font-weight: bold; border-color: white; box-shadow: 0 0 8px rgba(52, 152, 219, 0.5); }
+        .nav-btn.answered { background: var(--success); border-color: var(--success); }
+        .nav-btn.flagged { border-color: var(--accent); color: var(--accent); background: rgba(230, 126, 34, 0.2); }
+
+        /* Main Content Area */
+        .main-content {
+            flex: 1;
+            padding: 40px;
+            overflow-y: auto;
+            position: relative;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        }
+
+        .quiz-container {
+            max-width: 850px;
+            margin: 0 auto;
+            background: white;
+            padding: 50px;
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            animation: fadeIn 0.5s ease;
+        }
+
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            border-bottom: 2px solid var(--light);
+            padding-bottom: 20px;
+        }
+
+        .badge {
+            background: #e1f5fe;
+            color: var(--secondary);
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+
+        .question-text {
+            font-size: 1.25em;
+            margin-bottom: 35px;
+            line-height: 1.6;
+            color: #2c3e50;
+        }
+
+        .options-grid { display: grid; gap: 15px; }
+
+        .option-label {
+            display: flex;
+            align-items: center;
+            padding: 18px 25px;
+            border: 2px solid var(--light);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: white;
+        }
+
+        .option-label:hover { border-color: var(--secondary); background: #f4faff; transform: translateX(5px); }
+        .option-label.selected { border-color: var(--secondary); background-color: #eaf2f8; box-shadow: 0 4px 10px rgba(52, 152, 219, 0.1); }
+
+        input[type="radio"] { margin-right: 20px; transform: scale(1.3); accent-color: var(--secondary); }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 50px;
+            padding-top: 25px;
+            border-top: 1px solid var(--light);
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 6px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn:active { transform: scale(0.96); }
+        .btn-secondary { background: #dfe6e9; color: #636e72; }
+        .btn-secondary:hover { background: #b2bec3; }
+        .btn-primary { background: var(--secondary); color: white; box-shadow: 0 4px 15px rgba(41, 128, 185, 0.3); }
+        .btn-primary:hover { background: #1f618d; }
+        .btn-accent { background: white; border: 2px solid var(--accent); color: var(--accent); }
+        .btn-accent:hover { background: var(--accent); color: white; }
+        .btn-accent.active { background: var(--accent); color: white; }
+        .btn-success { background: var(--success); color: white; box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3); }
+        .btn-success:hover { background: #219150; }
+
+        /* Results Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(44, 62, 80, 0.9);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: white;
+            padding: 50px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 550px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: slideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .score-circle {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            border: 12px solid var(--secondary);
+            margin: 30px auto;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-size: 3.5em;
+            font-weight: 800;
+            color: var(--primary);
+            position: relative;
+        }
+
+        .score-circle::after {
+            content: '';
+            position: absolute;
+            top: -12px; left: -12px;
+            right: -12px; bottom: -12px;
+            border-radius: 50%;
+            border: 12px solid rgba(0,0,0,0.05);
+            z-index: -1;
+        }
+
+        .score-sub { font-size: 14px; text-transform: uppercase; color: #95a5a6; font-weight: normal; margin-top: -10px; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideUp { from { transform: translateY(100px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+
+        /* MathJax override */
+        .mjx-chtml { outline: 0; }
+    </style>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+
+<div class="sidebar">
+    <div class="timer-box">
+        <div class="timer-label">Time Remaining</div>
+        <div class="timer-display" id="timer">30:00</div>
+    </div>
+    <div style="margin-bottom: 15px; font-size: 0.85em; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.6);">Question Overview</div>
+    <div class="question-nav" id="navGrid">
+        </div>
+</div>
+
+<div class="main-content">
+    <div class="quiz-container" id="quizContainer">
+        <div class="question-header">
+            <h2 style="margin:0; font-weight: 700; color: var(--primary);">Question <span id="currentQNum">1</span><span style="color:#bdc3c7; font-weight:300;"> / 20</span></h2>
+            <div class="badge">5 Marks Each</div>
+        </div>
+
+        <div class="question-text" id="questionText">
+            </div>
+
+        <div class="options-grid" id="optionsContainer">
+            </div>
+
+        <div class="controls">
+            <button class="btn btn-accent" id="flagBtn" onclick="toggleFlag()">
+                <span id="flagIcon">⚑</span> <span id="flagText">Flag for Review</span>
+            </button>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn btn-secondary" id="prevBtn" onclick="changeQuestion(-1)">Previous</button>
+                <button class="btn btn-primary" id="nextBtn" onclick="changeQuestion(1)">Next Question</button>
+                <button class="btn btn-success" id="submitBtn" style="display:none;" onclick="submitQuiz()">Submit Quiz</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="resultModal">
+    <div class="modal-content">
+        <h2 style="color: var(--primary); margin-bottom: 10px;">Quiz Submitted</h2>
+        <p style="color: #7f8c8d;">Here is the analysis of your performance.</p>
+
+        <div class="score-circle">
+            <span id="finalScore">0</span>
+            <span class="score-sub">Total Score</span>
+        </div>
+
+        <p id="feedbackText" style="font-size: 1.1em; margin-bottom: 30px; padding: 0 20px;"></p>
+
+        <div style="display:flex; justify-content: center; gap: 15px;">
+            <button class="btn btn-secondary" onclick="location.reload()">Close</button>
+            <button class="btn btn-primary" onclick="location.reload()">Retake Quiz</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // --- Creative Quiz Data based on "Day 01.pdf" physics concepts ---
+    const quizData = [
+        {
+            q: "A drone is flying within a moving truck. If the truck rotates with angular velocity \\(\\omega\\), and the drone has a relative velocity \\(v_{rel}\\) inside the truck, which term accounts for the 'fictitious' force causing the drone to veer sideways from the truck driver's perspective?",
+            options: [
+                "Euler Acceleration \\( \\dot{\\omega} \\times r \\)",
+                "Centripetal Acceleration \\( \\omega \\times (\\omega \times r) \\)",
+                "Coriolis Acceleration \\( 2\\omega \\times v_{rel} \\)",
+                "Translational Acceleration \\( \\frac{d^2R_0}{dt^2} \\)"
+            ],
+            correct: 2
+        },
+        {
+            q: "Consider a robotic arm extending its length. If vector \\( \\textbf{P} \\) represents the position of the gripper relative to the rotating joint, the Transport Theorem states that the absolute time derivative \\( \\frac{d\\textbf{P}}{dt} \\) is:",
+            options: [
+                "\\( (\\frac{\\partial \\textbf{P}}{\\partial t})_{rel} \\times \\omega \\)",
+                "\\( (\\frac{\\partial \\textbf{P}}{\\partial t})_{rel} + \\omega \\times \\textbf{P} \\)",
+                "\\( \\omega \\times (\\frac{\\partial \\textbf{P}}{\\partial t})_{rel} \\)",
+                "\\( \\omega \\cdot \\textbf{P} + (\\frac{\\partial \\textbf{P}}{\\partial t})_{rel} \\)"
+            ],
+            correct: 1
+        },
+        {
+            q: "A bead slides outward with constant relative speed along a spoke of a wheel. If the wheel rotates at a constant angular velocity \\(\\omega\\), what is the direction of the Coriolis acceleration component acting on the bead?",
+            options: [
+                "Radially outward along the spoke",
+                "Radially inward towards the center",
+                "Perpendicular to the spoke (tangential)",
+                "Zero, because angular velocity is constant"
+            ],
+            correct: 2
+        },
+        {
+            q: "In a rotating space station, the term \\( \\omega \\times (\\omega \\times r) \\) represents the centripetal acceleration. Geometrically, this vector points:",
+            options: [
+                "Parallel to the axis of rotation",
+                "Tangential to the path of rotation",
+                "Directly outward away from the axis",
+                "Directly inward toward the axis of rotation"
+            ],
+            correct: 3
+        },
+        {
+            q: "When analyzing a mechanism with two moving parts (e.g., an excavator arm), we often use 'Intermediate Frames'. In 'Case I' analysis where we neglect the orientation of the second frame temporarily, we treat the origin of the second frame \\(O_2\\) as:",
+            options: [
+                "A rigid body with infinite mass",
+                "A simple particle moving in Frame 1",
+                "A fixed point in space",
+                "A massless vector"
+            ],
+            correct: 1
+        },
+        {
+            q: "A motor is spinning up, meaning its angular velocity \\(\\omega\\) is increasing over time. Which acceleration component depends directly on this change in angular velocity (\\(\\dot{\\omega}\\))?",
+            options: [
+                "Coriolis Acceleration",
+                "Euler (Tangential) Acceleration",
+                "Centripetal Acceleration",
+                "Relative Acceleration"
+            ],
+            correct: 1
+        },
+        {
+            q: "You are calculating the Inertia Tensor for a rectangular satellite body. The diagonal term \\( I_{zz} \\) (Moment of Inertia about the Z-axis) is calculated as:",
+            options: [
+                "\\( \\sum m_i (x_i^2 + y_i^2) \\)",
+                "\\( \\sum m_i (y_i^2 + z_i^2) \\)",
+                "\\( \\sum m_i (x_i y_i) \\)",
+                "\\( \\sum m_i (x_i + y_i)^2 \\)"
+            ],
+            correct: 0
+        },
+        {
+            q: "If a rigid body has a plane of symmetry at \\( x = 0 \\) (the YZ plane), what can be said about the Products of Inertia involving \\( x \\) (i.e., \\( I_{xy} \\) and \\( I_{xz} \\))?",
+            options: [
+                "They are both infinite",
+                "They are equal to the mass \\( M \\)",
+                "They are both zero",
+                "They are equal to \\( I_{xx} \\)"
+            ],
+            correct: 2
+        },
+        {
+            q: "The Parallel Axis Theorem allows us to move the moment of inertia from the center of mass to a parallel axis. If shifting the Z-axis by distances \\(a\\) and \\(b\\) in the X and Y directions respectively, the new \\( I_{z'z'} \\) is:",
+            options: [
+                "\\( I_{zz} + M(a^2 + b^2) \\)",
+                "\\( I_{zz} - M(a^2 + b^2) \\)",
+                "\\( I_{zz} \\times (a^2 + b^2) \\)",
+                "\\( I_{zz} + M(a + b) \\)"
+            ],
+            correct: 0
+        },
+        {
+            q: "For a system of particles, the total angular momentum \\( H_O \\) about a fixed point O is defined using the position vector \\( r_i \\) and linear momentum \\( m_i v_i \\) as:",
+            options: [
+                "\\( \\sum r_i \\cdot (m_i v_i) \\)",
+                "\\( \\sum r_i \\times (m_i v_i) \\)",
+                "\\( \\sum (m_i v_i) \\times r_i \\)",
+                "\\( \\sum m_i (r_i \\times a_i) \\)"
+            ],
+            correct: 1
+        },
+        {
+            q: "In the matrix form of the rotational equation \\( \\{H\\}_o = [I]_o \\{\\omega\\} \\), the symbol \\( [I]_o \\) represents:",
+            options: [
+                "The angular velocity vector",
+                "The identity matrix",
+                "The Inertia Tensor matrix",
+                "The center of mass vector"
+            ],
+            correct: 2
+        },
+        {
+            q: "A thin rod of mass \\(M\\) and length \\(L\\) connects two planets. If we calculate the moment of inertia about an axis perpendicular to the rod passing through its *center*, the value is:",
+            options: [
+                "\\( \\frac{1}{3} ML^2 \\)",
+                "\\( \\frac{1}{12} ML^2 \\)",
+                "\\( \\frac{1}{2} ML^2 \\)",
+                "\\( \\frac{2}{5} ML^2 \\)"
+            ],
+            correct: 1
+        },
+        {
+            q: "The derivative of angular momentum \\( \\frac{dH_B}{dt} \\) is related to the external torque \\( \\tau_B \\). If the reference point B is moving with velocity \\(v_B\\) and the center of mass has velocity \\(v\\), the torque equation is modified by:",
+            options: [
+                "Adding \\( v_B \\times p \\)",
+                "Subtracting \\( v_B \\cdot p \\)",
+                "Multiplying by mass \\( M \\)",
+                "No modification is needed"
+            ],
+            correct: 0
+        },
+        {
+            q: "Consider a point P described in a moving frame \\( oxyz \\) which is attached to a vehicle. If the vehicle stops moving linearly but continues to rotate, which term in the absolute velocity equation \\( v = \\frac{dR_0}{dt} + v_{rel} + \\omega \\times r \\) becomes zero?",
+            options: [
+                "\\( v_{rel} \\)",
+                "\\( \\omega \\times r \\)",
+                "\\( \\frac{dR_0}{dt} \\)",
+                "All terms become zero"
+            ],
+            correct: 2
+        },
+        {
+            q: "The 'Product of Inertia' \\( I_{xy} \\) is mathematically defined as:",
+            options: [
+                "\\( \\sum m_i (x_i^2 + y_i^2) \\)",
+                "\\( - \\sum m_i x_i y_i \\)",
+                "\\( \\sum m_i x_i y_i \\)",
+                "\\( \\sum m_i (x_i - y_i) \\)"
+            ],
+            correct: 1
+        },
+        {
+            q: "If a solid sphere of Mass \\(M\\) and radius \\(R\\) is rotating about an axis tangent to its surface (at the edge), which theorem would you use to find the inertia relative to the inertia at its center (\\(\\frac{2}{5}MR^2\\))?",
+            options: [
+                "Perpendicular Axis Theorem",
+                "Transport Theorem",
+                "Parallel Axis Theorem",
+                "Angular Momentum Theorem"
+            ],
+            correct: 2
+        },
+        {
+            q: "In the general acceleration equation, the term \\( a_{rel} \\) represents:",
+            options: [
+                "The acceleration of the frame origin",
+                "The acceleration of the particle as seen by an observer attached to the moving frame",
+                "The acceleration due to the rotation of the frame",
+                "The absolute acceleration relative to the ground"
+            ],
+            correct: 1
+        },
+        {
+            q: "When calculating the time derivative of a vector \\( B \\) in a rotating frame, the formula is \\( \\frac{dB}{dt} = (\\frac{\\partial B}{\\partial t})_{rel} + \\omega \\times B \\). If vector \\( B \\) is constant relative to the moving frame (like a rigidly attached antenna), what is \\( \\frac{dB}{dt} \\)?",
+            options: [
+                "Zero",
+                "\\( \\omega \\times B \\)",
+                "\\( (\\frac{\\partial B}{\\partial t})_{rel} \\)",
+                "\\( \\omega \\cdot B \\)"
+            ],
+            correct: 1
+        },
+        {
+            q: "A gyroscope flywheel has a large Moment of Inertia \\( I_{xx} \\) about its spin axis. If \\( I_{xy} = I_{xz} = 0 \\), this axis is called a:",
+            options: [
+                "Parallel Axis",
+                "Principal Axis of Inertia",
+                "Relative Axis",
+                "Translation Axis"
+            ],
+            correct: 1
+        },
+        {
+            q: "If you have a composite body made of two spheres connected by a rod, the total Moment of Inertia about the central axis is found by:",
+            options: [
+                "Multiplying the inertias of the individual parts",
+                "Subtracting the inertia of the rod from the spheres",
+                "Summing the inertias of all individual components (applying Parallel Axis Theorem where necessary)",
+                "Considering only the heaviest component"
+            ],
+            correct: 2
+        }
+    ];
+
+    // --- State Variables ---
+    let currentQuestion = 0;
+    let userAnswers = new Array(quizData.length).fill(null);
+    let flaggedQuestions = new Array(quizData.length).fill(false);
+    let timeLeft = 30 * 60; // 30 minutes in seconds
+    let timerInterval;
+
+    // --- Initialization ---
+    document.addEventListener('DOMContentLoaded', () => {
+        initNavigation();
+        loadQuestion(0);
+        startTimer();
+    });
+
+    // --- Functions ---
+    function startTimer() {
+        timerInterval = setInterval(() => {
+            timeLeft--;
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+
+            const display = document.getElementById('timer');
+            display.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+            // Warning style for last minute
+            if (timeLeft <= 60) {
+                display.classList.add('timer-warning');
+                display.style.color = 'var(--accent)';
+            }
+
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                submitQuiz();
+            }
+        }, 1000);
+    }
+
+    function initNavigation() {
+        const navGrid = document.getElementById('navGrid');
+        navGrid.innerHTML = '';
+        quizData.forEach((_, index) => {
+            const btn = document.createElement('button');
+            btn.className = 'nav-btn';
+            btn.textContent = index + 1;
+            btn.onclick = () => loadQuestion(index);
+            btn.id = `nav-${index}`;
+            navGrid.appendChild(btn);
+        });
+    }
+
+    function loadQuestion(index) {
+        currentQuestion = index;
+
+        // Update Header
+        document.getElementById('currentQNum').textContent = index + 1;
+
+        // Update Question Text
+        const qTextEl = document.getElementById('questionText');
+        qTextEl.textContent = quizData[index].q;
+
+        // Update Options
+        const optionsContainer = document.getElementById('optionsContainer');
+        optionsContainer.innerHTML = '';
+
+        quizData[index].options.forEach((opt, optIndex) => {
+            const label = document.createElement('label');
+            label.className = 'option-label';
+            if (userAnswers[index] === optIndex) label.classList.add('selected');
+
+            const input = document.createElement('input');
+            input.type = 'radio';
+            input.name = 'quizOption';
+            input.value = optIndex;
+            input.checked = userAnswers[index] === optIndex;
+            input.onchange = () => selectOption(optIndex);
+
+            const span = document.createElement('span');
+            span.textContent = opt;
+
+            label.appendChild(input);
+            label.appendChild(span);
+            optionsContainer.appendChild(label);
+        });
+
+        // Retrigger MathJax
+        if (window.MathJax) {
+            MathJax.typesetPromise([qTextEl, optionsContainer]);
+        }
+
+        // Update Buttons Visibility
+        document.getElementById('prevBtn').disabled = index === 0;
+
+        const nextBtn = document.getElementById('nextBtn');
+        const submitBtn = document.getElementById('submitBtn');
+
+        if (index === quizData.length - 1) {
+            nextBtn.style.display = 'none';
+            submitBtn.style.display = 'flex';
+        } else {
+            nextBtn.style.display = 'flex';
+            submitBtn.style.display = 'none';
+        }
+
+        // Update Flag Button state
+        const flagBtn = document.getElementById('flagBtn');
+        const flagText = document.getElementById('flagText');
+        if (flaggedQuestions[index]) {
+            flagBtn.classList.add('active');
+            flagText.textContent = 'Flagged';
+        } else {
+            flagBtn.classList.remove('active');
+            flagText.textContent = 'Flag for Review';
+        }
+
+        updateNavStyles();
+    }
+
+    function selectOption(optIndex) {
+        userAnswers[currentQuestion] = optIndex;
+        // Visual update without full reload
+        const labels = document.querySelectorAll('.option-label');
+        labels.forEach((l, i) => {
+            if (i === optIndex) l.classList.add('selected');
+            else l.classList.remove('selected');
+        });
+        updateNavStyles();
+    }
+
+    function changeQuestion(delta) {
+        const newIndex = currentQuestion + delta;
+        if (newIndex >= 0 && newIndex < quizData.length) {
+            loadQuestion(newIndex);
+        }
+    }
+
+    function toggleFlag() {
+        flaggedQuestions[currentQuestion] = !flaggedQuestions[currentQuestion];
+        loadQuestion(currentQuestion); // Refresh button state
+    }
+
+    function updateNavStyles() {
+        quizData.forEach((_, i) => {
+            const btn = document.getElementById(`nav-${i}`);
+            btn.className = 'nav-btn';
+
+            if (i === currentQuestion) btn.classList.add('active');
+            if (userAnswers[i] !== null) btn.classList.add('answered');
+            if (flaggedQuestions[i]) btn.classList.add('flagged');
+        });
+    }
+
+    function submitQuiz() {
+        clearInterval(timerInterval);
+
+        let score = 0;
+        let correctCount = 0;
+
+        userAnswers.forEach((ans, index) => {
+            if (ans === quizData[index].correct) {
+                score += 5;
+                correctCount++;
+            }
+        });
+
+        const scoreElement = document.getElementById('finalScore');
+        const feedbackElement = document.getElementById('feedbackText');
+
+        // Animate Score
+        let currentDisplayScore = 0;
+        const scoreAnimation = setInterval(() => {
+            if (currentDisplayScore < score) {
+                currentDisplayScore++;
+                scoreElement.textContent = currentDisplayScore;
+            } else {
+                clearInterval(scoreAnimation);
+            }
+        }, 20);
+
+        // Feedback Logic
+        if (score >= 90) {
+            feedbackElement.innerHTML = `<strong>Outstanding!</strong><br>You have a deep understanding of Rotating Frames and Inertia Tensors.`;
+            document.querySelector('.score-circle').style.borderColor = "var(--success)";
+        } else if (score >= 70) {
+            feedbackElement.innerHTML = `<strong>Great Job!</strong><br>You have a solid grasp of the concepts. Review the acceleration terms (Coriolis/Euler) to perfect your score.`;
+            document.querySelector('.score-circle').style.borderColor = "var(--secondary)";
+        } else if (score >= 50) {
+            feedbackElement.innerHTML = `<strong>Good Effort.</strong><br>You understand the basics, but check the Transport Theorem and Parallel Axis Theorem again.`;
+            document.querySelector('.score-circle').style.borderColor = "var(--accent)";
+        } else {
+            feedbackElement.innerHTML = `<strong>Keep Practicing.</strong><br>Focus on the definitions of Frame of Reference and the fundamental velocity/acceleration equations.`;
+            document.querySelector('.score-circle').style.borderColor = "var(--danger)";
+        }
+
+        document.getElementById('resultModal').style.display = 'flex';
+    }
+</script>
+
+</body>
+</html>
