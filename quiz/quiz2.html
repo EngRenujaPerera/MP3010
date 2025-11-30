@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Coordinate Frames & Transformations Quiz</title>
     <style>
         :root {
@@ -12,7 +12,10 @@
             --light: #ecf0f1;
             --success: #27ae60;
             --danger: #c0392b;
+            --header-height: 60px;
         }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -22,9 +25,38 @@
             display: flex;
             height: 100vh;
             color: #333;
+            overflow: hidden;
         }
 
-        /* Sidebar for Navigation */
+        /* --- Mobile Header (Hidden on Desktop) --- */
+        .mobile-header {
+            display: none;
+            height: var(--header-height);
+            background: var(--primary);
+            align-items: center;
+            padding: 0 15px;
+            justify-content: space-between;
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 50;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            color: white;
+        }
+
+        .mobile-menu-btn {
+            background: none; border: none; color: white;
+            font-size: 24px; cursor: pointer; padding: 5px;
+        }
+
+        .mobile-timer {
+            font-weight: bold;
+            font-variant-numeric: tabular-nums;
+            background: rgba(255,255,255,0.1);
+            padding: 4px 10px;
+            border-radius: 4px;
+        }
+
+        /* --- Sidebar --- */
         .sidebar {
             width: 280px;
             background-color: var(--primary);
@@ -34,7 +66,16 @@
             padding: 20px;
             box-shadow: 4px 0 10px rgba(0,0,0,0.1);
             overflow-y: auto;
-            z-index: 10;
+            z-index: 100;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Overlay */
+        .sidebar-overlay {
+            display: none;
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5); z-index: 90;
+            backdrop-filter: blur(2px);
         }
 
         .timer-box {
@@ -73,7 +114,7 @@
         .nav-btn.answered { background: var(--success); border-color: var(--success); }
         .nav-btn.flagged { border-color: var(--accent); color: var(--accent); background: rgba(230, 126, 34, 0.2); }
 
-        /* Main Content Area */
+        /* --- Main Content --- */
         .main-content {
             flex: 1;
             padding: 40px;
@@ -135,7 +176,7 @@
         .option-label:hover { border-color: var(--secondary); background: #fbf8fc; transform: translateX(5px); }
         .option-label.selected { border-color: var(--secondary); background-color: #f4ecf7; box-shadow: 0 4px 10px rgba(142, 68, 173, 0.15); }
 
-        input[type="radio"] { margin-right: 20px; transform: scale(1.3); accent-color: var(--secondary); }
+        input[type="radio"] { margin-right: 20px; transform: scale(1.3); accent-color: var(--secondary); flex-shrink: 0; }
 
         .controls {
             display: flex;
@@ -155,115 +196,127 @@
             transition: all 0.2s;
             display: flex;
             align-items: center;
+            justify-content: center;
             gap: 8px;
         }
 
         .btn:active { transform: scale(0.96); }
         .btn-secondary { background: #dfe6e9; color: #636e72; }
-        .btn-secondary:hover { background: #b2bec3; }
         .btn-primary { background: var(--secondary); color: white; box-shadow: 0 4px 15px rgba(142, 68, 173, 0.3); }
         .btn-primary:hover { background: #7d3c98; }
         .btn-accent { background: white; border: 2px solid var(--accent); color: var(--accent); }
-        .btn-accent:hover { background: var(--accent); color: white; }
         .btn-accent.active { background: var(--accent); color: white; }
         .btn-success { background: var(--success); color: white; box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3); }
-        .btn-success:hover { background: #219150; }
 
         /* Results Modal */
         .modal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: rgba(44, 62, 80, 0.9);
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            backdrop-filter: blur(5px);
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(44, 62, 80, 0.9); justify-content: center; align-items: center;
+            z-index: 1000; backdrop-filter: blur(5px);
         }
 
         .modal-content {
-            background: white;
-            padding: 50px;
-            border-radius: 20px;
-            text-align: center;
-            max-width: 550px;
-            width: 90%;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            background: white; padding: 50px; border-radius: 20px; text-align: center;
+            max-width: 550px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.3);
             animation: slideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            max-height: 90vh; overflow-y: auto;
         }
 
         .score-circle {
-            width: 180px;
-            height: 180px;
-            border-radius: 50%;
-            border: 12px solid var(--secondary);
-            margin: 30px auto;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            font-size: 3.5em;
-            font-weight: 800;
-            color: var(--primary);
-            position: relative;
+            width: 180px; height: 180px; border-radius: 50%;
+            border: 12px solid var(--secondary); margin: 30px auto;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            font-size: 3.5em; font-weight: 800; color: var(--primary); position: relative;
         }
-
-        .score-circle::after {
-            content: '';
-            position: absolute;
-            top: -12px; left: -12px;
-            right: -12px; bottom: -12px;
-            border-radius: 50%;
-            border: 12px solid rgba(0,0,0,0.05);
-            z-index: -1;
-        }
-
-        .score-sub { font-size: 14px; text-transform: uppercase; color: #95a5a6; font-weight: normal; margin-top: -10px; }
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes slideUp { from { transform: translateY(100px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
 
-        /* MathJax override */
         .mjx-chtml { outline: 0; }
+
+        /* --- MOBILE OPTIMIZATIONS --- */
+        @media (max-width: 900px) {
+            body { flex-direction: column; }
+
+            /* Show Mobile Header */
+            .mobile-header { display: flex; }
+
+            /* Sidebar becomes a drawer */
+            .sidebar {
+                position: fixed; top: 0; left: 0; bottom: 0;
+                width: 85%; max-width: 320px;
+                transform: translateX(-100%);
+                border-right: none;
+            }
+            .sidebar.open { transform: translateX(0); }
+            .sidebar-overlay.active { display: block; }
+
+            /* Main Content Adjustments */
+            .main-content {
+                padding: 20px;
+                padding-top: calc(var(--header-height) + 20px);
+            }
+
+            .quiz-container {
+                padding: 25px;
+                border-radius: 8px;
+            }
+
+            .question-text { font-size: 1.1em; }
+            .option-label { padding: 15px; font-size: 0.95em; }
+
+            /* Responsive Controls */
+            .controls { flex-direction: column; gap: 15px; }
+            .controls > button { width: 100%; }
+            .controls > div { display: flex; width: 100%; gap: 10px; }
+            .controls > div > button { flex: 1; }
+
+            /* Hide Desktop Timer since we have Mobile Header Timer */
+            .sidebar .timer-box { display: none; }
+        }
     </style>
     <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </head>
 <body>
 
-<div class="sidebar">
+<div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+<header class="mobile-header">
+    <button class="mobile-menu-btn" onclick="toggleSidebar()">☰</button>
+    <span style="font-weight:700; font-size: 1.1em;">Quiz 02</span>
+    <div class="mobile-timer" id="mobileTimer">30:00</div>
+</header>
+
+<div class="sidebar" id="sidebar">
     <div class="timer-box">
         <div class="timer-label">Time Remaining</div>
         <div class="timer-display" id="timer">30:00</div>
     </div>
     <div style="margin-bottom: 15px; font-size: 0.85em; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.6);">Question Overview</div>
-    <div class="question-nav" id="navGrid">
-        </div>
+    <div class="question-nav" id="navGrid"></div>
 </div>
 
 <div class="main-content">
     <div class="quiz-container" id="quizContainer">
         <div class="question-header">
-            <h2 style="margin:0; font-weight: 700; color: var(--primary);">Question <span id="currentQNum">1</span><span style="color:#bdc3c7; font-weight:300;"> / 20</span></h2>
+            <h2 style="margin:0; font-weight: 700; color: var(--primary); font-size: 1.2rem;">Question <span id="currentQNum">1</span><span style="color:#bdc3c7; font-weight:300;"> / 20</span></h2>
             <div class="badge">5 Marks Each</div>
         </div>
 
-        <div class="question-text" id="questionText">
-            </div>
+        <div class="question-text" id="questionText"></div>
 
-        <div class="options-grid" id="optionsContainer">
-            </div>
+        <div class="options-grid" id="optionsContainer"></div>
 
         <div class="controls">
             <button class="btn btn-accent" id="flagBtn" onclick="toggleFlag()">
-                <span id="flagIcon">⚑</span> <span id="flagText">Flag for Review</span>
+                <span id="flagIcon">⚑</span> <span id="flagText">Flag</span>
             </button>
             <div style="display: flex; gap: 10px;">
-                <button class="btn btn-secondary" id="prevBtn" onclick="changeQuestion(-1)">Previous</button>
-                <button class="btn btn-primary" id="nextBtn" onclick="changeQuestion(1)">Next Question</button>
-                <button class="btn btn-success" id="submitBtn" style="display:none;" onclick="submitQuiz()">Submit Quiz</button>
+                <button class="btn btn-secondary" id="prevBtn" onclick="changeQuestion(-1)">Prev</button>
+                <button class="btn btn-primary" id="nextBtn" onclick="changeQuestion(1)">Next</button>
+                <button class="btn btn-success" id="submitBtn" style="display:none;" onclick="submitQuiz()">Submit</button>
             </div>
         </div>
     </div>
@@ -276,12 +329,12 @@
 
         <div class="score-circle">
             <span id="finalScore">0</span>
-            <span class="score-sub">Total Score</span>
+            <span class="score-sub" style="font-size: 12px; margin-top: -5px;">Total Score</span>
         </div>
 
-        <p id="feedbackText" style="font-size: 1.1em; margin-bottom: 30px; padding: 0 20px;"></p>
+        <p id="feedbackText" style="font-size: 1.1em; margin-bottom: 30px; padding: 0 10px;"></p>
 
-        <div style="display:flex; justify-content: center; gap: 15px;">
+        <div style="display:flex; justify-content: center; gap: 15px; flex-wrap: wrap;">
             <button class="btn btn-secondary" onclick="location.reload()">Close</button>
             <button class="btn btn-primary" onclick="location.reload()">Retake Quiz</button>
         </div>
@@ -289,216 +342,42 @@
 </div>
 
 <script>
-    // --- Quiz Data for Day 02 (Coordinate Frames, Rotation, Translation) ---
+    // --- Quiz Data ---
     const quizData = [
-        {
-            q: "A rotation matrix \\( R \\) has the property that its inverse is equal to its transpose (\\( R^{-1} = R^T \\)). This property is a direct consequence of the matrix being:",
-            options: [
-                "Symmetric",
-                "Orthogonal",
-                "Skew-symmetric",
-                "Singular"
-            ],
-            correct: 1
-        },
-        {
-            q: "In the \\( 4 \\times 4 \\) Homogeneous Transformation Matrix, the bottom-right element (index 4,4) represents the scale factor \\( \\sigma \\). For a standard rigid body transformation (no scaling), this value must be:",
-            options: [
-                "0",
-                "1",
-                "\\( \\infty \\)",
-                "It depends on the rotation"
-            ],
-            correct: 1
-        },
-        {
-            q: "Consider a robotic arm base (Fixed Frame). If you perform a rotation of \\( \\theta_1 \\) about X, followed by \\( \\theta_2 \\) about Y, and finally \\( \\theta_3 \\) about Z (all about the **fixed** axes), the resulting total rotation matrix \\( R \\) is calculated as:",
-            options: [
-                "\\( R_x(\\theta_1) R_y(\\theta_2) R_z(\\theta_3) \\)",
-                "\\( R_z(\\theta_3) R_y(\\theta_2) R_x(\\theta_1) \\)",
-                "\\( R_x(\\theta_1) + R_y(\\theta_2) + R_z(\\theta_3) \\)",
-                "\\( (R_x R_y R_z)^T \\)"
-            ],
-            correct: 1
-        },
-        {
-            q: "In contrast to fixed frame rotations, if a frame rotates about its **own moving axes** (Euler Angles: e.g., rotate about current w, then current v', then current u''), the equivalent rotation matrix is found by:",
-            options: [
-                "Pre-multiplying the new rotation (Left-side multiplication)",
-                "Post-multiplying the new rotation (Right-side multiplication)",
-                "Adding the matrices",
-                "Inverting the matrices"
-            ],
-            correct: 1
-        },
-        {
-            q: "If frame \\{2\\} is translated relative to frame \\{1\\} by a vector \\( ^1D_2 \\), the relationship between the coordinates of a point \\( P \\) in both frames is given by:",
-            options: [
-                "\\( ^1P = ^2P - ^1D_2 \\)",
-                "\\( ^1P = ^2P + ^1D_2 \\)",
-                "\\( ^1P = ^1D_2 \\times ^2P \\)",
-                "\\( ^1P = (^1D_2)^T (^2P) \\)"
-            ],
-            correct: 1
-        },
-        {
-            q: "Matrix multiplication is generally **non-commutative**. What does this imply for 3D rotations?",
-            options: [
-                "The order of rotations does not matter",
-                "A rotation of 90° is the same as -90°",
-                "Rotating about X then Y gives a different orientation than Y then X",
-                "Rotation matrices cannot be inverted"
-            ],
-            correct: 2
-        },
-        {
-            q: "The 'Fixed Angle' representation where rotations occur about the fixed X, Y, and Z axes is commonly known in aviation and robotics as:",
-            options: [
-                "Euler Parameters",
-                "Roll, Pitch, and Yaw (RPY)",
-                "Quaternions",
-                "Axis-Angle Representation"
-            ],
-            correct: 1
-        },
-        {
-            q: "Which of the following is the correct rotation matrix for a rotation of \\( \\theta \\) about the **Z-axis**?",
-            options: [
-                "\\( \\begin{bmatrix} 1 & 0 & 0 \\\\ 0 & \\cos\\theta & -\\sin\\theta \\\\ 0 & \\sin\\theta & \\cos\\theta \\end{bmatrix} \\)",
-                "\\( \\begin{bmatrix} \\cos\\theta & 0 & \\sin\\theta \\\\ 0 & 1 & 0 \\\\ -\\sin\\theta & 0 & \\cos\\theta \\end{bmatrix} \\)",
-                "\\( \\begin{bmatrix} \\cos\\theta & -\\sin\\theta & 0 \\\\ \\sin\\theta & \\cos\\theta & 0 \\\\ 0 & 0 & 1 \\end{bmatrix} \\)",
-                "\\( \\begin{bmatrix} 1 & 0 & 0 \\\\ 0 & 1 & 0 \\\\ 0 & 0 & 1 \\end{bmatrix} \\)"
-            ],
-            correct: 2
-        },
-        {
-            q: "In the \\( 4 \\times 4 \\) Homogeneous Transformation Matrix, the top-right \\( 3 \\times 1 \\) sub-matrix represents:",
-            options: [
-                "The Rotation Matrix",
-                "The Perspective Transformation",
-                "The Translation Vector",
-                "The Scale Factor"
-            ],
-            correct: 2
-        },
-        {
-            q: "If the dot product of the X-axis of frame {1} and the Y-axis of frame {2} is 0 (\\( \\hat{x}_1 \\cdot \\hat{y}_2 = 0 \\)), what does this imply geometrically?",
-            options: [
-                "The axes are parallel",
-                "The axes are perpendicular (orthogonal)",
-                "The axes are coincident",
-                "The frames are at the same origin"
-            ],
-            correct: 1
-        },
-        {
-            q: "The 'WVU-Euler Angle' representation specifically refers to rotations that occur:",
-            options: [
-                "About the fixed base frame axes",
-                "About the current, moving principal axes",
-                "About an arbitrary vector K",
-                "Only in the 2D plane"
-            ],
-            correct: 1
-        },
-        {
-            q: "For a rotation matrix \\( R \\), the product \\( R R^T \\) must always equal:",
-            options: [
-                "The Zero Matrix",
-                "The Identity Matrix \\( I \\)",
-                "\\( 2R \\)",
-                "The Translation Vector"
-            ],
-            correct: 1
-        },
-        {
-            q: "You are given a transformation matrix \\( T \\) describing a robot hand. If you need to find the position of the world origin relative to the hand (inverse transformation), the rotation part of the new matrix will be:",
-            options: [
-                "The same as the original rotation",
-                "The transpose of the original rotation matrix",
-                "The negative of the original rotation matrix",
-                "The determinant of the rotation matrix"
-            ],
-            correct: 1
-        },
-        {
-            q: "In a homogeneous transformation matrix, the row vector \\( [0, 0, 0, 1] \\) at the bottom is essentially a placeholder for rigid body mechanics. The \\( [0, 0, 0] \\) part specifically relates to:",
-            options: [
-                "Translation",
-                "Rotation",
-                "Perspective / Projective transformation",
-                "Shearing"
-            ],
-            correct: 2
-        },
-        {
-            q: "How many degrees of freedom does a free rigid body have in 3D space?",
-            options: [
-                "3 (Position only)",
-                "4 (Time + Position)",
-                "6 (3 Position + 3 Orientation)",
-                "9 (Elements of rotation matrix)"
-            ],
-            correct: 2
-        },
-        {
-            q: "Two frames {A} and {B} are coincident. If {B} is rotated 90 degrees about the Z-axis, the coordinate of a point \\( P = [1, 0, 0]^T \\) (attached to B) as seen from frame {A} would be:",
-            options: [
-                "\\( [1, 0, 0]^T \\)",
-                "\\( [0, 1, 0]^T \\)",
-                "\\( [0, -1, 0]^T \\)",
-                "\\( [0, 0, 1]^T \\)"
-            ],
-            correct: 1
-        },
-        {
-            q: "The relation \\( ^2R_1 = (^1R_2)^{-1} \\) implies that if you know the rotation of Frame 2 w.r.t Frame 1, you can find the rotation of Frame 1 w.r.t Frame 2 by:",
-            options: [
-                "Squaring the matrix",
-                "Taking the Transpose of the matrix",
-                "Negating all elements",
-                "Multiplying by the Identity matrix"
-            ],
-            correct: 1
-        },
-        {
-            q: "Which rotation matrix represents a rotation of \\( \\theta \\) about the **X-axis**?",
-            options: [
-                "\\( \\begin{bmatrix} 1 & 0 & 0 \\\\ 0 & \\cos\\theta & -\\sin\\theta \\\\ 0 & \\sin\\theta & \\cos\\theta \\end{bmatrix} \\)",
-                "\\( \\begin{bmatrix} \\cos\\theta & 0 & \\sin\\theta \\\\ 0 & 1 & 0 \\\\ -\\sin\\theta & 0 & \\cos\\theta \\end{bmatrix} \\)",
-                "\\( \\begin{bmatrix} \\cos\\theta & -\\sin\\theta & 0 \\\\ \\sin\\theta & \\cos\\theta & 0 \\\\ 0 & 0 & 1 \\end{bmatrix} \\)",
-                "\\( \\begin{bmatrix} 0 & 1 & 0 \\\\ 1 & 0 & 0 \\\\ 0 & 0 & 1 \\end{bmatrix} \\)"
-            ],
-            correct: 0
-        },
-        {
-            q: "If a Frame {B} is first translated by vector \\( D \\) and *then* rotated by matrix \\( R \\) relative to Frame {A}, the compound transformation requires careful matrix construction. In the standard Homogeneous Matrix \\( T \\), the translation column represents the position of the new origin:",
-            options: [
-                "Relative to the new rotated axes",
-                "Relative to the original fixed axes",
-                "Relative to the midpoint",
-                "It is always zero"
-            ],
-            correct: 1
-        },
-        {
-            q: "In the context of Euler angles, if two axes align such that a degree of freedom is lost (Gimbal Lock), the rotation matrix becomes:",
-            options: [
-                "Singular (Determinant is 0)",
-                "Identity",
-                "Still valid, but the mapping from angles to matrix is not unique",
-                "Infinite"
-            ],
-            correct: 2
-        }
+        { q: "A rotation matrix \\( R \\) has the property that its inverse is equal to its transpose (\\( R^{-1} = R^T \\)). This property is a direct consequence of the matrix being:", options: [ "Symmetric", "Orthogonal", "Skew-symmetric", "Singular" ], correct: 1 },
+        { q: "In the \\( 4 \\times 4 \\) Homogeneous Transformation Matrix, the bottom-right element (index 4,4) represents the scale factor \\( \\sigma \\). For a standard rigid body transformation (no scaling), this value must be:", options: [ "0", "1", "\\( \\infty \\)", "It depends on the rotation" ], correct: 1 },
+        { q: "Consider a robotic arm base (Fixed Frame). If you perform a rotation of \\( \\theta_1 \\) about X, followed by \\( \\theta_2 \\) about Y, and finally \\( \\theta_3 \\) about Z (all about the **fixed** axes), the resulting total rotation matrix \\( R \\) is calculated as:", options: [ "\\( R_x(\\theta_1) R_y(\\theta_2) R_z(\\theta_3) \\)", "\\( R_z(\\theta_3) R_y(\\theta_2) R_x(\\theta_1) \\)", "\\( R_x(\\theta_1) + R_y(\\theta_2) + R_z(\\theta_3) \\)", "\\( (R_x R_y R_z)^T \\)" ], correct: 1 },
+        { q: "In contrast to fixed frame rotations, if a frame rotates about its **own moving axes** (Euler Angles: e.g., rotate about current w, then current v', then current u''), the equivalent rotation matrix is found by:", options: [ "Pre-multiplying the new rotation (Left-side multiplication)", "Post-multiplying the new rotation (Right-side multiplication)", "Adding the matrices", "Inverting the matrices" ], correct: 1 },
+        { q: "If frame \\{2\\} is translated relative to frame \\{1\\} by a vector \\( ^1D_2 \\), the relationship between the coordinates of a point \\( P \\) in both frames is given by:", options: [ "\\( ^1P = ^2P - ^1D_2 \\)", "\\( ^1P = ^2P + ^1D_2 \\)", "\\( ^1P = ^1D_2 \\times ^2P \\)", "\\( ^1P = (^1D_2)^T (^2P) \\)" ], correct: 1 },
+        { q: "Matrix multiplication is generally **non-commutative**. What does this imply for 3D rotations?", options: [ "The order of rotations does not matter", "A rotation of 90° is the same as -90°", "Rotating about X then Y gives a different orientation than Y then X", "Rotation matrices cannot be inverted" ], correct: 2 },
+        { q: "The 'Fixed Angle' representation where rotations occur about the fixed X, Y, and Z axes is commonly known in aviation and robotics as:", options: [ "Euler Parameters", "Roll, Pitch, and Yaw (RPY)", "Quaternions", "Axis-Angle Representation" ], correct: 1 },
+        { q: "Which of the following is the correct rotation matrix for a rotation of \\( \\theta \\) about the **Z-axis**?", options: [ "\\( \\begin{bmatrix} 1 & 0 & 0 \\\\ 0 & \\cos\\theta & -\\sin\\theta \\\\ 0 & \\sin\\theta & \\cos\\theta \\end{bmatrix} \\)", "\\( \\begin{bmatrix} \\cos\\theta & 0 & \\sin\\theta \\\\ 0 & 1 & 0 \\\\ -\\sin\\theta & 0 & \\cos\\theta \\end{bmatrix} \\)", "\\( \\begin{bmatrix} \\cos\\theta & -\\sin\\theta & 0 \\\\ \\sin\\theta & \\cos\\theta & 0 \\\\ 0 & 0 & 1 \\end{bmatrix} \\)", "\\( \\begin{bmatrix} 1 & 0 & 0 \\\\ 0 & 1 & 0 \\\\ 0 & 0 & 1 \\end{bmatrix} \\)" ], correct: 2 },
+        { q: "In the \\( 4 \\times 4 \\) Homogeneous Transformation Matrix, the top-right \\( 3 \\times 1 \\) sub-matrix represents:", options: [ "The Rotation Matrix", "The Perspective Transformation", "The Translation Vector", "The Scale Factor" ], correct: 2 },
+        { q: "If the dot product of the X-axis of frame {1} and the Y-axis of frame {2} is 0 (\\( \\hat{x}_1 \\cdot \\hat{y}_2 = 0 \\)), what does this imply geometrically?", options: [ "The axes are parallel", "The axes are perpendicular (orthogonal)", "The axes are coincident", "The frames are at the same origin" ], correct: 1 },
+        { q: "The 'WVU-Euler Angle' representation specifically refers to rotations that occur:", options: [ "About the fixed base frame axes", "About the current, moving principal axes", "About an arbitrary vector K", "Only in the 2D plane" ], correct: 1 },
+        { q: "For a rotation matrix \\( R \\), the product \\( R R^T \\) must always equal:", options: [ "The Zero Matrix", "The Identity Matrix \\( I \\)", "\\( 2R \\)", "The Translation Vector" ], correct: 1 },
+        { q: "You are given a transformation matrix \\( T \\) describing a robot hand. If you need to find the position of the world origin relative to the hand (inverse transformation), the rotation part of the new matrix will be:", options: [ "The same as the original rotation", "The transpose of the original rotation matrix", "The negative of the original rotation matrix", "The determinant of the rotation matrix" ], correct: 1 },
+        { q: "In a homogeneous transformation matrix, the row vector \\( [0, 0, 0, 1] \\) at the bottom is essentially a placeholder for rigid body mechanics. The \\( [0, 0, 0] \\) part specifically relates to:", options: [ "Translation", "Rotation", "Perspective / Projective transformation", "Shearing" ], correct: 2 },
+        { q: "How many degrees of freedom does a free rigid body have in 3D space?", options: [ "3 (Position only)", "4 (Time + Position)", "6 (3 Position + 3 Orientation)", "9 (Elements of rotation matrix)" ], correct: 2 },
+        { q: "Two frames {A} and {B} are coincident. If {B} is rotated 90 degrees about the Z-axis, the coordinate of a point \\( P = [1, 0, 0]^T \\) (attached to B) as seen from frame {A} would be:", options: [ "\\( [1, 0, 0]^T \\)", "\\( [0, 1, 0]^T \\)", "\\( [0, -1, 0]^T \\)", "\\( [0, 0, 1]^T \\)" ], correct: 1 },
+        { q: "The relation \\( ^2R_1 = (^1R_2)^{-1} \\) implies that if you know the rotation of Frame 2 w.r.t Frame 1, you can find the rotation of Frame 1 w.r.t Frame 2 by:", options: [ "Squaring the matrix", "Taking the Transpose of the matrix", "Negating all elements", "Multiplying by the Identity matrix" ], correct: 1 },
+        { q: "Which rotation matrix represents a rotation of \\( \\theta \\) about the **X-axis**?", options: [ "\\( \\begin{bmatrix} 1 & 0 & 0 \\\\ 0 & \\cos\\theta & -\\sin\\theta \\\\ 0 & \\sin\\theta & \\cos\\theta \\end{bmatrix} \\)", "\\( \\begin{bmatrix} \\cos\\theta & 0 & \\sin\\theta \\\\ 0 & 1 & 0 \\\\ -\\sin\\theta & 0 & \\cos\\theta \\end{bmatrix} \\)", "\\( \\begin{bmatrix} \\cos\\theta & -\\sin\\theta & 0 \\\\ \\sin\\theta & \\cos\\theta & 0 \\\\ 0 & 0 & 1 \\end{bmatrix} \\)", "\\( \\begin{bmatrix} 0 & 1 & 0 \\\\ 1 & 0 & 0 \\\\ 0 & 0 & 1 \\end{bmatrix} \\)" ], correct: 0 },
+        { q: "If a Frame {B} is first translated by vector \\( D \\) and *then* rotated by matrix \\( R \\) relative to Frame {A}, the compound transformation requires careful matrix construction. In the standard Homogeneous Matrix \\( T \\), the translation column represents the position of the new origin:", options: [ "Relative to the new rotated axes", "Relative to the original fixed axes", "Relative to the midpoint", "It is always zero" ], correct: 1 },
+        { q: "In the context of Euler angles, if two axes align such that a degree of freedom is lost (Gimbal Lock), the rotation matrix becomes:", options: [ "Singular (Determinant is 0)", "Identity", "Still valid, but the mapping from angles to matrix is not unique", "Infinite" ], correct: 2 }
     ];
 
     // --- State Variables ---
     let currentQuestion = 0;
     let userAnswers = new Array(quizData.length).fill(null);
     let flaggedQuestions = new Array(quizData.length).fill(false);
-    let timeLeft = 30 * 60; // 30 minutes in seconds
+    let timeLeft = 30 * 60; 
     let timerInterval;
+
+    // --- DOM Elements ---
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.querySelector('.sidebar-overlay');
+    const mobileTimer = document.getElementById('mobileTimer');
+    const desktopTimer = document.getElementById('timer');
 
     // --- Initialization ---
     document.addEventListener('DOMContentLoaded', () => {
@@ -507,20 +386,27 @@
         startTimer();
     });
 
-    // --- Functions ---
+    // --- Sidebar / Mobile Functions ---
+    function toggleSidebar() {
+        sidebar.classList.toggle('open');
+        overlay.classList.toggle('active');
+        overlay.style.display = sidebar.classList.contains('open') ? 'block' : 'none';
+    }
+
+    // --- Core Logic ---
     function startTimer() {
         timerInterval = setInterval(() => {
             timeLeft--;
             const minutes = Math.floor(timeLeft / 60);
             const seconds = timeLeft % 60;
+            const timeString = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 
-            const display = document.getElementById('timer');
-            display.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            desktopTimer.textContent = timeString;
+            mobileTimer.textContent = timeString;
 
-            // Warning style for last minute
             if (timeLeft <= 60) {
-                display.classList.add('timer-warning');
-                display.style.color = 'var(--accent)';
+                desktopTimer.classList.add('timer-warning');
+                mobileTimer.style.color = 'var(--accent)';
             }
 
             if (timeLeft <= 0) {
@@ -537,7 +423,10 @@
             const btn = document.createElement('button');
             btn.className = 'nav-btn';
             btn.textContent = index + 1;
-            btn.onclick = () => loadQuestion(index);
+            btn.onclick = () => {
+                loadQuestion(index);
+                if(window.innerWidth <= 900) toggleSidebar();
+            };
             btn.id = `nav-${index}`;
             navGrid.appendChild(btn);
         });
@@ -545,15 +434,11 @@
 
     function loadQuestion(index) {
         currentQuestion = index;
-
-        // Update Header
         document.getElementById('currentQNum').textContent = index + 1;
 
-        // Update Question Text
         const qTextEl = document.getElementById('questionText');
         qTextEl.textContent = quizData[index].q;
 
-        // Update Options
         const optionsContainer = document.getElementById('optionsContainer');
         optionsContainer.innerHTML = '';
 
@@ -577,14 +462,9 @@
             optionsContainer.appendChild(label);
         });
 
-        // Retrigger MathJax
-        if (window.MathJax) {
-            MathJax.typesetPromise([qTextEl, optionsContainer]);
-        }
+        if (window.MathJax) MathJax.typesetPromise([qTextEl, optionsContainer]);
 
-        // Update Buttons Visibility
         document.getElementById('prevBtn').disabled = index === 0;
-
         const nextBtn = document.getElementById('nextBtn');
         const submitBtn = document.getElementById('submitBtn');
 
@@ -596,7 +476,6 @@
             submitBtn.style.display = 'none';
         }
 
-        // Update Flag Button state
         const flagBtn = document.getElementById('flagBtn');
         const flagText = document.getElementById('flagText');
         if (flaggedQuestions[index]) {
@@ -604,15 +483,13 @@
             flagText.textContent = 'Flagged';
         } else {
             flagBtn.classList.remove('active');
-            flagText.textContent = 'Flag for Review';
+            flagText.textContent = 'Flag';
         }
-
         updateNavStyles();
     }
 
     function selectOption(optIndex) {
         userAnswers[currentQuestion] = optIndex;
-        // Visual update without full reload
         const labels = document.querySelectorAll('.option-label');
         labels.forEach((l, i) => {
             if (i === optIndex) l.classList.add('selected');
@@ -623,21 +500,18 @@
 
     function changeQuestion(delta) {
         const newIndex = currentQuestion + delta;
-        if (newIndex >= 0 && newIndex < quizData.length) {
-            loadQuestion(newIndex);
-        }
+        if (newIndex >= 0 && newIndex < quizData.length) loadQuestion(newIndex);
     }
 
     function toggleFlag() {
         flaggedQuestions[currentQuestion] = !flaggedQuestions[currentQuestion];
-        loadQuestion(currentQuestion); // Refresh button state
+        loadQuestion(currentQuestion);
     }
 
     function updateNavStyles() {
         quizData.forEach((_, i) => {
             const btn = document.getElementById(`nav-${i}`);
             btn.className = 'nav-btn';
-
             if (i === currentQuestion) btn.classList.add('active');
             if (userAnswers[i] !== null) btn.classList.add('answered');
             if (flaggedQuestions[i]) btn.classList.add('flagged');
@@ -646,21 +520,14 @@
 
     function submitQuiz() {
         clearInterval(timerInterval);
-
         let score = 0;
-        let correctCount = 0;
-
         userAnswers.forEach((ans, index) => {
-            if (ans === quizData[index].correct) {
-                score += 5;
-                correctCount++;
-            }
+            if (ans === quizData[index].correct) score += 5;
         });
 
         const scoreElement = document.getElementById('finalScore');
         const feedbackElement = document.getElementById('feedbackText');
 
-        // Animate Score
         let currentDisplayScore = 0;
         const scoreAnimation = setInterval(() => {
             if (currentDisplayScore < score) {
@@ -671,7 +538,6 @@
             }
         }, 20);
 
-        // Feedback Logic
         if (score >= 90) {
             feedbackElement.innerHTML = `<strong>Outstanding!</strong><br>You have mastered Coordinate Transformations and Rotation Matrices.`;
             document.querySelector('.score-circle').style.borderColor = "var(--success)";
