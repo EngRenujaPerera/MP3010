@@ -17,6 +17,7 @@
             --text-muted: #94a3b8;
             --border: #334155;
             --quiz-accent: #fbbf24;
+            --success: #10b981;
             --header-height: 60px;
         }
 
@@ -32,140 +33,142 @@
             overflow: hidden;
         }
 
+        /* --- 1. NEW: THE PERSUASIVE MODAL STYLES --- */
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(8px); z-index: 2000;
+            display: none; /* Hidden by default, JS toggles it */
+            align-items: center; justify-content: center; padding: 20px;
+        }
+
+        .welcome-card {
+            background: linear-gradient(145deg, #1e293b, #0f172a);
+            border: 1px solid var(--border); border-radius: 20px;
+            width: 100%; max-width: 800px; display: flex; flex-direction: column;
+            overflow: hidden; box-shadow: 0 50px 100px -20px rgba(0,0,0,0.7);
+            animation: scaleIn 0.4s ease;
+        }
+
+        .welcome-header { padding: 30px; text-align: center; border-bottom: 1px solid var(--border); }
+        .welcome-header h1 { margin: 0; color: #fff; font-size: 1.8rem; }
+        .welcome-header p { color: var(--text-muted); margin-top: 10px; }
+
+        .options-grid { display: flex; flex-direction: row; }
+        .option-col { flex: 1; padding: 30px; display: flex; flex-direction: column; gap: 15px; }
+        .option-col.guest { background: rgba(255,255,255,0.02); border-right: 1px solid var(--border); }
+        .option-col.pro { background: rgba(59, 130, 246, 0.05); position: relative; }
+
+        /* Recommended Badge */
+        .badge {
+            position: absolute; top: 15px; right: 15px;
+            background: var(--quiz-accent); color: #000; font-size: 0.7rem; font-weight: 800;
+            padding: 4px 10px; border-radius: 20px; text-transform: uppercase;
+        }
+
+        .benefit-list { list-style: none; padding: 0; margin: 0; }
+        .benefit-item { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; font-size: 0.9rem; color: var(--text-muted); }
+        .icon-check { color: var(--success); font-weight: bold; }
+        .icon-cross { color: #ef4444; font-weight: bold; }
+
+        .btn-welcome {
+            padding: 14px; border-radius: 8px; border: none; font-weight: 600; cursor: pointer;
+            margin-top: auto; transition: transform 0.2s; font-size: 1rem;
+        }
+        .btn-guest { background: transparent; border: 1px solid var(--border); color: var(--text-muted); }
+        .btn-guest:hover { border-color: var(--text-main); color: var(--text-main); }
+        .btn-pro { background: var(--primary); color: white; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4); }
+        .btn-pro:hover { background: var(--primary-hover); transform: translateY(-2px); }
+
+        @keyframes scaleIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+
         /* --- Mobile Header (Hidden on Desktop) --- */
         .mobile-header {
-            display: none;
-            height: var(--header-height);
-            background: var(--panel-bg);
-            border-bottom: 1px solid var(--border);
-            align-items: center;
-            padding: 0 15px;
-            justify-content: space-between;
-            position: fixed;
-            top: 0; left: 0; right: 0;
-            z-index: 50;
+            display: none; height: var(--header-height); background: var(--panel-bg);
+            border-bottom: 1px solid var(--border); align-items: center; padding: 0 15px;
+            justify-content: space-between; position: fixed; top: 0; left: 0; right: 0; z-index: 50;
         }
-
-        .mobile-menu-btn {
-            background: none; border: none; color: white;
-            font-size: 24px; cursor: pointer; padding: 5px;
-        }
-
+        .mobile-menu-btn { background: none; border: none; color: white; font-size: 24px; cursor: pointer; padding: 5px; }
         .mobile-title { font-size: 1rem; font-weight: 700; color: white; }
 
         /* --- Sidebar --- */
         .sidebar {
-            width: 360px;
-            background-color: var(--panel-bg);
-            border-right: 1px solid var(--border);
-            display: flex;
-            flex-direction: column;
-            flex-shrink: 0;
-            z-index: 100; /* Higher z-index for mobile overlay */
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            width: 360px; background-color: var(--panel-bg); border-right: 1px solid var(--border);
+            display: flex; flex-direction: column; flex-shrink: 0;
+            z-index: 100; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .sidebar-header {
-            padding: 20px;
-            border-bottom: 1px solid var(--border);
-            background: rgba(15, 23, 42, 0.3);
-            display: flex; flex-direction: column; gap: 15px;
+        /* --- 2. NEW: DASHBOARD STYLES --- */
+        .sidebar-dashboard { padding: 20px; background: rgba(0,0,0,0.2); border-bottom: 1px solid var(--border); }
+        .user-greeting { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+        .u-avatar { width: 45px; height: 45px; border-radius: 50%; border: 2px solid var(--primary); object-fit: cover; }
+        .u-text h3 { margin: 0; font-size: 1rem; color: #fff; font-weight: 600; }
+        .u-text span { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.5px; }
+
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .stat-box { background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; text-align: center; }
+        .stat-val { display: block; font-size: 1.2rem; font-weight: 700; color: #fff; }
+        .stat-label { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; }
+
+        .resume-btn {
+            margin-top: 15px; width: 100%; padding: 10px; background: rgba(16, 185, 129, 0.15);
+            color: var(--success); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 6px;
+            font-size: 0.8rem; cursor: pointer; display: none; /* Hidden if no history */
+            align-items: center; justify-content: center; gap: 8px; font-weight: 600;
         }
+        .resume-btn:hover { background: rgba(16, 185, 129, 0.25); }
 
-        .course-meta h2 { margin: 0; font-size: 1.1rem; font-weight: 700; color: #fff; }
-        .course-meta span { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--primary); font-weight: 700; }
+        /* Modified Header to fit under dashboard */
+        .course-meta { margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); }
+        .course-meta h2 { margin: 0; font-size: 1rem; font-weight: 700; color: #fff; }
+        .course-meta span { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--primary); font-weight: 700; }
 
-        .sidebar-nav { display: flex; background: rgba(0,0,0,0.2); border-radius: 6px; padding: 4px; gap: 4px; }
+        .sidebar-nav { display: flex; background: rgba(0,0,0,0.2); border-radius: 6px; padding: 4px; gap: 4px; margin-top: 15px; }
         .s-nav-btn { flex: 1; background: none; border: none; color: var(--text-muted); padding: 8px; font-size: 0.8rem; font-weight: 600; border-radius: 4px; cursor: pointer; transition: all 0.2s; text-align: center; }
         .s-nav-btn:hover { color: #fff; background: rgba(255,255,255,0.05); }
         .s-nav-btn.active { background: var(--primary); color: white; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
 
         .sidebar-content { list-style: none; padding: 0; margin: 0; overflow-y: auto; flex-grow: 1; }
-
         .sidebar-item { display: flex; align-items: center; padding: 14px 20px; cursor: pointer; border-bottom: 1px solid rgba(51, 65, 85, 0.3); transition: all 0.2s; gap: 12px; }
         .sidebar-item:hover { background-color: rgba(59, 130, 246, 0.1); }
         .sidebar-item.active { background-color: rgba(59, 130, 246, 0.15); border-left: 4px solid var(--primary); }
         .sidebar-item.is-quiz .item-icon { background: rgba(234, 179, 8, 0.1); color: var(--quiz-accent); }
         .sidebar-item.active.is-quiz .item-icon { background: var(--quiz-accent); color: #000; }
-
         .item-icon { width: 32px; height: 32px; border-radius: 6px; background: rgba(255,255,255,0.05); color: var(--text-muted); display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
         .sidebar-item.active .item-icon { background: var(--primary); color: white; }
         .item-info { flex-grow: 1; }
         .item-info h4 { margin: 0; font-size: 0.9rem; font-weight: 500; color: var(--text-main); line-height: 1.4; }
         .item-info span { font-size: 0.75rem; color: var(--text-muted); }
 
-        /* --- Overlay for Mobile Sidebar --- */
-        .sidebar-overlay {
-            display: none;
-            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.7); z-index: 90;
-            backdrop-filter: blur(2px);
-            opacity: 0; transition: opacity 0.3s;
-        }
+        .sidebar-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 90; backdrop-filter: blur(2px); opacity: 0; transition: opacity 0.3s; }
 
         /* --- Main Content --- */
-        .main-stage {
-            flex-grow: 1;
-            display: flex; flex-direction: column; padding: 0;
-            background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
-            overflow-y: auto;
-            position: relative;
-        }
+        .main-stage { flex-grow: 1; display: flex; flex-direction: column; padding: 0; background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%); overflow-y: auto; position: relative; }
+        .content-wrapper { width: 100%; max-width: 1100px; margin: 0 auto; padding: 40px; flex-grow: 1; display: flex; flex-direction: column; }
 
-        .content-wrapper {
-            width: 100%; max-width: 1100px; margin: 0 auto; padding: 40px;
-            flex-grow: 1; display: flex; flex-direction: column;
-        }
-
-        .viewport-container {
-            width: 100%; aspect-ratio: 16 / 9; border-radius: 12px;
-            overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
-            background: #000; position: relative;
-            animation: slideUp 0.6s ease forwards;
-        }
+        .viewport-container { width: 100%; aspect-ratio: 16 / 9; border-radius: 12px; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7); background: #000; position: relative; animation: slideUp 0.6s ease forwards; }
         .viewport-container iframe { width: 100%; height: 100%; border: none; position: absolute; top: 0; left: 0; }
 
-        /* Quiz/Status Screen */
-        .quiz-start-screen {
-            display: none; width: 100%; height: 100%;
-            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-            flex-direction: column; align-items: center; justify-content: center;
-            text-align: center; padding: 40px; box-sizing: border-box;
-        }
+        .quiz-start-screen { display: none; width: 100%; height: 100%; background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 40px; box-sizing: border-box; }
         .quiz-icon-large { font-size: 4rem; margin-bottom: 20px; background: rgba(251, 191, 36, 0.1); width: 100px; height: 100px; display: flex; align-items: center; justify-content: center; border-radius: 50%; color: var(--quiz-accent); }
         .quiz-title-display { font-size: 2rem; color: white; margin-bottom: 10px; }
         .quiz-desc-display { color: var(--text-muted); margin-bottom: 30px; max-width: 400px; }
         .start-quiz-btn { background-color: var(--quiz-accent); color: #000; padding: 15px 40px; font-size: 1.1rem; font-weight: 700; border: none; border-radius: 8px; cursor: pointer; text-decoration: none; }
-        .start-quiz-btn:hover { opacity: 0.9; }
 
         .current-video-title { margin-top: 25px; font-size: 1.5rem; color: #fff; opacity: 0; animation: fadeIn 0.5s forwards 0.3s; }
 
-        /* --- Resources Section --- */
         .resources-section { margin-top: 30px; background: var(--panel-bg); border-radius: 12px; border: 1px solid var(--border); overflow: hidden; opacity: 0; animation: fadeIn 0.5s forwards 0.5s; }
-
-        /* Scrollable Tabs for Mobile */
-        .tabs-header {
-            display: flex; border-bottom: 1px solid var(--border); background: rgba(15, 23, 42, 0.5);
-            overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; /* Hide scrollbar */
-        }
+        .tabs-header { display: flex; border-bottom: 1px solid var(--border); background: rgba(15, 23, 42, 0.5); overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
         .tabs-header::-webkit-scrollbar { display: none; }
-
-        .tab-btn {
-            background: none; border: none; padding: 16px 24px; color: var(--text-muted);
-            font-family: inherit; font-weight: 600; cursor: pointer; transition: all 0.2s;
-            position: relative; white-space: nowrap; flex-shrink: 0;
-        }
+        .tab-btn { background: none; border: none; padding: 16px 24px; color: var(--text-muted); font-family: inherit; font-weight: 600; cursor: pointer; transition: all 0.2s; position: relative; white-space: nowrap; flex-shrink: 0; }
         .tab-btn:hover { color: var(--text-main); background: rgba(255,255,255,0.05); }
         .tab-btn.active { color: var(--primary); }
         .tab-btn.active::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: var(--primary); }
-
         .tab-content { padding: 24px; display: none; }
         .tab-content.active { display: block; animation: fadeIn 0.3s ease; }
-
         .resource-list { list-style: none; padding: 0; margin: 0; }
         .resource-item { display: flex; align-items: center; padding: 12px; border-radius: 8px; background: rgba(15, 23, 42, 0.3); margin-bottom: 10px; border: 1px solid transparent; transition: all 0.2s; }
         .resource-icon { width: 40px; height: 40px; background: rgba(59, 130, 246, 0.1); color: var(--primary); border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-right: 15px; font-weight: bold; font-size: 0.8rem; flex-shrink: 0;}
-        .resource-details { flex-grow: 1; min-width: 0; /* Fix flex text overflow */ }
+        .resource-details { flex-grow: 1; min-width: 0; }
         .resource-name { display: block; font-weight: 500; color: var(--text-main); margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .resource-meta { font-size: 0.8rem; color: var(--text-muted); }
         .view-btn { background: var(--primary); color: white; text-decoration: none; padding: 8px 16px; border-radius: 6px; font-size: 0.85rem; font-weight: 500; cursor: pointer; flex-shrink: 0; }
@@ -173,65 +176,59 @@
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes fadeIn { to { opacity: 1; } }
 
-        /* --- MOBILE OPTIMIZATIONS --- */
         @media (max-width: 900px) {
-            /* Fix layout */
             body { flex-direction: column; overflow: hidden; }
-
-            /* Show Mobile Header */
             .mobile-header { display: flex; }
-
-            /* Hide Sidebar Off-screen */
-            .sidebar {
-                position: fixed;
-                top: 0; left: 0; bottom: 0;
-                width: 85%; /* Drawer width */
-                max-width: 320px;
-                transform: translateX(-100%); /* Hidden by default */
-                box-shadow: 4px 0 15px rgba(0,0,0,0.5);
-                height: 100%;
-                border-right: none;
-            }
+            .sidebar { position: fixed; top: 0; left: 0; bottom: 0; width: 85%; max-width: 320px; transform: translateX(-100%); box-shadow: 4px 0 15px rgba(0,0,0,0.5); height: 100%; border-right: none; }
             .sidebar.open { transform: translateX(0); }
-
-            /* Show overlay when sidebar is open */
             .sidebar-overlay.active { display: block; opacity: 1; }
-
-            /* Main Stage Adjustments */
-            .main-stage {
-                padding-top: var(--header-height); /* Push down for header */
-            }
-
-            .content-wrapper {
-                padding: 0; /* Remove padding for edge-to-edge feel */
-                width: 100%;
-            }
-
-            .viewport-container {
-                border-radius: 0; /* Full width video */
-            }
-
-            .current-video-title {
-                padding: 0 20px;
-                font-size: 1.2rem;
-                margin-top: 20px;
-            }
-
-            .resources-section {
-                margin: 20px;
-                border-radius: 8px;
-            }
-
-            .tab-btn {
-                padding: 12px 20px; /* Slightly smaller tabs */
-            }
-
+            .main-stage { padding-top: var(--header-height); }
+            .content-wrapper { padding: 0; width: 100%; }
+            .viewport-container { border-radius: 0; }
+            .current-video-title { padding: 0 20px; font-size: 1.2rem; margin-top: 20px; }
+            .resources-section { margin: 20px; border-radius: 8px; }
+            .tab-btn { padding: 12px 20px; }
             .quiz-title-display { font-size: 1.5rem; }
             .quiz-desc-display { font-size: 0.9rem; }
+
+            .options-grid { flex-direction: column; }
+            .option-col.guest { border-right: none; border-bottom: 1px solid var(--border); }
         }
     </style>
 </head>
 <body>
+
+    <div class="modal-overlay" id="welcomeModal">
+        <div class="welcome-card">
+            <div class="welcome-header">
+                <h1>Welcome to Kinematics & Dynamics</h1>
+                <p>How would you like to access the course materials?</p>
+            </div>
+            <div class="options-grid">
+                <div class="option-col guest">
+                    <h3>👤 Guest Mode</h3>
+                    <ul class="benefit-list">
+                        <li class="benefit-item"><span class="icon-check">✓</span> Watch all videos</li>
+                        <li class="benefit-item"><span class="icon-check">✓</span> Access PDF notes</li>
+                        <li class="benefit-item"><span class="icon-cross">✕</span> Progress is lost on exit</li>
+                        <li class="benefit-item"><span class="icon-cross">✕</span> No quiz tracking</li>
+                    </ul>
+                    <button class="btn-welcome btn-guest" onclick="selectMode('guest')">Continue Anonymously</button>
+                </div>
+                <div class="option-col pro">
+                    <span class="badge">Recommended</span>
+                    <h3>🎓 Student Portal</h3>
+                    <ul class="benefit-list">
+                        <li class="benefit-item"><span class="icon-check">✓</span> <b>Save your progress</b></li>
+                        <li class="benefit-item"><span class="icon-check">✓</span> Track engaged hours</li>
+                        <li class="benefit-item"><span class="icon-check">✓</span> Resume where you left off</li>
+                        <li class="benefit-item"><span class="icon-check">✓</span> Verified Quiz Scores</li>
+                    </ul>
+                    <button class="btn-welcome btn-pro" onclick="selectMode('student')">Login / Sign Up</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
 
@@ -241,16 +238,41 @@
         <div style="width: 24px;"></div> </header>
 
     <aside class="sidebar" id="sidebar">
-        <div class="sidebar-header">
+        <div class="sidebar-dashboard">
+            <div class="user-greeting">
+                <img src="https://ui-avatars.com/api/?name=Guest&background=334155&color=fff" class="u-avatar" id="avatarDisplay">
+                <div class="u-text">
+                    <h3 id="nameDisplay">Guest User</h3>
+                    <span id="roleDisplay">Not Tracking</span>
+                </div>
+            </div>
+
+            <div class="stats-grid" id="statsGrid" style="opacity: 0.5;">
+                <div class="stat-box">
+                    <span class="stat-val" id="timeVal">0m</span>
+                    <span class="stat-label">Engaged</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-val" id="progressVal">0%</span>
+                    <span class="stat-label">Complete</span>
+                </div>
+            </div>
+
+            <button class="resume-btn" id="resumeBtn" onclick="resumeLastVideo()">
+                <span>▶</span> Resume Lesson
+            </button>
+
             <div class="course-meta">
                 <span>Course Module</span>
                 <h2>Kinematics & Dynamics</h2>
             </div>
+
             <div class="sidebar-nav">
                 <button class="s-nav-btn active" onclick="renderSidebar('lessons')">Lessons</button>
                 <button class="s-nav-btn" onclick="renderSidebar('slides')">Files</button>
             </div>
         </div>
+
         <ul class="sidebar-content" id="sidebar-list"></ul>
     </aside>
 
@@ -304,53 +326,120 @@
         };
 
         const courseContent = [
-            // L1 & L2: Same Video
             { title: "Lecture 1: Rigid Body Dynamics", type: "video", id: "Nj3Ntg_QupA", resources: { notes: [ { name: "Lecture 1 PDF", type: "PDF", size: "915 KB", url: "files/Lecture1_Rigid body dynamics.pdf" } ], slides: resources.day1, tutes: [] } },
             { title: "Lecture 2: Time Rate of Vector", type: "video", id: "Nj3Ntg_QupA", resources: { notes: [ { name: "Lecture 2 PDF", type: "PDF", size: "434 KB", url: "files/Lecture2_Time rate of vector in rotational motion.pdf" } ], slides: resources.day1, tutes: [] } },
-            // L3, L4, L5: Same Video
             { title: "Lecture 3: Intermediate Frames", type: "video", id: "DccSNMkR3dI", resources: { notes: [ { name: "Lecture 3 PDF", type: "PDF", size: "536 KB", url: "files/Lecture3_Intermediate frames.pdf" } ], slides: resources.day1, tutes: [] } },
             { title: "Lecture 4: Kinematic Expressions", type: "video", id: "DccSNMkR3dI", resources: { notes: [ { name: "Lecture 4 PDF", type: "PDF", size: "873 KB", url: "files/Lecture4_Generalizations of kinematic expressions.pdf" } ], slides: resources.day1, tutes: [] } },
             { title: "Lecture 5: Momentum Analysis", type: "video", id: "DccSNMkR3dI", resources: { notes: [ { name: "Lecture 5 PDF", type: "PDF", size: "1.28 MB", url: "files/Lecture5_Momentum analysis.pdf" } ], slides: resources.day1, tutes: [] } },
-            // L6 & L7: Same Video
             { title: "Lecture 6: Inertia Tensor", type: "video", id: "hZ2ODrVfj3g", resources: { notes: [ { name: "Lecture 6 PDF", type: "PDF", size: "1.05 MB", url: "files/Lecture6_Inertia tensor.pdf" } ], slides: resources.day1, tutes: [] } },
             { title: "Lecture 7: Parallel Axes Theorem", type: "video", id: "hZ2ODrVfj3g", resources: { notes: [ { name: "Lecture 7 PDF", type: "PDF", size: "455 KB", url: "files/Lecture7_Parallel axes theorem.pdf" } ], slides: resources.day1, tutes: [] } },
             { title: "Quiz 01: Checkpoint", type: "quiz", url: "quiz/quiz1.html", resources: resources.empty },
-            // L8
             { title: "Lecture 8: Coordinate Frames", type: "video", id: "sIpWLFL5E-s", resources: { notes: [ { name: "Lecture 8 PDF", type: "PDF", size: "606 KB", url: "files/Lecture8_Coordinate frames, Mapping and Transformation matrix.pdf" } ], slides: resources.day2, tutes: [] } },
-            // L9
             { title: "Lecture 9: Fundamental Rotation Matrices", type: "video", id: "cwx5lCeYKqM", resources: { notes: [ { name: "Lecture 9 PDF", type: "PDF", size: "941 KB", url: "files/Lecture9_Fundamental rotation matrices.pdf" } ], slides: resources.day2, tutes: [] } },
             { title: "Quiz 02: Rotation Matrices", type: "quiz", url: "quiz/quiz2.html", resources: resources.empty },
-            // L10
             { title: "Lecture 10: Linkage Mechanisms", type: "video", id: "9ZrshlMcU8w", resources: { notes: [ { name: "Lecture 10 PDF", type: "PDF", size: "2.25 MB", url: "files/Lecture10_Linkage mechanisms.pdf" } ], slides: resources.day3, tutes: resources.day3_tute } },
             { title: "Quiz 03: Mechanisms", type: "quiz", url: "quiz/quiz3.html", resources: resources.empty },
-            // L11: Not Available
             { title: "Lecture 11: Velocity Analysis (ICM)", type: "video", id: null, resources: { notes: [ { name: "Lecture 11 PDF", type: "PDF", size: "882 KB", url: "files/Lecture11_Velocity analysis_ICM.pdf" } ], slides: resources.day3, tutes: resources.day3_tute } },
-            // L12
             { title: "Lecture 12: Velocity Analysis (VVD)", type: "video", id: "C-Le56Nvhr8", resources: { notes: [ { name: "Lecture 12 PDF", type: "PDF", size: "3.91 MB", url: "files/Lecture12_Velocity analysis_VVD.pdf" } ], slides: resources.day3, tutes: resources.day3_tute } },
-            // L13
             { title: "Lecture 13: Acceleration Vector Diagram", type: "video", id: "QTHzsPW3Tdg", resources: { notes: [ { name: "Lecture 13 PDF", type: "PDF", size: "684 KB", url: "files/Lecture13_Acceleration Vector Diagram.pdf" } ], slides: resources.day3, tutes: resources.day3_tute } },
-            // L14
             { title: "Lecture 14: Gears", type: "video", id: "ZOvJ40aZlC8", resources: { notes: [ { name: "Lecture 14 PDF", type: "PDF", size: "2.41 MB", url: "files/Lecture14_Gears.pdf" } ], slides: [ ...resources.day4, { name: "Gear Full Slide", type: "PDF", size: "3.2 MB", url: "slides/Gear full.pdf" } ], tutes: resources.day4_tute } },
-            // L15
             { title: "Lecture 15: Gear Trains", type: "video", id: "Mg2bmKAvHZI", resources: { notes: [ { name: "Lecture 15 PDF", type: "PDF", size: "2.0 MB", url: "files/Lecture15_Gear Trains.pdf" } ], slides: resources.day4, tutes: resources.day4_tute } },
             { title: "Quiz 04: Gears", type: "quiz", url: "quiz/quiz4.html", resources: resources.empty },
-            // L16 & L17: Same Video
             { title: "Lecture 16: Cams", type: "video", id: "GV1tlgHpMs0", resources: { notes: [ { name: "Lecture 16 PDF", type: "PDF", size: "983 KB", url: "files/Lecture16_Cams.pdf" } ], slides: resources.day5, tutes: [] } },
             { title: "Lecture 17: Cam Profile", type: "video", id: "GV1tlgHpMs0", resources: { notes: [ { name: "Lecture 17 PDF", type: "PDF", size: "2.07 MB", url: "files/Lecture17_Cam profile.pdf" } ], slides: resources.day5, tutes: [] } },
-            // L18 & L19: Not Available
             { title: "Lecture 18: Gyroscope", type: "video", id: null, resources: { notes: [ { name: "Lecture 18 PDF (Updated)", type: "PDF", size: "2.70 MB", url: "files/Lecture18_Gyroscope_updated.pdf" } ], slides: [], tutes: [] } },
             { title: "Lecture 19: Introduction to MEMS", type: "video", id: null, resources: { notes: [ { name: "Lecture 19 PDF", type: "PDF", size: "433 KB", url: "files/Lecture19_Introduction to MEMS.pdf" } ], slides: [], tutes: [] } },
             { title: "Quiz 05: Advanced Topics", type: "quiz", url: "quiz/quiz5.html", resources: resources.empty }
         ];
 
-        // --- Logic ---
+        // --- 3. NEW: AUTH & MODAL LOGIC ---
+        const modal = document.getElementById('welcomeModal');
+        let currentUser = null;
+        let engagedSeconds = 0;
+        let lastVideoIndex = -1;
+
+        // Check startup state when page loads
+        function checkState() {
+            const userSession = localStorage.getItem('currentUser');
+            const guestMode = localStorage.getItem('guestMode');
+
+            if (userSession) {
+                // User is logged in
+                currentUser = JSON.parse(userSession);
+                initStudentMode();
+            } else if (guestMode) {
+                // User previously chose Guest
+                initGuestMode();
+            } else {
+                // First time visit -> Show Modal
+                modal.style.display = 'flex';
+            }
+        }
+
+        function selectMode(mode) {
+            if (mode === 'student') {
+                // Redirect to the login page you created earlier
+                window.location.href = "login.html";
+            } else {
+                localStorage.setItem('guestMode', 'true');
+                modal.style.display = 'none';
+                initGuestMode();
+            }
+        }
+
+        function initStudentMode() {
+            document.getElementById('nameDisplay').textContent = currentUser.name || "Student";
+            document.getElementById('roleDisplay').textContent = "Tracking Active";
+            document.getElementById('roleDisplay').style.color = "#10b981"; // Green
+            if(currentUser.photo) document.getElementById('avatarDisplay').src = currentUser.photo;
+            document.getElementById('statsGrid').style.opacity = "1";
+
+            startEngagementTimer();
+            checkResumeStatus();
+        }
+
+        function initGuestMode() {
+            document.getElementById('nameDisplay').textContent = "Guest User";
+            document.getElementById('roleDisplay').textContent = "Progress Not Saved";
+            document.getElementById('roleDisplay').style.color = "#ef4444"; // Red
+            startEngagementTimer(); // Guests get timer but it won't save to database
+            checkResumeStatus();
+        }
+
+        function startEngagementTimer() {
+            setInterval(() => {
+                engagedSeconds++;
+                const mins = Math.floor(engagedSeconds / 60);
+                document.getElementById('timeVal').textContent = mins + "m";
+            }, 1000);
+        }
+
+        function checkResumeStatus() {
+            const savedIndex = localStorage.getItem('lastVideoIndex');
+            if(savedIndex !== null && savedIndex !== undefined) {
+                document.getElementById('resumeBtn').style.display = 'flex';
+                lastVideoIndex = parseInt(savedIndex);
+            }
+        }
+
+        function resumeLastVideo() {
+            if(lastVideoIndex > -1) {
+                loadContent(lastVideoIndex, true);
+                // If on mobile, scroll up and close sidebar
+                if(window.innerWidth <= 900) {
+                    toggleSidebar();
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+            }
+        }
+
+        // --- 4. CORE UI LOGIC ---
         const sidebar = document.getElementById('sidebar');
         const overlay = document.querySelector('.sidebar-overlay');
         const sidebarList = document.getElementById('sidebar-list');
         const titleEl = document.getElementById('videoTitle');
         const iframeEl = document.getElementById('course-player');
-        
-        // Quiz & Status Screen Elements
+
         const quizScreen = document.getElementById('quiz-screen');
         const quizTitleDisplay = document.getElementById('quizTitleDisplay');
         const statusIcon = document.getElementById('statusIcon');
@@ -361,11 +450,11 @@
         let activeIndex = 0;
 
         document.addEventListener('DOMContentLoaded', () => {
+            checkState(); // Check if we need to show modal
             renderSidebar('lessons');
             loadContent(0, false);
         });
 
-        // Mobile Menu Toggle
         function toggleSidebar() {
             sidebar.classList.toggle('open');
             overlay.classList.toggle('active');
@@ -412,7 +501,7 @@
             activeIndex = index;
             loadContent(index, true);
             updateSidebarHighlight();
-            if(window.innerWidth <= 900) toggleSidebar(); // Close menu on mobile selection
+            if(window.innerWidth <= 900) toggleSidebar();
 
             if (currentMode === 'slides') {
                 if (courseContent[index].resources.notes.length === 0 && courseContent[index].resources.slides.length > 0) switchTab('slides');
@@ -425,25 +514,23 @@
             const item = courseContent[index];
             titleEl.textContent = item.title;
 
+            // TRACKING LOGIC: Save progress to local storage (for Resume feature)
+            localStorage.setItem('lastVideoIndex', index);
+            const progress = Math.round(((index + 1) / courseContent.length) * 100);
+            document.getElementById('progressVal').textContent = progress + "%";
+
             if (item.type === 'quiz') {
-                // Show Quiz Mode
-                iframeEl.style.display = 'none';
-                iframeEl.src = "";
-                
+                iframeEl.style.display = 'none'; iframeEl.src = "";
                 quizScreen.style.display = 'flex';
                 statusIcon.textContent = '📝';
                 quizTitleDisplay.textContent = item.title;
-                statusDesc.textContent = ""; // Clear text as requested
-                
+                statusDesc.textContent = "";
                 launchQuizBtn.style.display = 'inline-block';
-                launchQuizBtn.textContent = "Start Quiz"; // Updated button text
+                launchQuizBtn.textContent = "Start Quiz";
                 launchQuizBtn.onclick = function() { window.open(item.url, '_blank'); };
-            
-            } else if (item.type === 'video' && !item.id) {
-                // Show "Video Coming Soon" Mode (Lectures 11, 18, 19)
-                iframeEl.style.display = 'none';
-                iframeEl.src = "";
 
+            } else if (item.type === 'video' && !item.id) {
+                iframeEl.style.display = 'none'; iframeEl.src = "";
                 quizScreen.style.display = 'flex';
                 statusIcon.textContent = '⏳';
                 quizTitleDisplay.textContent = item.title;
@@ -451,10 +538,8 @@
                 launchQuizBtn.style.display = 'none';
 
             } else {
-                // Show Video Mode
                 quizScreen.style.display = 'none';
                 iframeEl.style.display = 'block';
-                
                 let originParam = (window.location.protocol !== 'file:') ? `&origin=${window.location.origin}` : '';
                 const autoPlayParam = autoPlay ? '&autoplay=1' : '';
                 iframeEl.src = `https://www.youtube.com/embed/${item.id}?rel=0${originParam}${autoPlayParam}`;
