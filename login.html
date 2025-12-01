@@ -12,6 +12,7 @@
             --glass-bg: rgba(30, 41, 59, 0.7);
             --text-main: #f1f5f9;
             --text-muted: #94a3b8;
+            --border: rgba(255, 255, 255, 0.1);
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; -webkit-tap-highlight-color: transparent; }
@@ -31,7 +32,7 @@
         #physics-canvas {
             position: absolute; top: 0; left: 0;
             width: 100%; height: 100%;
-            z-index: 1; /* Behind everything */
+            z-index: 1;
         }
 
         /* --- Login Card --- */
@@ -40,12 +41,13 @@
             width: 90%; max-width: 400px;
             background: var(--glass-bg);
             backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--border);
             border-radius: 24px;
             padding: 40px 30px;
             text-align: center;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
             animation: floatUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+            display: flex; flex-direction: column; align-items: center;
         }
 
         .icon-circle {
@@ -55,11 +57,10 @@
             border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
             font-size: 2.5rem;
-            margin: 0 auto 20px auto;
+            margin-bottom: 20px;
             border: 1px solid rgba(59, 130, 246, 0.3);
         }
         
-        /* Changed icon to a gear */
         .icon-circle::after { content: '⚙️'; }
 
         h1 { font-size: 1.8rem; font-weight: 700; margin-bottom: 8px; }
@@ -80,16 +81,36 @@
         .google-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 15px rgba(0,0,0,0.1); }
 
         .back-link {
-            display: inline-block; margin-top: 25px;
+            display: inline-block; margin-top: 20px;
             font-size: 0.9rem; color: var(--primary);
             text-decoration: none; font-weight: 500;
         }
 
+        /* --- Footer / Contact Admin --- */
+        .footer-divider {
+            width: 100%; height: 1px; background: var(--border);
+            margin: 25px 0 15px 0;
+        }
+
+        .admin-contact {
+            font-size: 0.8rem; color: var(--text-muted);
+            display: flex; flex-direction: column; gap: 5px;
+        }
+        
+        .contact-btn {
+            color: var(--text-muted); text-decoration: none;
+            display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+            padding: 6px 12px; border-radius: 6px;
+            transition: all 0.2s; border: 1px solid transparent;
+        }
+        .contact-btn:hover {
+            color: #fff; background: rgba(255,255,255,0.05); border-color: var(--border);
+        }
+
         /* Error Box */
         #error-box {
-            margin-top: 20px;
-            background: rgba(239, 68, 68, 0.15);
-            color: #fca5a5;
+            margin-top: 20px; width: 100%;
+            background: rgba(239, 68, 68, 0.15); color: #fca5a5;
             padding: 12px; border-radius: 8px;
             font-size: 0.85rem; display: none; text-align: left;
             border: 1px solid rgba(239, 68, 68, 0.3);
@@ -97,7 +118,6 @@
 
         @keyframes floatUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Mobile specific adjustments */
         @media (max-width: 480px) {
             .login-container { padding: 30px 20px; width: 88%; }
             h1 { font-size: 1.5rem; }
@@ -122,14 +142,21 @@
         <div id="error-box"></div>
 
         <a href="index.html" class="back-link">Continue as Guest</a>
+
+        <div class="footer-divider"></div>
+        <div class="admin-contact">
+            <span>Encountering issues?</span>
+            <a href="mailto:2023e158@eng.jfn.ac.lk?subject=MP3010%20Portal%20Issue&body=Hello%20Admin,%20I%20am%20facing%20an%20issue%20with%20the%20student%20portal." class="contact-btn">
+                📩 Contact Admin
+            </a>
+        </div>
     </div>
 
     <script type="module">
-        // 1. Import Firebase Auth Only
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-        // 2. YOUR CONFIGURATION
+        // YOUR CONFIGURATION
         const firebaseConfig = {
             apiKey: "AIzaSyCKe-vpvKDsbj_jD2rxQWCy3DpYfvrDDBE",
             authDomain: "mp3010-6a710.firebaseapp.com",
@@ -140,51 +167,41 @@
             measurementId: "G-V871T1YJ3K"
         };
 
-        // 3. Initialize App
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const provider = new GoogleAuthProvider();
 
-        // 4. Handle Login
         window.handleLogin = async function() {
             const btn = document.querySelector('.google-btn');
             const errorBox = document.getElementById('error-box');
             
-            // Visual Feedback
             btn.style.opacity = "0.7";
             btn.innerHTML = "Connecting...";
             errorBox.style.display = 'none';
 
             try {
-                // Open Google Popup
                 const result = await signInWithPopup(auth, provider);
                 const user = result.user;
 
-                // Save minimal user data to browser (Local Storage)
                 const userData = {
                     name: user.displayName,
                     email: user.email,
                     photo: user.photoURL
                 };
                 localStorage.setItem('currentUser', JSON.stringify(userData));
-                
-                // Clear guest mode flag if it exists
                 localStorage.removeItem('guestMode');
-
-                // Redirect to Main Course Page
                 window.location.href = "index.html";
 
             } catch (error) {
                 console.error(error);
                 btn.style.opacity = "1";
                 btn.innerHTML = '<img src="https://www.svgrepo.com/show/475656/google-color.svg" width="24"><span>Continue with Google</span>';
-                
                 errorBox.style.display = 'block';
                 errorBox.innerHTML = `<strong>Connection Error:</strong><br>${error.message}`;
             }
         }
 
-        // --- 5. NEW ANIMATED GEAR BACKGROUND ---
+        // --- ANIMATED GEAR BACKGROUND ---
         const canvas = document.getElementById('physics-canvas');
         const ctx = canvas.getContext('2d');
         let gears = [];
@@ -192,58 +209,35 @@
         function resize() {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
-            initGears(); // Re-initialize gears on resize
+            initGears();
         }
         window.addEventListener('resize', resize);
         
         class Gear {
             constructor(x, y, radius, teeth, speed, color) {
-                this.x = x;
-                this.y = y;
-                this.radius = radius;
-                this.teeth = teeth;
-                this.speed = speed;
-                this.angle = Math.random() * Math.PI * 2;
-                this.color = color;
+                this.x = x; this.y = y; this.radius = radius; this.teeth = teeth;
+                this.speed = speed; this.angle = Math.random() * Math.PI * 2; this.color = color;
             }
-
-            update() {
-                this.angle += this.speed;
-            }
-
+            update() { this.angle += this.speed; }
             draw(ctx) {
                 ctx.save();
                 ctx.translate(this.x, this.y);
                 ctx.rotate(this.angle);
                 ctx.fillStyle = this.color;
-
-                // Draw gear body (a ring)
                 ctx.beginPath();
-                ctx.arc(0, 0, this.radius * 0.85, 0, Math.PI * 2); // Outer rim
-                ctx.arc(0, 0, this.radius * 0.6, 0, Math.PI * 2, true); // Inner hole
+                ctx.arc(0, 0, this.radius * 0.85, 0, Math.PI * 2);
+                ctx.arc(0, 0, this.radius * 0.6, 0, Math.PI * 2, true);
                 ctx.fill();
-
-                // Draw teeth
                 const toothAngle = (Math.PI * 2) / this.teeth;
                 for (let i = 0; i < this.teeth; i++) {
-                    ctx.save();
-                    ctx.rotate(toothAngle * i);
-                    // Draw a trapezoidal tooth
-                    ctx.beginPath();
+                    ctx.save(); ctx.rotate(toothAngle * i); ctx.beginPath();
                     ctx.moveTo(-this.radius * 0.1, -this.radius * 0.85);
                     ctx.lineTo(-this.radius * 0.08, -this.radius);
                     ctx.lineTo(this.radius * 0.08, -this.radius);
                     ctx.lineTo(this.radius * 0.1, -this.radius * 0.85);
-                    ctx.closePath();
-                    ctx.fill();
-                    ctx.restore();
+                    ctx.closePath(); ctx.fill(); ctx.restore();
                 }
-                
-                // Draw central hub
-                ctx.beginPath();
-                ctx.arc(0, 0, this.radius * 0.25, 0, Math.PI * 2);
-                ctx.fill();
-
+                ctx.beginPath(); ctx.arc(0, 0, this.radius * 0.25, 0, Math.PI * 2); ctx.fill();
                 ctx.restore();
             }
         }
@@ -252,40 +246,24 @@
             gears = [];
             const centerX = canvas.width / 2;
             const centerY = canvas.height / 2;
-            const gearColor = 'rgba(59, 130, 246, 0.15)'; // Subtle blue
-
-            // Create a cluster of meshing gears centered on the screen
-            
-            // Central large gear
+            const gearColor = 'rgba(59, 130, 246, 0.15)';
             gears.push(new Gear(centerX, centerY, 100, 32, 0.003, gearColor));
-
-            // Top-left meshing gear (counter-rotating)
             gears.push(new Gear(centerX - 160, centerY - 90, 70, 22, -0.0045, gearColor));
-            
-            // Bottom-right meshing gear (counter-rotating)
             gears.push(new Gear(centerX + 150, centerY + 110, 80, 26, -0.004, gearColor));
-
-            // Add more gears for larger screens to fill space
             if (canvas.width > 768) {
-                // Far left
                 gears.push(new Gear(centerX - 350, centerY + 50, 120, 38, 0.0025, gearColor));
-                // Far right
                 gears.push(new Gear(centerX + 380, centerY - 150, 90, 28, 0.0035, gearColor));
-                // Corner
                 gears.push(new Gear(100, canvas.height - 100, 140, 44, -0.002, gearColor));
             }
         }
 
         function animate() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            for (let gear of gears) {
-                gear.update();
-                gear.draw(ctx);
-            }
+            for (let gear of gears) { gear.update(); gear.draw(ctx); }
             requestAnimationFrame(animate);
         }
 
-        resize(); // Initialize and start
+        resize();
         animate();
     </script>
 </body>
