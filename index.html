@@ -47,6 +47,11 @@
             width: 100%; max-width: 800px; display: flex; flex-direction: column;
             overflow: hidden; box-shadow: 0 50px 100px -20px rgba(0,0,0,0.7);
             animation: scaleIn 0.4s ease;
+            
+            /* --- MOBILE FIX: Allow scrolling inside the card --- */
+            max-height: 90vh; 
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch; /* Smooth scrolling for iOS */
         }
 
         .welcome-header { padding: 30px; text-align: center; border-bottom: 1px solid var(--border); }
@@ -167,6 +172,7 @@
         .tab-content.active { display: block; animation: fadeIn 0.3s ease; }
         .resource-list { list-style: none; padding: 0; margin: 0; }
         .resource-item { display: flex; align-items: center; padding: 12px; border-radius: 8px; background: rgba(15, 23, 42, 0.3); margin-bottom: 10px; border: 1px solid transparent; transition: all 0.2s; }
+        .resource-item:hover { background: rgba(15, 23, 42, 0.5); border-color: rgba(59, 130, 246, 0.3); }
         .resource-icon { width: 40px; height: 40px; background: rgba(59, 130, 246, 0.1); color: var(--primary); border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-right: 15px; font-weight: bold; font-size: 0.8rem; flex-shrink: 0;}
         .resource-details { flex-grow: 1; min-width: 0; }
         .resource-name { display: block; font-weight: 500; color: var(--text-main); margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -190,9 +196,15 @@
             .tab-btn { padding: 12px 20px; }
             .quiz-title-display { font-size: 1.5rem; }
             .quiz-desc-display { font-size: 0.9rem; }
-
+            
             .options-grid { flex-direction: column; }
             .option-col.guest { border-right: none; border-bottom: 1px solid var(--border); }
+            
+            /* --- MOBILE FIXES ADDED HERE --- */
+            .welcome-card { margin: 0 auto; max-width: 95%; } 
+            .welcome-header { padding: 20px; } /* Less padding on header */
+            .option-col { padding: 20px; }    /* Less padding in content */
+            .welcome-header h1 { font-size: 1.4rem; } /* Smaller title */
         }
     </style>
 </head>
@@ -266,13 +278,13 @@
                 <span>Course Module</span>
                 <h2>Kinematics & Dynamics</h2>
             </div>
-
+            
             <div class="sidebar-nav">
                 <button class="s-nav-btn active" onclick="renderSidebar('lessons')">Lessons</button>
                 <button class="s-nav-btn" onclick="renderSidebar('slides')">Files</button>
             </div>
         </div>
-
+        
         <ul class="sidebar-content" id="sidebar-list"></ul>
     </aside>
 
@@ -379,7 +391,7 @@
         function selectMode(mode) {
             if (mode === 'student') {
                 // Redirect to the login page you created earlier
-                window.location.href = "login.html";
+                window.location.href = "login.html"; 
             } else {
                 localStorage.setItem('guestMode', 'true');
                 modal.style.display = 'none';
@@ -393,7 +405,7 @@
             document.getElementById('roleDisplay').style.color = "#10b981"; // Green
             if(currentUser.photo) document.getElementById('avatarDisplay').src = currentUser.photo;
             document.getElementById('statsGrid').style.opacity = "1";
-
+            
             startEngagementTimer();
             checkResumeStatus();
         }
@@ -439,7 +451,7 @@
         const sidebarList = document.getElementById('sidebar-list');
         const titleEl = document.getElementById('videoTitle');
         const iframeEl = document.getElementById('course-player');
-
+        
         const quizScreen = document.getElementById('quiz-screen');
         const quizTitleDisplay = document.getElementById('quizTitleDisplay');
         const statusIcon = document.getElementById('statusIcon');
@@ -501,7 +513,7 @@
             activeIndex = index;
             loadContent(index, true);
             updateSidebarHighlight();
-            if(window.innerWidth <= 900) toggleSidebar();
+            if(window.innerWidth <= 900) toggleSidebar(); 
 
             if (currentMode === 'slides') {
                 if (courseContent[index].resources.notes.length === 0 && courseContent[index].resources.slides.length > 0) switchTab('slides');
@@ -524,11 +536,11 @@
                 quizScreen.style.display = 'flex';
                 statusIcon.textContent = '📝';
                 quizTitleDisplay.textContent = item.title;
-                statusDesc.textContent = "";
+                statusDesc.textContent = ""; 
                 launchQuizBtn.style.display = 'inline-block';
                 launchQuizBtn.textContent = "Start Quiz";
                 launchQuizBtn.onclick = function() { window.open(item.url, '_blank'); };
-
+            
             } else if (item.type === 'video' && !item.id) {
                 iframeEl.style.display = 'none'; iframeEl.src = "";
                 quizScreen.style.display = 'flex';
