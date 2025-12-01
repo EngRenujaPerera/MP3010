@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MP 3010 - Kinematics and Dynamics Exam</title>
+    <style>
+        :root {
+            --primary: #800000; /* Maroon for UOJ context */
+            --secondary: #333;
+            --light: #f4f4f4;
+            --success: #28a745;
+            --warning: #ffc107;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f2f5;
+            color: #333;
+        }
+
+        /* Header */
+        header {
+            background-color: var(--primary);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-info h1 { margin: 0; font-size: 1.5rem; }
+        .header-info p { margin: 5px 0 0; opacity: 0.9; }
+
+        .equation-notice {
+            background-color: rgba(255, 255, 255, 0.2);
+            color: #fff;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            margin-top: 10px;
+            display: inline-block;
+            font-weight: 600;
+        }
+
+        #timer-badge {
+            background: white;
+            color: var(--primary);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            display: inline-block;
+            margin-top: 10px;
+            margin-left: 10px;
+        }
+
+        /* Container */
+        .container {
+            max-width: 800px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        /* Cards */
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            transition: transform 0.2s;
+        }
+
+        .section-title {
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            color: var(--primary);
+        }
+
+        /* MCQ Styles */
+        .mcq-question { margin-bottom: 20px; }
+        .question-text { font-weight: 600; margin-bottom: 10px; display: block; }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+
+        .option-label {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .option-label:hover { background-color: #f9f9f9; }
+        .option-label input { margin-right: 10px; }
+
+        /* Structured Question Styles */
+        .structured-question { margin-bottom: 30px; }
+
+        /* Image Styles */
+        .exam-figure {
+            display: block;
+            max-width: 100%;
+            height: auto;
+            margin: 15px auto;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        textarea {
+            width: 100%;
+            height: 100px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-top: 10px;
+            font-family: inherit;
+            box-sizing: border-box;
+        }
+
+        input[type="text"], input[type="number"] {
+            box-sizing: border-box;
+        }
+
+        /* File Upload Styles */
+        .file-upload-box {
+            border: 2px dashed var(--primary);
+            padding: 20px;
+            background: #fff9f9;
+            border-radius: 8px;
+            margin: 15px 0;
+            text-align: center;
+        }
+
+        .file-upload-box label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: var(--primary);
+        }
+
+        .file-upload-box input[type="file"] {
+            width: 100%;
+            max-width: 300px;
+        }
+
+        .file-note {
+            display: block;
+            font-size: 0.85rem;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        /* Mathematical Equation Styling */
+        .equation-box {
+            background-color: #fafafa;
+            border: 1px solid #eee;
+            border-left: 5px solid var(--primary);
+            padding: 20px;
+            margin-top: 20px;
+            border-radius: 5px;
+        }
+
+        .equation-item {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px dashed #e0e0e0;
+        }
+
+        .equation-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .eq-label {
+            display: block;
+            font-weight: bold;
+            color: #555;
+            margin-bottom: 5px;
+            font-family: 'Segoe UI', sans-serif;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .math-display {
+            font-family: "Cambria Math", "Latin Modern Math", "Times New Roman", serif;
+            font-size: 1.3rem;
+            color: #000;
+            background: #fff;
+            padding: 10px;
+            border-radius: 5px;
+            display: inline-block;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.03);
+            border: 1px solid #f0f0f0;
+        }
+
+        /* Submit Button */
+        .submit-btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.1rem;
+            border-radius: 30px;
+            cursor: pointer;
+            display: block;
+            width: 100%;
+            transition: background 0.3s;
+        }
+
+        .submit-btn:hover { background-color: #5c0000; }
+
+        /* Results Modal */
+        #result-modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            max-width: 500px;
+            text-align: center;
+            animation: slideUp 0.4s ease;
+        }
+
+        .score-circle {
+            width: 120px; height: 120px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin: 0 auto 20px;
+            font-weight: bold;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .math { font-style: italic; font-family: serif; }
+
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="header-info">
+        <h1>FACULTY OF ENGINEERING</h1>
+        <p>End Semester Examination | Semester III</p>
+        <p>MP 3010 - KINEMATICS AND DYNAMICS</p>
+        <div class="equation-notice">ℹ️ Useful Equations are provided at the bottom</div>
+        <div id="timer-badge">Time Left: <span id="time">02:00:00</span></div>
+    </div>
+</header>
+
+<div class="container">
+    <form id="examForm">
+
+        <div class="card">
+            <h2 class="section-title">Question 01 (20 Marks)</h2>
+            <p><em>Select the most appropriate answer.</em></p>
+
+            <div id="mcq-container">
+                </div>
+        </div>
+
+        <div class="card">
+            <h2 class="section-title">Question 02 (20 Marks)</h2>
+
+            <div class="structured-question">
+                <p><strong>A.</strong> Consider following linkage mechanism. Identify the mechanisms of A to C. (3 marks)</p>
+
+                <img src="1.png" alt="Figure 01: Linkage Mechanism" class="exam-figure">
+
+                <label>Identify A:</label> <input type="text" style="width:100%; margin-bottom:5px;">
+                <label>Identify B:</label> <input type="text" style="width:100%; margin-bottom:5px;">
+                <label>Identify C:</label> <input type="text" style="width:100%; margin-bottom:5px;">
+            </div>
+
+            <div class="structured-question">
+                <p><strong>B.</strong> Gruebler's equation is given by <span class="math">DOF = 3(n-1) - 2L - H</span>.</p>
+                <p>i. Define the terms n, L, and H.</p>
+                <textarea placeholder="Type your answer here..."></textarea>
+
+                <p>ii. For the mechanism shown in Figure 02, calculate the degree of freedom. (7 marks)</p>
+
+                <img src="2.png" alt="Figure 02: Mechanism for Gruebler's Equation" class="exam-figure">
+
+                <textarea placeholder="Show calculation steps..."></textarea>
+            </div>
+
+            <div class="structured-question">
+                <p><strong>C.</strong> The endpoint of a robotic arm is initially at P=(5,2,7). The arm undergoes Euler angle rotations.</p>
+                <p>i. Find the resulting rotation matrix.</p>
+                <textarea></textarea>
+                <p>ii. Determine the final coordinates of the endpoint.</p>
+                <input type="text" placeholder="Final Coordinates (x, y, z)" style="width: 100%; padding: 10px;">
+            </div>
+        </div>
+
+        <div class="card">
+            <h2 class="section-title">Question 03 (35 Marks)</h2>
+
+            <div class="structured-question">
+                <p><strong>A.</strong> The oscillating link OAB of a mechanism (shown below) is pivoted at O and is moving at 90 r.p.m. anticlockwise. OA=150mm; AB=75mm; and AC=250mm.</p>
+
+                <img src="3.png" alt="Figure 03: Oscillating Link Mechanism" class="exam-figure">
+
+                <p>Draw the space diagram and velocity vector diagrams using the given scales.</p>
+
+                <div class="file-upload-box">
+                    <label>📷 Upload Diagram for 3(A)</label>
+                    <input type="file" accept="image/*,.pdf" onchange="validateFileSize(this)">
+                    <span class="file-note">Supported: JPG, PNG, PDF. Max Size: 5MB.</span>
+                </div>
+
+                <p>Calculate and enter the following values based on your diagram:</p>
+                <label>1. Calculated Velocity of block C (m/s):</label>
+                <input type="number" step="0.01" style="width: 100%; padding: 8px; margin-bottom: 10px;">
+
+                <label>2. Angular velocity of link AC (rad/s):</label>
+                <input type="number" step="0.01" style="width: 100%; padding: 8px; margin-bottom: 10px;">
+
+                <label>3. Rubbing velocities at O, A, and C (m/s):</label>
+                <input type="text" placeholder="e.g., O=.., A=.., C=.." style="width: 100%; padding: 8px;">
+            </div>
+
+            <hr style="border: 0; border-top: 1px solid #eee; margin: 30px 0;">
+
+            <div class="structured-question">
+                <p><strong>B.</strong> PQRS is a four bar chain with link PS fixed. Lengths: PQ=62.5mm; QR=175mm; RS=112.5mm; PS=200mm. The crank PQ rotates at 10 rad/s clockwise.</p>
+                <p>Draw the velocity and acceleration diagram when angle QPS=60° and Q and R lie on the same side of PS.</p>
+
+                <div class="file-upload-box">
+                    <label>📷 Upload Velocity & Acceleration Diagram for 3(B)</label>
+                    <input type="file" accept="image/*,.pdf" onchange="validateFileSize(this)">
+                    <span class="file-note">Supported: JPG, PNG, PDF. Max Size: 5MB.</span>
+                </div>
+
+                <p>Find the angular velocity and angular acceleration:</p>
+                <label>Angular Velocity of QR & RS:</label>
+                <textarea placeholder="Enter calculated values..." style="height: 60px;"></textarea>
+                <label>Angular Acceleration of QR & RS:</label>
+                <textarea placeholder="Enter calculated values..." style="height: 60px;"></textarea>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2 class="section-title">Question 04 (18 Marks)</h2>
+
+            <div class="structured-question">
+                <p><strong>A.</strong> Pinion (20 teeth) transmits 1.5 kW to gear wheel (50 teeth). Obliquity 20°.</p>
+                <label>(a) Length of path of approach:</label>
+                <input type="text" style="width: 100%; padding: 8px; margin-bottom:10px;">
+                <label>(b) Length of arc of approach:</label>
+                <input type="text" style="width: 100%; padding: 8px;">
+            </div>
+
+            <div class="structured-question">
+                <p><strong>B.</strong> A compound gear train consists of 7 gears as illustrated in Figure 04. Input gear 1 rotates at 1200 rpm clockwise.</p>
+
+                <img src="4.png" alt="Figure 04: Compound Gear Train" class="exam-figure">
+
+                <p>Calculate Speed and Direction of Gear 7, Diameters, and Velocity Ratios.</p>
+                <textarea placeholder="Enter your full calculation results here..."></textarea>
+            </div>
+
+             <div class="structured-question">
+                <p><strong>C. Reverted Epicyclic Gear Train</strong></p>
+
+                <img src="5.png" alt="Reverted Epicyclic Gear Train Diagram" class="exam-figure">
+
+                <p style="text-align: justify;">
+                    A reverted epicyclic gear train for a hoist block is shown in the figure above.
+                    The arm E is keyed to the same shaft as the load drum and the wheel A is keyed to a second shaft which carries a chain wheel, the chain being operated by hand.
+                    The two shafts have common axis but can rotate independently.
+                    The wheels B and C are compound and rotate together on a pin carried at the end of arm E.
+                    The wheel D has internal teeth and is fixed to the outer casing of the block so that it does not rotate.
+                </p>
+                <p>
+                    The wheels A and B have 16 and 36 teeth respectively with a module of 3 mm.
+                    The wheels C and D have a module of 4 mm. Find:
+                </p>
+                <ol>
+                    <li>The number of teeth on wheels C and D when the speed of A is ten times the speed of arm E, both rotating in the same sense.</li>
+                    <li>The speed of wheel D when the wheel A is fixed and the arm E rotates at 450 r.p.m. Anticlockwise.</li>
+                </ol>
+                <textarea placeholder="Enter your answers for 1 and 2 here..."></textarea>
+            </div>
+        </div>
+
+         <div class="card">
+            <h2 class="section-title">Question 05 (12 Marks)</h2>
+            <p><strong>Cam Profile Design:</strong></p>
+
+            <p>Draw the profile of the cam when:</p>
+            <ol>
+                <li>The axis of the follower passes through the cam axis.</li>
+                <li>The axis of the follower is offset 20mm towards right.</li>
+            </ol>
+
+            <div class="file-upload-box">
+                <label>📷 Upload Cam Profile Drawings for Q5</label>
+                <input type="file" accept="image/*,.pdf" onchange="validateFileSize(this)">
+                <span class="file-note">Supported: JPG, PNG, PDF. Max Size: 5MB.</span>
+            </div>
+
+            <p>Determine maximum velocity and acceleration of the follower:</p>
+            <label>Max Velocity (Outward & Return):</label>
+            <input type="text" style="width: 100%; padding: 8px; margin-bottom: 10px;">
+            <label>Max Acceleration (Outward & Return):</label>
+            <input type="text" style="width: 100%; padding: 8px;">
+        </div>
+
+        <div class="card">
+            <h2 class="section-title">Useful Equations</h2>
+            <div class="equation-box">
+                <div class="equation-item">
+                    <span class="eq-label">Length of path of approach (KP)</span>
+                    <div class="math-display">
+                        KP = &radic;(R<sub>A</sub><sup>2</sup> - R<sup>2</sup>cos<sup>2</sup>&Phi;) - R sin&Phi;
+                    </div>
+                </div>
+
+                <div class="equation-item">
+                    <span class="eq-label">Gear Module (M)</span>
+                    <div class="math-display">
+                        M = D / T
+                    </div>
+                </div>
+
+                <div class="equation-item">
+                    <span class="eq-label">Speed Ratio</span>
+                    <div class="math-display">
+                        Speed Ratio = <span style="display:inline-block; vertical-align:middle; text-align:center;">
+                            <div style="border-bottom:1px solid black;">Product of teeth on driven</div>
+                            <div>Product of teeth on drivers</div>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="equation-item">
+                    <span class="eq-label">Maximum velocity of follower (V<sub>R</sub>)</span>
+                    <div class="math-display">
+                        V<sub>R</sub> =
+                        <span style="display:inline-block; vertical-align:middle; text-align:center;">
+                            <div style="border-bottom:1px solid black;">&pi;&omega;S</div>
+                            <div>2&theta;<sub>R</sub></div>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="equation-item">
+                    <span class="eq-label">Maximum acceleration of follower (a<sub>R</sub>)</span>
+                    <div class="math-display">
+                        a<sub>R</sub> =
+                        <span style="display:inline-block; vertical-align:middle; text-align:center;">
+                            <div style="border-bottom:1px solid black;">&pi;<sup>2</sup>&omega;<sup>2</sup>S</div>
+                            <div>2(&theta;<sub>R</sub>)<sup>2</sup></div>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <button type="button" class="submit-btn" onclick="submitExam()">Submit Examination</button>
+    </form>
+</div>
+
+<div id="result-modal">
+    <div class="modal-content">
+        <h2>Examination Completed</h2>
+        <div class="score-circle">
+            <span id="score-display">0</span>/20
+        </div>
+        <p><strong>Part 1 (MCQ) Score</strong></p>
+        <p style="color: #666; font-size: 0.9rem;">
+            Your drawings and structured answers have been recorded locally.
+            <br><br>
+            <em>(Note: Since this is a standalone HTML file, files are not actually sent to a server.)</em>
+        </p>
+        <button class="submit-btn" onclick="closeModal()">Close</button>
+    </div>
+</div>
+
+<script>
+    // --- File Size Validation ---
+    function validateFileSize(input) {
+        if (input.files && input.files[0]) {
+            const fileSize = input.files[0].size / 1024 / 1024; // in MB
+            if (fileSize > 5) {
+                alert('File size exceeds 5MB. Please select a smaller file.');
+                input.value = ''; // Clear the input
+            }
+        }
+    }
+
+    // --- Data: MCQs ---
+    const quizData = [
+        { id: 1, question: "1. What does the parameterization of rigid body motion include?", options: ["Body angular velocity and spatial angular velocity", "Force moments and inertia", "Euler's rigid body equations", "All of the above"], correct: 3 },
+        { id: 2, question: "2. What is conserved in the conservation of spatial angular momentum?", options: ["Magnitude of body angular momentum", "Gyroscopic motion", "Spinning top", "None of the above"], correct: 0 },
+        { id: 3, question: "3. Which principle is associated with MEMS accelerometers and gyroscopes?", options: ["Working principle", "Conservation principle", "Kinetic energy principle", "Force moment principle"], correct: 0 },
+        { id: 4, question: "4. What are kinematic chains?", options: ["Mechanisms and kinematic inversions", "Pairs and degrees of freedom", "Four bar mechanisms", "All of the above"], correct: 3 },
+        { id: 5, question: "5. What law is related to four bar mechanisms?", options: ["Grashof's law", "Newton's law", "Euler's law", "Kennedy's theorem"], correct: 0 },
+        { id: 6, question: "6. What theorem is associated with instantaneous center?", options: ["Kennedy's theorem", "Grashof's theorem", "Euler's theorem", "Newton's theorem"], correct: 0 },
+        { id: 7, question: "7. What is the law of gear meshing related to?", options: ["Gear types and trains", "Gear design parameters", "Cam drives", "Both gear types and design parameters"], correct: 3 },
+        { id: 8, question: "8. What are cam drives used for?", options: ["Transmitting motion", "Changing speed", "Changing direction", "All of the above"], correct: 3 },
+        { id: 9, question: "9. What does Euler's rigid body equations describe?", options: ["Rotating bodies", "Translating bodies", "Both rotating and translating bodies", "None of the above"], correct: 0 },
+        { id: 10, question: "10. What is gyroscopic motion related to?", options: ["Conservation of spatial angular momentum", "Spinning top", "Both conservation and spinning top", "None of the above"], correct: 2 }
+    ];
+
+    // --- Render MCQs ---
+    const mcqContainer = document.getElementById('mcq-container');
+
+    quizData.forEach((q, index) => {
+        const questionDiv = document.createElement('div');
+        questionDiv.className = 'mcq-question';
+
+        let optionsHtml = '';
+        q.options.forEach((opt, i) => {
+            optionsHtml += `
+                <label class="option-label">
+                    <input type="radio" name="q${index}" value="${i}">
+                    <span>${String.fromCharCode(65+i)}) ${opt}</span>
+                </label>
+            `;
+        });
+
+        questionDiv.innerHTML = `
+            <span class="question-text">${q.question}</span>
+            <div class="options-grid">${optionsHtml}</div>
+        `;
+        mcqContainer.appendChild(questionDiv);
+    });
+
+    // --- Timer Logic (2 Hours) ---
+    let timeLimit = 2 * 60 * 60; // seconds
+    const timerDisplay = document.getElementById('time');
+
+    const timerInterval = setInterval(() => {
+        const hours = Math.floor(timeLimit / 3600);
+        const minutes = Math.floor((timeLimit % 3600) / 60);
+        const seconds = timeLimit % 60;
+
+        timerDisplay.textContent =
+            `${String(hours).padStart(2,'0')}:${String(minutes).padStart(2,'0')}:${String(seconds).padStart(2,'0')}`;
+
+        if (timeLimit <= 0) {
+            clearInterval(timerInterval);
+            submitExam();
+        }
+        timeLimit--;
+    }, 1000);
+
+    // --- Submission Logic ---
+    function submitExam() {
+        clearInterval(timerInterval);
+
+        let score = 0;
+        const marksPerMcq = 2;
+
+        // Calculate MCQ Score
+        quizData.forEach((q, index) => {
+            const selected = document.querySelector(`input[name="q${index}"]:checked`);
+            if (selected && parseInt(selected.value) === q.correct) {
+                score += marksPerMcq;
+                selected.parentElement.style.border = "2px solid var(--success)";
+                selected.parentElement.style.backgroundColor = "#d4edda";
+            } else if (selected) {
+                 selected.parentElement.style.border = "2px solid red";
+                 selected.parentElement.style.backgroundColor = "#f8d7da";
+            }
+        });
+
+        // Show Results
+        document.getElementById('score-display').textContent = score;
+        document.getElementById('result-modal').style.display = 'flex';
+
+        // Disable inputs
+        const inputs = document.querySelectorAll('input, textarea');
+        inputs.forEach(input => input.disabled = true);
+    }
+
+    function closeModal() {
+        document.getElementById('result-modal').style.display = 'none';
+        window.scrollTo(0,0);
+    }
+</script>
+
+</body>
+</html>
