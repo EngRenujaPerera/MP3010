@@ -17,6 +17,7 @@
             --text-muted: #94a3b8;
             --border: #334155;
             --quiz-accent: #fbbf24;
+            --exam-accent: #f43f5e; /* New accent color for Exam */
             --success: #10b981;
             --header-height: 60px;
         }
@@ -113,13 +114,18 @@
 
         /* Sidebar Content */
         .sidebar-content { list-style: none; padding: 0; margin: 0; overflow-y: auto; flex-grow: 1; }
-        
+
         .sidebar-item { display: flex; align-items: center; padding: 14px 20px; cursor: pointer; border-bottom: 1px solid rgba(51, 65, 85, 0.3); transition: all 0.2s; gap: 12px; }
         .sidebar-item:hover { background-color: rgba(59, 130, 246, 0.1); }
         .sidebar-item.active { background-color: rgba(59, 130, 246, 0.15); border-left: 4px solid var(--primary); }
-        
+
         .sidebar-item.is-quiz .item-icon { background: rgba(234, 179, 8, 0.1); color: var(--quiz-accent); }
         .sidebar-item.active.is-quiz .item-icon { background: var(--quiz-accent); color: #000; }
+        
+        /* New Exam Style */
+        .sidebar-item.is-exam .item-icon { background: rgba(244, 63, 94, 0.1); color: var(--exam-accent); }
+        .sidebar-item.active.is-exam .item-icon { background: var(--exam-accent); color: white; }
+
         .item-icon { width: 32px; height: 32px; border-radius: 6px; background: rgba(255,255,255,0.05); color: var(--text-muted); display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
         .sidebar-item.active .item-icon { background: var(--primary); color: white; }
         .item-info { flex-grow: 1; }
@@ -146,7 +152,7 @@
         .quiz-title-display { font-size: 2rem; color: white; margin-bottom: 10px; }
         .quiz-desc-display { color: var(--text-muted); margin-bottom: 30px; max-width: 400px; }
         .start-quiz-btn { background-color: var(--quiz-accent); color: #000; padding: 15px 40px; font-size: 1.1rem; font-weight: 700; border: none; border-radius: 8px; cursor: pointer; text-decoration: none; margin-bottom: 15px; }
-        
+
         /* Auto-save notification */
         .auto-save-note { font-size: 0.8rem; color: var(--success); margin-top: 10px; display: flex; align-items: center; gap: 5px; opacity: 0; transition: opacity 0.3s; }
 
@@ -194,10 +200,10 @@
             .quiz-desc-display { font-size: 0.9rem; }
             .options-grid { flex-direction: column; }
             .option-col.guest { border-right: none; border-bottom: 1px solid var(--border); }
-            .welcome-card { margin: 0 auto; max-width: 95%; } 
-            .welcome-header { padding: 20px; } 
-            .option-col { padding: 20px; }    
-            .welcome-header h1 { font-size: 1.4rem; } 
+            .welcome-card { margin: 0 auto; max-width: 95%; }
+            .welcome-header { padding: 20px; }
+            .option-col { padding: 20px; }
+            .welcome-header h1 { font-size: 1.4rem; }
             .course-footer { padding-bottom: 30px; margin: 20px; }
         }
     </style>
@@ -264,7 +270,7 @@
     <header class="mobile-header">
         <button class="mobile-menu-btn" onclick="toggleSidebar()">☰</button>
         <div class="mobile-title">Kinematics & Dynamics</div>
-        <div style="width: 24px;"></div> 
+        <div style="width: 24px;"></div>
     </header>
 
     <aside class="sidebar" id="sidebar">
@@ -301,13 +307,13 @@
                 <span>Course Module</span>
                 <h2>Kinematics & Dynamics</h2>
             </div>
-            
+
             <div class="sidebar-nav">
                 <button class="s-nav-btn active" onclick="renderSidebar('lessons')">Lessons</button>
                 <button class="s-nav-btn" onclick="renderSidebar('slides')">Files</button>
             </div>
         </div>
-        
+
         <ul class="sidebar-content" id="sidebar-list"></ul>
 
         <div class="sidebar-footer-controls">
@@ -393,7 +399,8 @@
             { title: "Lecture 17: Cam Profile", type: "video", id: "GV1tlgHpMs0", resources: { notes: [ { name: "Lecture 17 PDF", type: "PDF", size: "2.07 MB", url: "files/Lecture17_Cam profile.pdf" } ], slides: resources.day5, tutes: [] } },
             { title: "Lecture 18: Gyroscope", type: "video", id: null, resources: { notes: [ { name: "Lecture 18 PDF (Updated)", type: "PDF", size: "2.70 MB", url: "files/Lecture18_Gyroscope_updated.pdf" } ], slides: [], tutes: [] } },
             { title: "Lecture 19: Introduction to MEMS", type: "video", id: null, resources: { notes: [ { name: "Lecture 19 PDF", type: "PDF", size: "433 KB", url: "files/Lecture19_Introduction to MEMS.pdf" } ], slides: [], tutes: [] } },
-            { title: "Quiz 05: Advanced Topics", type: "quiz", url: "quiz/quiz5.html", resources: resources.empty }
+            { title: "Quiz 05: Advanced Topics", type: "quiz", url: "quiz/quiz5.html", resources: resources.empty },
+            { title: "Online End Examination", type: "quiz", url: "papers/exam1.html", resources: resources.empty }
         ];
 
         // --- 3. LOGIC CONTROLLER ---
@@ -420,7 +427,7 @@
         }
 
         function selectMode(mode) {
-            if (mode === 'student') window.location.href = "login.html"; 
+            if (mode === 'student') window.location.href = "login.html";
             else {
                 localStorage.setItem('guestMode', 'true');
                 modal.style.display = 'none';
@@ -434,7 +441,7 @@
             document.getElementById('roleDisplay').style.color = "#10b981";
             if(currentUser.photo) document.getElementById('avatarDisplay').src = currentUser.photo;
             document.getElementById('statsGrid').style.opacity = "1";
-            
+
             // Load saved total time
             const savedTime = localStorage.getItem('totalStudyTime');
             if(savedTime) engagedSeconds = parseInt(savedTime);
@@ -449,7 +456,7 @@
             document.getElementById('nameDisplay').textContent = "Guest User";
             document.getElementById('roleDisplay').textContent = "Progress Not Saved";
             document.getElementById('roleDisplay').style.color = "#ef4444";
-            startEngagementTimer(); 
+            startEngagementTimer();
             checkResumeStatus();
         }
 
@@ -458,7 +465,7 @@
             setInterval(() => {
                 engagedSeconds++;
                 document.getElementById('timeVal').textContent = formatTime(engagedSeconds);
-                
+
                 // Save every 5 seconds if student
                 if(currentUser && engagedSeconds % 5 === 0) {
                     localStorage.setItem('totalStudyTime', engagedSeconds);
@@ -505,7 +512,7 @@
             const list = document.getElementById('reportList');
             const empty = document.getElementById('emptyReport');
             const quizData = JSON.parse(localStorage.getItem('quizData')) || {};
-            
+
             list.innerHTML = '';
             let hasData = false;
 
@@ -536,7 +543,7 @@
             // Initialize or update
             let currentData = allQuizData[quizKey] || { title: quizTitle, attempts: 0 };
             currentData.attempts += 1;
-            
+
             allQuizData[quizKey] = currentData;
             localStorage.setItem('quizData', JSON.stringify(allQuizData));
 
@@ -571,7 +578,7 @@
         const sidebarList = document.getElementById('sidebar-list');
         const titleEl = document.getElementById('videoTitle');
         const iframeEl = document.getElementById('course-player');
-        
+
         const quizScreen = document.getElementById('quiz-screen');
         const quizTitleDisplay = document.getElementById('quizTitleDisplay');
         const statusIcon = document.getElementById('statusIcon');
@@ -582,7 +589,7 @@
         let activeIndex = 0;
 
         document.addEventListener('DOMContentLoaded', () => {
-            checkState(); 
+            checkState();
             renderSidebar('lessons');
             loadContent(0, false);
         });
@@ -603,7 +610,19 @@
             sidebarList.innerHTML = '';
             courseContent.forEach((item, index) => {
                 let icon, sub, type;
-                if (item.type === 'quiz') { icon = '📝'; sub = 'Assessment'; type='quiz'; }
+                let isExam = false;
+                
+                if (item.type === 'quiz') { 
+                    if (item.title.includes("Examination")) {
+                         icon = '🎓'; 
+                         sub = 'Final Assessment';
+                         isExam = true;
+                    } else {
+                         icon = '📝'; 
+                         sub = 'Assessment';
+                    }
+                    type='quiz'; 
+                }
                 else { icon = '▶'; sub = 'Video Lesson'; type='video'; }
 
                 if (mode === 'slides') {
@@ -614,11 +633,12 @@
                 const li = document.createElement('li');
                 li.className = 'sidebar-item';
                 if(type === 'quiz') li.classList.add('is-quiz');
-                
+                if(isExam) li.classList.add('is-exam');
+
                 li.dataset.index = index;
                 li.innerHTML = `<div class="item-icon">${icon}</div><div class="item-info"><h4>${item.title}</h4><span>${sub}</span></div>`;
                 li.onclick = () => handleSidebarClick(index);
-                
+
                 sidebarList.appendChild(li);
             });
             updateSidebarHighlight();
@@ -635,7 +655,7 @@
             activeIndex = index;
             loadContent(index, true);
             updateSidebarHighlight();
-            if(window.innerWidth <= 900) toggleSidebar(); 
+            if(window.innerWidth <= 900) toggleSidebar();
 
             if (currentMode === 'slides') {
                 if (courseContent[index].resources.notes.length === 0 && courseContent[index].resources.slides.length > 0) switchTab('slides');
@@ -647,7 +667,7 @@
         function loadContent(index, autoPlay) {
             const item = courseContent[index];
             titleEl.textContent = item.title;
-            activeIndex = index; 
+            activeIndex = index;
 
             // SAVE PROGRESS (Simple Tracking)
             localStorage.setItem('lastVideoIndex', index);
@@ -657,18 +677,18 @@
             if (item.type === 'quiz') {
                 iframeEl.style.display = 'none'; iframeEl.src = "";
                 quizScreen.style.display = 'flex';
-                statusIcon.textContent = '📝';
+                statusIcon.textContent = item.title.includes("Examination") ? '🎓' : '📝';
                 quizTitleDisplay.textContent = item.title;
-                statusDesc.textContent = ""; 
+                statusDesc.textContent = "";
                 launchQuizBtn.style.display = 'inline-block';
-                launchQuizBtn.textContent = "Start Quiz";
-                
+                launchQuizBtn.textContent = item.title.includes("Examination") ? "Begin Examination" : "Start Quiz";
+
                 // AUTOMATIC ATTEMPT TRACKING
-                launchQuizBtn.onclick = function() { 
-                    registerAttempt(index); 
-                    window.open(item.url, '_blank'); 
+                launchQuizBtn.onclick = function() {
+                    registerAttempt(index);
+                    window.open(item.url, '_blank');
                 };
-            
+
             } else if (item.type === 'video' && !item.id) {
                 iframeEl.style.display = 'none'; iframeEl.src = "";
                 quizScreen.style.display = 'flex';
