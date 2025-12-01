@@ -33,11 +33,11 @@
             overflow: hidden;
         }
 
-        /* --- 1. NEW: THE PERSUASIVE MODAL STYLES --- */
+        /* --- 1. PERSUASIVE MODAL STYLES --- */
         .modal-overlay {
             position: fixed; inset: 0; background: rgba(0,0,0,0.85);
             backdrop-filter: blur(8px); z-index: 2000;
-            display: none; /* Hidden by default, JS toggles it */
+            display: none; /* Hidden by default */
             align-items: center; justify-content: center; padding: 20px;
         }
 
@@ -48,10 +48,10 @@
             overflow: hidden; box-shadow: 0 50px 100px -20px rgba(0,0,0,0.7);
             animation: scaleIn 0.4s ease;
             
-            /* --- MOBILE FIX: Allow scrolling inside the card --- */
+            /* Mobile Scroll Fix */
             max-height: 90vh; 
             overflow-y: auto;
-            -webkit-overflow-scrolling: touch; /* Smooth scrolling for iOS */
+            -webkit-overflow-scrolling: touch;
         }
 
         .welcome-header { padding: 30px; text-align: center; border-bottom: 1px solid var(--border); }
@@ -63,7 +63,6 @@
         .option-col.guest { background: rgba(255,255,255,0.02); border-right: 1px solid var(--border); }
         .option-col.pro { background: rgba(59, 130, 246, 0.05); position: relative; }
 
-        /* Recommended Badge */
         .badge {
             position: absolute; top: 15px; right: 15px;
             background: var(--quiz-accent); color: #000; font-size: 0.7rem; font-weight: 800;
@@ -86,7 +85,7 @@
 
         @keyframes scaleIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
 
-        /* --- Mobile Header (Hidden on Desktop) --- */
+        /* --- Mobile Header --- */
         .mobile-header {
             display: none; height: var(--header-height); background: var(--panel-bg);
             border-bottom: 1px solid var(--border); align-items: center; padding: 0 15px;
@@ -102,7 +101,6 @@
             z-index: 100; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* --- 2. NEW: DASHBOARD STYLES --- */
         .sidebar-dashboard { padding: 20px; background: rgba(0,0,0,0.2); border-bottom: 1px solid var(--border); }
         .user-greeting { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
         .u-avatar { width: 45px; height: 45px; border-radius: 50%; border: 2px solid var(--primary); object-fit: cover; }
@@ -117,12 +115,11 @@
         .resume-btn {
             margin-top: 15px; width: 100%; padding: 10px; background: rgba(16, 185, 129, 0.15);
             color: var(--success); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 6px;
-            font-size: 0.8rem; cursor: pointer; display: none; /* Hidden if no history */
+            font-size: 0.8rem; cursor: pointer; display: none;
             align-items: center; justify-content: center; gap: 8px; font-weight: 600;
         }
         .resume-btn:hover { background: rgba(16, 185, 129, 0.25); }
 
-        /* Modified Header to fit under dashboard */
         .course-meta { margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); }
         .course-meta h2 { margin: 0; font-size: 1rem; font-weight: 700; color: #fff; }
         .course-meta span { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--primary); font-weight: 700; }
@@ -179,6 +176,31 @@
         .resource-meta { font-size: 0.8rem; color: var(--text-muted); }
         .view-btn { background: var(--primary); color: white; text-decoration: none; padding: 8px 16px; border-radius: 6px; font-size: 0.85rem; font-weight: 500; cursor: pointer; flex-shrink: 0; }
 
+        /* --- Footer Styles --- */
+        .course-footer {
+            margin-top: 40px;
+            padding-top: 25px;
+            border-top: 1px solid var(--border);
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            line-height: 1.6;
+            opacity: 0.8;
+        }
+        .footer-highlight { color: var(--text-main); font-weight: 600; }
+        .heart-icon { 
+            color: #ef4444; 
+            display: inline-block; 
+            animation: heartbeat 1.5s infinite;
+        }
+        
+        @keyframes heartbeat {
+            0% { transform: scale(1); }
+            15% { transform: scale(1.2); }
+            30% { transform: scale(1); }
+            100% { transform: scale(1); }
+        }
+
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes fadeIn { to { opacity: 1; } }
 
@@ -196,15 +218,15 @@
             .tab-btn { padding: 12px 20px; }
             .quiz-title-display { font-size: 1.5rem; }
             .quiz-desc-display { font-size: 0.9rem; }
-            
             .options-grid { flex-direction: column; }
             .option-col.guest { border-right: none; border-bottom: 1px solid var(--border); }
-            
-            /* --- MOBILE FIXES ADDED HERE --- */
             .welcome-card { margin: 0 auto; max-width: 95%; } 
-            .welcome-header { padding: 20px; } /* Less padding on header */
-            .option-col { padding: 20px; }    /* Less padding in content */
-            .welcome-header h1 { font-size: 1.4rem; } /* Smaller title */
+            .welcome-header { padding: 20px; } 
+            .option-col { padding: 20px; }    
+            .welcome-header h1 { font-size: 1.4rem; } 
+            
+            /* Footer mobile adjustments */
+            .course-footer { padding-bottom: 30px; margin: 20px; }
         }
     </style>
 </head>
@@ -321,6 +343,12 @@
                     <ul class="resource-list" id="list-tutes"></ul>
                 </div>
             </div>
+
+            <footer class="course-footer">
+                <div>&copy; 2025 <span class="footer-highlight">Faculty of Engineering</span> | E23 Batch</div>
+                <div style="margin-top:5px;">Made <span class="heart-icon">❤️</span> with E23 Brotherhood</div>
+            </footer>
+
         </div>
     </main>
 
