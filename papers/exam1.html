@@ -86,9 +86,22 @@
         .gear-table th, .gear-table td { border: 1px solid #ddd; padding: 8px; text-align: center; }
         .gear-table th { background-color: var(--primary); color: white; }
 
-        /* --- Camera Modal --- */
-        #camera-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 3000; display: none; flex-direction: column; justify-content: center; align-items: center; }
+        /* --- MODALS (POPUPS) --- */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95); z-index: 3000;
+            display: none; /* Hidden by default */
+            flex-direction: column; justify-content: center; align-items: center;
+        }
+        
         #camera-feed { width: 90%; max-width: 600px; background: black; border: 2px solid white; border-radius: 10px; }
+        
+        .alert-box {
+            background: white; padding: 40px; border-radius: 15px; text-align: center; max-width: 500px;
+            animation: popUp 0.3s ease-out;
+        }
+        @keyframes popUp { from {transform: scale(0.8); opacity: 0;} to {transform: scale(1); opacity: 1;} }
+
     </style>
 </head>
 <body>
@@ -115,7 +128,6 @@
             <p><strong>Duration:</strong> 2 Hours</p>
             <p><strong>Security:</strong> Tab switching is monitored. Leaving the screen will auto-submit your exam.</p>
             <p><strong>Uploads:</strong> Use the <b>Camera Button</b> to take photos without leaving the page.</p>
-            
         </div>
 
         <div style="margin-top: 25px;">
@@ -146,14 +158,13 @@
 
         <div class="exam-card">
             <div class="section-header"><h3>QUESTION 02 (20 Marks)</h3></div>
-
-            <p><strong>A.</strong> Consider following linkage mechanism (Figure 01). Identify the mechanisms of A to C. [cite: 59]</p>
+            <p><strong>A.</strong> Consider following linkage mechanism (Figure 01). Identify the mechanisms of A to C.</p>
             <img src="1.png" alt="Figure 01" class="exam-figure">
             <input type="text" placeholder="Identify A">
             <input type="text" placeholder="Identify B">
             <input type="text" placeholder="Identify C">
 
-            <p><strong>B.</strong> Gruebler's equation is given by <b>DOF = 3(n-1) - 2L - H</b>[cite: 65].</p>
+            <p><strong>B.</strong> Gruebler's equation is given by <b>DOF = 3(n-1) - 2L - H</b>.</p>
             <p>i. Define the terms n, L, and H.</p>
             <textarea style="height:60px;"></textarea>
             <p>ii. For the mechanism shown in Figure 02, calculate the degree of freedom. (7 marks)</p>
@@ -163,7 +174,7 @@
             <p><strong>C.</strong> The endpoint of a robotic arm is initially at <b>P=(5,2,7)</b>. The arm undergoes Euler angle rotations:</p>
             <ul>
                 <li>First by <b>90° about the z-axis</b></li>
-                <li>Then by <b>180° about its own x-axis</b> [cite: 70-71].</li>
+                <li>Then by <b>180° about its own x-axis</b>.</li>
             </ul>
             <p>i. Find the resulting rotation matrix.</p>
             <textarea style="height:80px;"></textarea>
@@ -173,13 +184,11 @@
 
         <div class="exam-card">
             <div class="section-header"><h3>QUESTION 03 (35 Marks)</h3></div>
-
-            <p><strong>(A)</strong> The oscillating link OAB (Figure 03) is pivoted at O and moves at <b>90 r.p.m. anticlockwise</b>[cite: 75].</p>
-            <p>Data: <b>OA=150mm, AB=75mm, AC=250mm</b>[cite: 76].</p>
+            <p><strong>(A)</strong> The oscillating link OAB (Figure 03) is pivoted at O and moves at <b>90 r.p.m. anticlockwise</b>.</p>
+            <p>Data: <b>OA=150mm, AB=75mm, AC=250mm</b>.</p>
             <img src="3.png" alt="Figure 03" class="exam-figure">
 
             <p>Draw Space Diagram (1:50) and Velocity Vector Diagram (1cm = 0.2m/s).</p>
-
             <div class="upload-area">
                 <p><strong>Upload Q3(A) Diagrams</strong></p>
                 <button type="button" class="btn-cam" onclick="openCamera('q3a')">📷 Camera</button>
@@ -188,16 +197,15 @@
                 <img id="p3a" class="preview-img">
             </div>
 
-            <p>Calculate [cite: 78-80]:</p>
+            <p>Calculate:</p>
             <label>1. Velocity of block C (m/s):</label><input type="number" step="0.01">
             <label>2. Angular velocity of link AC (rad/s):</label><input type="number" step="0.01">
             <label>3. Rubbing velocities at O, A, C (Pin diameters = 20mm):</label><input type="text">
 
             <hr style="margin:20px 0; border-top:1px dashed #ccc;">
 
-            <p><strong>(B)</strong> Four bar chain PQRS (PS Fixed). PQ=62.5mm, QR=175mm, RS=112.5mm, PS=200mm. Crank PQ rotates <b>10 rad/s clockwise</b> [cite: 93-94].</p>
-            <p>Draw velocity/acceleration diagram when <b>Angle QPS = 60°</b>[cite: 95].</p>
-
+            <p><strong>(B)</strong> Four bar chain PQRS (PS Fixed). PQ=62.5mm, QR=175mm, RS=112.5mm, PS=200mm. Crank PQ rotates <b>10 rad/s clockwise</b>.</p>
+            <p>Draw velocity/acceleration diagram when <b>Angle QPS = 60°</b>.</p>
             <div class="upload-area">
                 <p><strong>Upload Q3(B) Diagrams</strong></p>
                 <button type="button" class="btn-cam" onclick="openCamera('q3b')">📷 Camera</button>
@@ -205,21 +213,19 @@
                 <input type="file" id="f3b" style="display:none" onchange="previewFile(this, 'p3b')">
                 <img id="p3b" class="preview-img">
             </div>
-
-            <p>Find Angular Velocity & Acceleration of QR and RS[cite: 96]:</p>
+            <p>Find Angular Velocity & Acceleration of QR and RS:</p>
             <textarea style="height:80px;" placeholder="Enter answers..."></textarea>
         </div>
 
         <div class="exam-card">
             <div class="section-header"><h3>QUESTION 04 (18 Marks)</h3></div>
-
-            <p><strong>(A)</strong> Pinion (20 teeth, module 6mm) rotates at 200 rpm, transmits 1.5kW to Wheel (50 teeth). Addendum = 1/4 circular pitch. Obliquity = 20° [cite: 101-103].</p>
+            <p><strong>(A)</strong> Pinion (20 teeth, module 6mm) rotates at 200 rpm, transmits 1.5kW to Wheel (50 teeth). Addendum = 1/4 circular pitch. Obliquity = 20°.</p>
             <input type="text" placeholder="(a) Length of path of approach">
             <input type="text" placeholder="(b) Length of arc of approach">
 
             <hr style="margin:20px 0; border-top:1px dashed #ccc;">
 
-            <p><strong>(B)</strong> Compound gear train (Figure 04). Input Gear 1 rotates <b>1200 rpm clockwise</b>[cite: 107].</p>
+            <p><strong>(B)</strong> Compound gear train (Figure 04). Input Gear 1 rotates <b>1200 rpm clockwise</b>.</p>
             <img src="4.png" alt="Figure 04" class="exam-figure">
 
             <table class="gear-table">
@@ -235,13 +241,12 @@
                 </tbody>
             </table>
 
-            <p>Compute [cite: 110-112]:</p>
+            <p>Compute:</p>
             <ol>
                 <li>Speed/Direction of Gear 7</li>
                 <li>Diameter of gears 2,3,4,5,6,7</li>
                 <li>Velocity ratios (1-2, 3-4, 5-6, 6-7)</li>
             </ol>
-
             <div class="upload-area">
                 <p><strong>(Optional) Upload Calculation Sheet</strong></p>
                 <button type="button" class="btn-cam" onclick="openCamera('q4')">📷 Camera</button>
@@ -253,23 +258,10 @@
 
             <hr style="margin:20px 0; border-top:1px dashed #ccc;">
 
-            <p><strong>(C)</strong> A reverted epicyclic gear train for a hoist block is shown in
-Figure. The arm E is keyed to the same shaft as the load drum
-and the wheel A is keyed to a second shaft which carries a chain
-wheel, the chain being operated by hand. The two shafts have
-common axis but can rotate independently. The wheels B and C
-are compound and rotate together on a pin carried at the end of
-arm E. The wheel D has internal teeth and is fixed to the outer
-casing of the block so that it does not rotate. The wheels A and
-B have 16 and 36 teeth respectively with a module of 3 mm. The
-wheels C and D have a module of 4 mm. Find:
-</p>
+            <p><strong>(C)</strong> A reverted epicyclic gear train for a hoist block is shown in Figure. The arm E is keyed to the same shaft as the load drum and the wheel A is keyed to a second shaft which carries a chain wheel, the chain being operated by hand.</p>
             <img src="5.png" alt="Epicyclic Train" class="exam-figure">
-            <p>11. The number of teeth on wheels C and D when the speed of A
-is ten times the speed of arm E, both rotating in the same sense.
-</p>
-            <p>2. The speed of wheel D when the wheel A is fixed and the arm
-E rotates at 450 r.p.m. Anticlockwise.</p>
+            <p>1. The number of teeth on wheels C and D when the speed of A is ten times the speed of arm E, both rotating in the same sense.</p>
+            <p>2. The speed of wheel D when the wheel A is fixed and the arm E rotates at 450 r.p.m. Anticlockwise.</p>
             <textarea placeholder="Enter answers..."></textarea>
         </div>
 
@@ -278,18 +270,13 @@ E rotates at 450 r.p.m. Anticlockwise.</p>
             <p><strong>Cam Profile Design:</strong></p>
             <ul style="background:#f9f9f9; padding:15px 30px; border-radius:5px;">
                 <p>A cam operating a knife-edged follower has the following data :
-<br>(a) Follower moves outwards through 40 mm during 60° of cam rotation.
-<br>(b) Follower dwells for the next 45°.
-<br>(c) Follower returns to its original position during next 90°.
-<br>(d) Follower dwells for the rest of the rotation.
-The displacement of the follower is to take place with simple harmonic motion during both the
-outward and return strokes. The least radius of the cam is 50 mm. Draw the profile of the cam when
-<br>1. the axis of the follower passes through the cam axis.
-<br>2. the axis of the follower is offset 20 mm towards right from the cam axis.</p>
+                <br>(a) Follower moves outwards through 40 mm during 60° of cam rotation.
+                <br>(b) Follower dwells for the next 45°.
+                <br>(c) Follower returns to its original position during next 90°.
+                <br>(d) Follower dwells for the rest of the rotation.
+                The displacement of the follower is to take place with simple harmonic motion during both the outward and return strokes. The least radius of the cam is 50 mm.</p>
             </ul>
-
-
-
+            <p>Draw the profile when: 1. Axis passes through cam axis. 2. Offset 20mm right.</p>
 
             <div class="upload-area">
                 <p><strong>Upload Cam Profile</strong></p>
@@ -307,7 +294,7 @@ outward and return strokes. The least radius of the cam is 50 mm. Draw the profi
     </div>
 </section>
 
-<div id="camera-modal">
+<div id="camera-modal" class="modal-overlay">
     <video id="camera-feed" autoplay playsinline></video>
     <canvas id="camera-canvas" style="display:none;"></canvas>
     <div style="margin-top:20px; display:flex; gap:20px;">
@@ -316,8 +303,28 @@ outward and return strokes. The least radius of the cam is 50 mm. Draw the profi
     </div>
 </div>
 
+<div id="violation-modal" class="modal-overlay">
+    <div class="alert-box">
+        <h2 style="color:red; font-size:2rem;">⚠️ EXAM TERMINATED</h2>
+        <p style="font-size:1.1rem; margin: 20px 0;">You navigated away from the exam window.</p>
+        <p>Your answers have been auto-submitted and a violation has been recorded.</p>
+        <button class="btn-main" style="background: #333;" onclick="location.reload()">Close Portal</button>
+    </div>
+</div>
+
+<div id="success-modal" class="modal-overlay">
+    <div class="alert-box">
+        <h2 style="color:green; font-size:2rem;">✅ SUBMITTED</h2>
+        <p style="font-size:1.1rem; margin: 20px 0;">Your examination has been successfully recorded.</p>
+        <div style="background:#eee; padding:10px; border-radius:10px; margin-bottom:20px;">
+            <p><strong>MCQ Score:</strong> <span id="final-score">0</span>/20</p>
+        </div>
+        <button class="btn-main" onclick="location.reload()">Return Home</button>
+    </div>
+</div>
+
 <script>
-    // --- MCQs [cite: 6-56] ---
+    // --- MCQs ---
     const quizData = [
         { q: "1. Parameterization of rigid body motion includes?", o: ["Body/Spatial angular velocity", "Force moments", "Euler's equations", "All of the above"], a: 3 },
         { q: "2. Conserved in spatial angular momentum?", o: ["Magnitude of angular momentum", "Gyroscopic motion", "Spinning top", "None"], a: 0 },
@@ -342,6 +349,7 @@ outward and return strokes. The least radius of the cam is 50 mm. Draw the profi
     let safeMode = false;
     let currentId = null;
     let stream = null;
+    let timerInterval = null;
 
     // --- NAVIGATION ---
     function handleLogin(e) {
@@ -351,7 +359,6 @@ outward and return strokes. The least radius of the cam is 50 mm. Draw the profi
         document.getElementById('sec-instructions').style.display = 'flex';
     }
 
-    // --- CRITICAL BUTTON FIX ---
     function toggleStartBtn(checkbox) {
         document.getElementById('startBtn').disabled = !checkbox.checked;
     }
@@ -364,24 +371,47 @@ outward and return strokes. The least radius of the cam is 50 mm. Draw the profi
 
         // Timer
         let t = 7200;
-        setInterval(() => {
+        timerInterval = setInterval(() => {
             t--;
             let h=Math.floor(t/3600), m=Math.floor((t%3600)/60), s=t%60;
             document.getElementById('timer').innerText = `${h}:${m<10?'0'+m:m}:${s<10?'0'+s:s}`;
-            if(t<=0) alert("Time Up!");
+            if(t<=0) submitExam('timeout');
         }, 1000);
 
-        // Security
+        // Security Check
         document.addEventListener('visibilitychange', () => {
-            if(!safeMode && document.hidden) alert("VIOLATION: Exam Auto-Submitted!");
+            if(!safeMode && document.hidden) {
+                clearInterval(timerInterval);
+                document.getElementById('violation-modal').style.display = 'flex';
+            }
         });
+    }
+
+    // --- SUBMIT LOGIC ---
+    function submitExam(type) {
+        clearInterval(timerInterval);
+        
+        // Calculate Score
+        let score = 0;
+        quizData.forEach((q, index) => {
+            const selected = document.querySelector(`input[name="q${index}"]:checked`);
+            if (selected && parseInt(selected.value) === q.a) score += 2;
+        });
+        document.getElementById('final-score').innerText = score;
+
+        // Show Modal
+        if(type === 'manual') {
+            document.getElementById('success-modal').style.display = 'flex';
+        } else {
+             document.getElementById('violation-modal').style.display = 'flex';
+        }
     }
 
     // --- UPLOAD & CAMERA ---
     function safeUpload(id) {
         safeMode = true;
         document.getElementById(id).click();
-        setTimeout(() => safeMode = false, 2000); // Re-arm security after 2s
+        setTimeout(() => safeMode = false, 2000); // Re-arm security
     }
 
     function previewFile(input, imgId) {
@@ -417,8 +447,6 @@ outward and return strokes. The least radius of the cam is 50 mm. Draw the profi
         if(stream) stream.getTracks().forEach(t=>t.stop());
         setTimeout(() => safeMode = false, 1000);
     }
-
-    function submitExam() { alert("Exam Submitted Successfully!"); location.reload(); }
 </script>
 </body>
 </html>
