@@ -93,9 +93,9 @@
             display: none; /* Hidden by default */
             flex-direction: column; justify-content: center; align-items: center;
         }
-        
+
         #camera-feed { width: 90%; max-width: 600px; background: black; border: 2px solid white; border-radius: 10px; }
-        
+
         .alert-box {
             background: white; padding: 40px; border-radius: 15px; text-align: center; max-width: 500px;
             animation: popUp 0.3s ease-out;
@@ -258,7 +258,16 @@
 
             <hr style="margin:20px 0; border-top:1px dashed #ccc;">
 
-            <p><strong>(C)</strong> A reverted epicyclic gear train for a hoist block is shown in Figure. The arm E is keyed to the same shaft as the load drum and the wheel A is keyed to a second shaft which carries a chain wheel, the chain being operated by hand.</p>
+            <p><strong>(C)</strong> A reverted epicyclic gear train for a hoist block is shown in
+Figure. The arm E is keyed to the same shaft as the load drum
+and the wheel A is keyed to a second shaft which carries a chain
+wheel, the chain being operated by hand. The two shafts have
+common axis but can rotate independently. The wheels B and C
+are compound and rotate together on a pin carried at the end of
+arm E. The wheel D has internal teeth and is fixed to the outer
+casing of the block so that it does not rotate. The wheels A and
+B have 16 and 36 teeth respectively with a module of 3 mm. The
+wheels C and D have a module of 4 mm. Find: </p>
             <img src="5.png" alt="Epicyclic Train" class="exam-figure">
             <p>1. The number of teeth on wheels C and D when the speed of A is ten times the speed of arm E, both rotating in the same sense.</p>
             <p>2. The speed of wheel D when the wheel A is fixed and the arm E rotates at 450 r.p.m. Anticlockwise.</p>
@@ -390,7 +399,7 @@
     // --- SUBMIT LOGIC ---
     function submitExam(type) {
         clearInterval(timerInterval);
-        
+
         // Calculate Score
         let score = 0;
         quizData.forEach((q, index) => {
