@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Kinematics & Dynamics Quiz</title>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        /* --- VISUAL STYLES (Kept exactly as you designed) --- */
+        :root {
+            --primary: #2c3e50;
+            --secondary: #2980b9;
+            --accent: #e67e22;
+            --light: #ecf0f1;
+            --success: #27ae60;
+            --danger: #c0392b;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            margin: 0; padding: 0; display: flex; height: 100vh; color: #333;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px; background-color: var(--primary); color: white;
+            display: flex; flex-direction: column; padding: 20px;
+            box-shadow: 4px 0 10px rgba(0,0,0,0.1); overflow-y: auto; z-index: 10;
+        }
+
+        .timer-box {
+            background: rgba(255,255,255,0.1); padding: 15px; border-radius: 8px;
+            text-align: center; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.2);
+        }
+        .timer-label { font-size: 0.85em; text-transform: uppercase; letter-spacing: 1px; opacity: 0.8; }
+        .timer-display { font-size: 2.2em; font-weight: bold; margin-top: 5px; }
+        .timer-warning { color: var(--accent); animation: pulse 1s infinite; }
+
+        .question-nav { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+        .nav-btn {
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+            color: white; padding: 10px 0; border-radius: 4px; cursor: pointer;
+            transition: all 0.2s ease; font-size: 0.9em;
+        }
+        .nav-btn:hover { background: var(--secondary); transform: translateY(-2px); }
+        .nav-btn.active { background: var(--secondary); font-weight: bold; border-color: white; box-shadow: 0 0 8px rgba(52, 152, 219, 0.5); }
+        .nav-btn.answered { background: var(--success); border-color: var(--success); }
+        .nav-btn.flagged { border-color: var(--accent); color: var(--accent); background: rgba(230, 126, 34, 0.2); }
+
+        /* Main Content */
+        .main-content {
+            flex: 1; padding: 40px; overflow-y: auto; position: relative;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        }
+        .quiz-container {
+            max-width: 850px; margin: 0 auto; background: white; padding: 50px;
+            border-radius: 15px; box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            animation: fadeIn 0.5s ease;
+        }
+        .question-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; border-bottom: 2px solid var(--light); padding-bottom: 20px; }
+        .badge { background: #e1f5fe; color: var(--secondary); padding: 6px 15px; border-radius: 20px; font-weight: bold; font-size: 0.9em; }
+        .question-text { font-size: 1.25em; margin-bottom: 35px; line-height: 1.6; color: #2c3e50; }
+
+        .options-grid { display: grid; gap: 15px; }
+        .option-label {
+            display: flex; align-items: center; padding: 18px 25px;
+            border: 2px solid var(--light); border-radius: 10px; cursor: pointer;
+            transition: all 0.2s; background: white;
+        }
+        .option-label:hover { border-color: var(--secondary); background: #f4faff; transform: translateX(5px); }
+        .option-label.selected { border-color: var(--secondary); background-color: #eaf2f8; box-shadow: 0 4px 10px rgba(52, 152, 219, 0.1); }
+        input[type="radio"] { margin-right: 20px; transform: scale(1.3); accent-color: var(--secondary); }
+
+        .controls { display: flex; justify-content: space-between; margin-top: 50px; padding-top: 25px; border-top: 1px solid var(--light); }
+        .btn { padding: 12px 30px; border: none; border-radius: 6px; font-size: 1em; font-weight: 600; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 8px; }
+        .btn:active { transform: scale(0.96); }
+        .btn-secondary { background: #dfe6e9; color: #636e72; }
+        .btn-secondary:hover { background: #b2bec3; }
+        .btn-primary { background: var(--secondary); color: white; box-shadow: 0 4px 15px rgba(41, 128, 185, 0.3); }
+        .btn-primary:hover { background: #1f618d; }
+        .btn-accent { background: white; border: 2px solid var(--accent); color: var(--accent); }
+        .btn-accent:hover { background: var(--accent); color: white; }
+        .btn-accent.active { background: var(--accent); color: white; }
+        .btn-success { background: var(--success); color: white; box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3); }
+        .btn-success:hover { background: #219150; }
+
+        /* Modal */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(44, 62, 80, 0.9); justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(5px); }
+        .modal-content { background: white; padding: 50px; border-radius: 20px; text-align: center; max-width: 550px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.3); animation: slideUp 0.4s ease; }
+        .score-circle { width: 180px; height: 180px; border-radius: 50%; border: 12px solid var(--secondary); margin: 30px auto; display: flex; flex-direction: column; justify-content: center; align-items: center; font-size: 3.5em; font-weight: 800; color: var(--primary); position: relative; }
+        .score-sub { font-size: 14px; text-transform: uppercase; color: #95a5a6; font-weight: normal; margin-top: -10px; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideUp { from { transform: translateY(100px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+        .mjx-chtml { outline: 0; }
+    </style>
+</head>
+<body>
+
+<div class="sidebar">
+    <div class="timer-box">
+        <div class="timer-label">Time Remaining</div>
+        <div class="timer-display" id="timer">30:00</div>
+    </div>
+    <div style="margin-bottom: 15px; font-size: 0.85em; text-transform: uppercase; letter-spacing: 1px; opacity:0.6;">Question Overview</div>
+    <div class="question-nav" id="navGrid"></div>
+</div>
+
+<div class="main-content">
+    <div class="quiz-container" id="quizContainer">
+        <div class="question-header">
+            <h2 style="margin:0; font-weight: 700; color: var(--primary);">Question <span id="currentQNum">1</span><span style="color:#bdc3c7; font-weight:300;"> / 20</span></h2>
+            <div class="badge">5 Marks Each</div>
+        </div>
+
+        <div class="question-text" id="questionText"></div>
+        <div class="options-grid" id="optionsContainer"></div>
+
+        <div class="controls">
+            <button class="btn btn-accent" id="flagBtn" onclick="toggleFlag()">
+                <span id="flagIcon">⚑</span> <span id="flagText">Flag</span>
+            </button>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn btn-secondary" id="prevBtn" onclick="changeQuestion(-1)">Previous</button>
+                <button class="btn btn-primary" id="nextBtn" onclick="changeQuestion(1)">Next</button>
+                <button class="btn btn-success" id="submitBtn" style="display:none;" onclick="submitQuiz()">Submit Quiz</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="resultModal">
+    <div class="modal-content">
+        <h2 style="color: var(--primary); margin-bottom: 10px;">Quiz Submitted</h2>
+        <p style="color: #7f8c8d;">Your score has been recorded to your dashboard.</p>
+
+        <div class="score-circle">
+            <span id="finalScore">0</span>
+            <span class="score-sub">% Score</span>
+        </div>
+
+        <p id="feedbackText" style="font-size: 1.1em; margin-bottom: 30px; padding: 0 20px;"></p>
+
+        <div style="display:flex; justify-content: center; gap: 15px;">
+            <button class="btn btn-primary" onclick="window.close()">Return to Dashboard</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // --- INTEGRATION CONFIGURATION ---
+    // Make sure this matches the index in your Main Dashboard (0-based)
+    // If this is "Quiz 01" which is the 8th item, index is 7.
+    const QUIZ_ID = "q_7";
+    const QUIZ_TITLE = "Quiz 01: Checkpoint";
+
+    // --- Quiz Data ---
+    const quizData = [
+        { q: "A drone is flying within a moving truck. If the truck rotates with angular velocity \\(\\omega\\), and the drone has a relative velocity \\(v_{rel}\\) inside the truck, which term accounts for the 'fictitious' force causing the drone to veer sideways?", options: ["Euler Acceleration \\( \\dot{\\omega} \\times r \\)", "Centripetal Acceleration \\( \\omega \\times (\\omega \\times r) \\)", "Coriolis Acceleration \\( 2\\omega \\times v_{rel} \\)", "Translational Acceleration"], correct: 2 },
+        { q: "The absolute time derivative \\( \\frac{d\\textbf{P}}{dt} \\) using the Transport Theorem is:", options: ["\\( (\\dot{P})_{rel} \\times \\omega \\)", "\\( (\\dot{P})_{rel} + \\omega \\times \\textbf{P} \\)", "\\( \\omega \\times (\\dot{P})_{rel} \\)", "\\( \\omega \\cdot \\textbf{P} + (\\dot{P})_{rel} \\)"], correct: 1 },
+        { q: "Direction of Coriolis acceleration on a bead sliding outward on a rotating wheel spoke?", options: ["Radially outward", "Radially inward", "Perpendicular to the spoke (tangential)", "Zero"], correct: 2 },
+        { q: "Centripetal acceleration \\( \\omega \\times (\\omega \\times r) \\) points:", options: ["Parallel to axis", "Tangential", "Outward", "Inward toward axis"], correct: 3 },
+        { q: "In 'Case I' intermediate frame analysis, we treat the origin \\(O_2\\) as:", options: ["A particle in Frame 1", "A rigid body", "Fixed point", "Massless vector"], correct: 0 },
+        { q: "Which acceleration depends on \\(\\dot{\\omega}\\) (angular acceleration)?", options: ["Coriolis", "Euler (Tangential)", "Centripetal", "Relative"], correct: 1 },
+        { q: "Inertia Tensor term \\( I_{zz} \\) is:", options: ["\\( \\sum m_i (x_i^2 + y_i^2) \\)", "\\( \\sum m_i (y_i^2 + z_i^2) \\)", "\\( \\sum m_i x_i y_i \\)", "\\( \\sum m_i (x+y)^2 \\)"], correct: 0 },
+        { q: "If body has symmetry at \\( x=0 \\), then \\( I_{xy} \\) and \\( I_{xz} \\) are:", options: ["Infinite", "Equal to Mass", "Zero", "Equal to \\( I_{xx} \\)"], correct: 2 },
+        { q: "Parallel Axis Theorem shift for \\( I_{zz} \\) by distances a, b:", options: ["\\( I_{zz} + M(a^2 + b^2) \\)", "\\( I_{zz} - M(a^2+b^2) \\)", "\\( I_{zz}(a^2+b^2) \\)", "\\( I_{zz} + M(a+b) \\)"], correct: 0 },
+        { q: "Angular Momentum \\( H_O \\) definition:", options: ["\\( \\sum r_i \\cdot p_i \\)", "\\( \\sum r_i \\times (m_i v_i) \\)", "\\( \\sum v_i \\times r_i \\)", "\\( \\sum m(r \\times a) \\)"], correct: 1 },
+        { q: "In \\( \\{H\\} = [I] \\{\\omega\\} \\), \\( [I] \\) is:", options: ["Angular velocity", "Identity", "Inertia Tensor", "Center of Mass"], correct: 2 },
+        { q: "Inertia of thin rod (length L) about center:", options: ["\\( 1/3 ML^2 \\)", "\\( 1/12 ML^2 \\)", "\\( 1/2 ML^2 \\)", "\\( 2/5 ML^2 \\)"], correct: 1 },
+        { q: "Derivative of angular momentum \\( \\dot{H}_B \\) involves torque. If B is moving, add:", options: ["\\( v_B \\times p_{cm} \\)", "\\( v_B \\cdot p \\)", "Mass M", "None"], correct: 0 },
+        { q: "If vehicle stops moving linearly but rotates, which term in velocity eq is zero?", options: ["\\( v_{rel} \\)", "\\( \\omega \\times r \\)", "\\( \\dot{R}_0 \\)", "All"], correct: 2 },
+        { q: "Product of Inertia \\( I_{xy} \\) definition:", options: ["\\( \\sum m(x^2+y^2) \\)", "\\( - \\sum m x y \\)", "\\( \\sum m x y \\)", "\\( \\sum m(x-y) \\)"], correct: 1 },
+        { q: "Theorem to find inertia at edge of sphere from center:", options: ["Perpendicular Axis", "Transport", "Parallel Axis", "Angular Momentum"], correct: 2 },
+        { q: "\\( a_{rel} \\) represents:", options: ["Frame acceleration", "Acceleration seen by observer on moving frame", "Rotation acc", "Absolute acc"], correct: 1 },
+        { q: "If vector B is constant in moving frame, \\( \\dot{B}_{abs} \\) is:", options: ["Zero", "\\( \\omega \\times B \\)", "\\( \\dot{B}_{rel} \\)", "\\( \\omega \\cdot B \\)"], correct: 1 },
+        { q: "Axis where products of inertia are zero is:", options: ["Parallel Axis", "Principal Axis", "Relative Axis", "Translation Axis"], correct: 1 },
+        { q: "Total Inertia of composite body:", options: ["Multiply parts", "Subtract parts", "Sum individual inertias (shifted to same axis)", "Heaviest part"], correct: 2 }
+    ];
+
+    // --- State Variables ---
+    let currentQuestion = 0;
+    let userAnswers = new Array(quizData.length).fill(null);
+    let flaggedQuestions = new Array(quizData.length).fill(false);
+    let timeLeft = 30 * 60;
+    let timerInterval;
+
+    document.addEventListener('DOMContentLoaded', () => {
+        initNavigation();
+        loadQuestion(0);
+        startTimer();
+    });
+
+    function startTimer() {
+        timerInterval = setInterval(() => {
+            timeLeft--;
+            const mins = Math.floor(timeLeft / 60);
+            const secs = timeLeft % 60;
+            const display = document.getElementById('timer');
+            display.textContent = `${mins.toString().padStart(2,'0')}:${secs.toString().padStart(2,'0')}`;
+            if (timeLeft <= 60) display.classList.add('timer-warning');
+            if (timeLeft <= 0) { clearInterval(timerInterval); submitQuiz(); }
+        }, 1000);
+    }
+
+    function initNavigation() {
+        const navGrid = document.getElementById('navGrid');
+        navGrid.innerHTML = '';
+        quizData.forEach((_, index) => {
+            const btn = document.createElement('button');
+            btn.className = 'nav-btn';
+            btn.textContent = index + 1;
+            btn.onclick = () => loadQuestion(index);
+            btn.id = `nav-${index}`;
+            navGrid.appendChild(btn);
+        });
+    }
+
+    function loadQuestion(index) {
+        currentQuestion = index;
+        document.getElementById('currentQNum').textContent = index + 1;
+
+        const qTextEl = document.getElementById('questionText');
+        qTextEl.textContent = quizData[index].q;
+
+        const optionsContainer = document.getElementById('optionsContainer');
+        optionsContainer.innerHTML = '';
+
+        quizData[index].options.forEach((opt, optIndex) => {
+            const label = document.createElement('label');
+            label.className = 'option-label';
+            if (userAnswers[index] === optIndex) label.classList.add('selected');
+
+            const input = document.createElement('input');
+            input.type = 'radio'; input.name = 'quizOption'; input.value = optIndex;
+            input.checked = userAnswers[index] === optIndex;
+            input.onchange = () => selectOption(optIndex);
+
+            const span = document.createElement('span');
+            span.textContent = opt;
+            label.append(input, span);
+            optionsContainer.appendChild(label);
+        });
+
+        if (window.MathJax) MathJax.typesetPromise([qTextEl, optionsContainer]);
+
+        document.getElementById('prevBtn').disabled = index === 0;
+        const isLast = index === quizData.length - 1;
+        document.getElementById('nextBtn').style.display = isLast ? 'none' : 'flex';
+        document.getElementById('submitBtn').style.display = isLast ? 'flex' : 'none';
+
+        const flagBtn = document.getElementById('flagBtn');
+        const flagText = document.getElementById('flagText');
+        if (flaggedQuestions[index]) {
+            flagBtn.classList.add('active');
+            flagText.textContent = 'Flagged';
+        } else {
+            flagBtn.classList.remove('active');
+            flagText.textContent = 'Flag';
+        }
+        updateNavStyles();
+    }
+
+    function selectOption(optIndex) {
+        userAnswers[currentQuestion] = optIndex;
+        document.querySelectorAll('.option-label').forEach((l, i) => {
+            if (i === optIndex) l.classList.add('selected');
+            else l.classList.remove('selected');
+        });
+        updateNavStyles();
+    }
+
+    function changeQuestion(delta) {
+        const newIndex = currentQuestion + delta;
+        if (newIndex >= 0 && newIndex < quizData.length) loadQuestion(newIndex);
+    }
+
+    function toggleFlag() {
+        flaggedQuestions[currentQuestion] = !flaggedQuestions[currentQuestion];
+        loadQuestion(currentQuestion);
+    }
+
+    function updateNavStyles() {
+        quizData.forEach((_, i) => {
+            const btn = document.getElementById(`nav-${i}`);
+            btn.className = 'nav-btn';
+            if (i === currentQuestion) btn.classList.add('active');
+            if (userAnswers[i] !== null) btn.classList.add('answered');
+            if (flaggedQuestions[i]) btn.classList.add('flagged');
+        });
+    }
+
+    // --- KEY INTEGRATION LOGIC ---
+    function submitQuiz() {
+        clearInterval(timerInterval);
+
+        // 1. Calculate Score
+        let rawScore = 0;
+        userAnswers.forEach((ans, index) => {
+            if (ans === quizData[index].correct) rawScore += 5; // 5 marks per question
+        });
+
+        // Since there are 20 questions @ 5 marks, rawScore IS the percentage (out of 100)
+        // If you change question count, use: (rawScore / (quizData.length * 5)) * 100
+        const finalPercentage = rawScore;
+
+        // 2. Save to Dashboard Database (Local Storage)
+        let allQuizData = JSON.parse(localStorage.getItem('quizData')) || {};
+        let currentRecord = allQuizData[QUIZ_ID] || { title: QUIZ_TITLE, attempts: 0, score: 0 };
+
+        // Update: Keep highest score, increment attempt count is mostly handled by start button
+        // but we ensure persistence here.
+        currentRecord.score = Math.max(currentRecord.score, finalPercentage);
+
+        allQuizData[QUIZ_ID] = currentRecord;
+        localStorage.setItem('quizData', JSON.stringify(allQuizData));
+
+        // 3. Show Visual Feedback
+        const scoreElement = document.getElementById('finalScore');
+        const feedbackElement = document.getElementById('feedbackText');
+        const circle = document.querySelector('.score-circle');
+
+        scoreElement.textContent = finalPercentage;
+
+        if (finalPercentage >= 90) {
+            feedbackElement.innerHTML = `<strong>Outstanding!</strong><br>Deep understanding of Rotating Frames.`;
+            circle.style.borderColor = "var(--success)";
+        } else if (finalPercentage >= 70) {
+            feedbackElement.innerHTML = `<strong>Great Job!</strong><br>Solid grasp of concepts.`;
+            circle.style.borderColor = "var(--secondary)";
+        } else if (finalPercentage >= 50) {
+            feedbackElement.innerHTML = `<strong>Good Effort.</strong><br>Review Transport Theorem terms.`;
+            circle.style.borderColor = "var(--accent)";
+        } else {
+            feedbackElement.innerHTML = `<strong>Keep Practicing.</strong><br>Focus on acceleration equations.`;
+            circle.style.borderColor = "var(--danger)";
+        }
+
+        document.getElementById('resultModal').style.display = 'flex';
+    }
+</script>
+
+</body>
+</html>
