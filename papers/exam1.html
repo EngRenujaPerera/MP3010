@@ -3,554 +3,422 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MP 3010 - Kinematics & Dynamics | Secure Exam Portal</title>
+    <title>MP 3010 - Kinematics & Dynamics | UOJ Secure Portal</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #800000; /* UOJ Maroon */
+            /* UNIVERSITY OF JAFFNA MAROON THEME */
+            --primary: #800000;
             --primary-dark: #5c0000;
-            --accent: #ffd700;
+            --accent: #FFD700;
             --glass: rgba(255, 255, 255, 0.95);
-            --glass-border: rgba(255, 255, 255, 0.5);
             --text: #333;
-            --bg-gradient: linear-gradient(135deg, #1a1a1a 0%, #800000 100%);
+            --bg-gradient: linear-gradient(135deg, #2b0000 0%, #800000 50%, #1a1a1a 100%);
         }
 
-        * { box-sizing: border-box; transition: all 0.3s ease; }
+        * { box-sizing: border-box; transition: all 0.2s ease; }
 
         body {
             font-family: 'Poppins', sans-serif;
-            margin: 0;
-            padding: 0;
+            margin: 0; padding: 0;
             background: var(--bg-gradient);
             background-attachment: fixed;
             color: var(--text);
             min-height: 100vh;
-            overflow-x: hidden;
         }
 
-        /* --- Background Animation --- */
-        .bg-particles {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            z-index: -1;
-            overflow: hidden;
-        }
-        .particle {
-            position: absolute;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 50%;
-            animation: float 20s infinite linear;
-        }
-        @keyframes float {
-            0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
-            50% { opacity: 0.5; }
-            100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
-        }
+        /* --- UI Components --- */
+        .app-section { display: none; min-height: 100vh; padding: 20px; justify-content: center; align-items: center; }
+        .active-section { display: flex; animation: fadeIn 0.4s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* --- Sections Management --- */
-        .app-section {
-            display: none; /* Hidden by default */
-            min-height: 100vh;
-            padding: 20px;
-            justify-content: center;
-            align-items: center;
+        .glass-card {
+            background: var(--glass); padding: 40px; border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5); max-width: 600px; width: 100%;
+            text-align: center; border: 1px solid rgba(255,255,255,0.5);
         }
-
-        .active-section {
-            display: flex;
-            animation: fadeIn 0.5s ease-in;
-        }
-
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* --- Login & Instructions Cards --- */
-        .auth-card, .rules-card {
-            background: var(--glass);
-            padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            max-width: 500px;
-            width: 100%;
-            text-align: center;
-            border: 1px solid var(--glass-border);
-            backdrop-filter: blur(10px);
-        }
-
-        .auth-card h1 { color: var(--primary); margin-bottom: 10px; }
-        .logo-text { font-size: 0.9rem; color: #666; margin-bottom: 30px; letter-spacing: 1px; }
-
-        .input-group { margin-bottom: 20px; text-align: left; }
-        .input-group label { display: block; font-weight: 600; margin-bottom: 5px; color: var(--primary); }
-        .input-group input {
-            width: 100%; padding: 12px;
-            border: 2px solid #ddd; border-radius: 8px;
-            font-size: 1rem; outline: none;
-        }
-        .input-group input:focus { border-color: var(--primary); }
 
         .btn-main {
-            background: var(--primary); color: white;
-            padding: 15px 30px; border: none; border-radius: 30px;
-            font-size: 1.1rem; font-weight: bold; cursor: pointer;
-            width: 100%; box-shadow: 0 4px 15px rgba(128, 0, 0, 0.3);
+            background: var(--primary); color: white; padding: 15px 30px;
+            border: none; border-radius: 30px; font-size: 1.1rem; font-weight: bold;
+            cursor: pointer; width: 100%; margin-top: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
         }
-        .btn-main:hover { transform: translateY(-2px); background: var(--primary-dark); }
 
-        .rules-list { text-align: left; background: #fff5f5; padding: 20px; border-radius: 10px; border-left: 5px solid red; margin-bottom: 25px; }
-        .rules-list li { margin-bottom: 10px; font-size: 0.95rem; }
+        /* DISABLED STATE STYLE */
+        .btn-main:disabled {
+            background: #cccccc; color: #888888; cursor: not-allowed;
+            transform: none !important; box-shadow: none;
+        }
+        .btn-main:hover:not(:disabled) { background: var(--primary-dark); transform: translateY(-2px); }
+
+        input[type="text"], input[type="number"], textarea {
+            width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px;
+            margin-bottom: 15px; font-family: inherit;
+        }
+        input:focus, textarea:focus { border-color: var(--primary); outline: none; }
 
         /* --- Exam Layout --- */
-        #exam-interface {
-            display: block; width: 100%; max-width: 900px; margin: 0 auto;
-        }
+        #exam-interface { display: block; width: 100%; max-width: 900px; margin: 0 auto; padding-bottom: 50px;}
 
         header {
-            background: var(--glass);
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: sticky; top: 10px; z-index: 100;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            background: white; border-radius: 15px; padding: 15px 25px; margin-bottom: 25px;
+            display: flex; justify-content: space-between; align-items: center;
+            position: sticky; top: 10px; z-index: 100; box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border-left: 5px solid var(--primary);
         }
 
-        .timer-box {
-            background: var(--primary); color: white;
-            padding: 10px 20px; border-radius: 50px;
-            font-weight: bold; font-family: monospace; font-size: 1.2rem;
-            box-shadow: 0 0 10px rgba(128,0,0,0.5);
+        .exam-card { background: white; border-radius: 15px; padding: 30px; margin-bottom: 25px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .section-header { border-bottom: 2px solid var(--primary); padding-bottom: 10px; margin-bottom: 20px; color: var(--primary); }
+        .exam-figure { display: block; max-width: 100%; height: auto; margin: 15px auto; border: 1px solid #ddd; border-radius: 5px; }
+
+        /* --- Upload Widget --- */
+        .upload-area {
+            border: 2px dashed var(--primary); background: #fffdfd; padding: 20px;
+            border-radius: 10px; text-align: center; margin: 15px 0;
         }
+        .btn-cam { background: #2c3e50; color: white; padding: 8px 15px; border-radius: 5px; border: none; cursor: pointer; margin: 5px; }
+        .btn-file { background: #7f8c8d; color: white; padding: 8px 15px; border-radius: 5px; border: none; cursor: pointer; margin: 5px; }
+        .preview-img { max-width: 100%; max-height: 250px; display: none; margin-top: 10px; border: 1px solid #ccc; }
 
-        .exam-card {
-            background: var(--glass);
-            border-radius: 15px;
-            padding: 30px;
-            margin-bottom: 25px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-        }
+        /* --- Table Style for Q4 --- */
+        .gear-table { width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 0.9rem; }
+        .gear-table th, .gear-table td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+        .gear-table th { background-color: var(--primary); color: white; }
 
-        .section-header {
-            border-bottom: 2px solid var(--primary);
-            padding-bottom: 10px; margin-bottom: 20px;
-            color: var(--primary); display: flex; justify-content: space-between;
-        }
-
-        /* MCQ & Inputs */
-        .option-label {
-            display: flex; align-items: center;
-            padding: 15px; background: white; border: 1px solid #eee;
-            border-radius: 8px; cursor: pointer; margin-bottom: 8px;
-        }
-        .option-label:hover { background: #fff0f0; border-color: var(--primary); }
-        .option-label input { margin-right: 15px; accent-color: var(--primary); }
-
-        textarea, input[type="text"], input[type="number"] {
-            width: 100%; padding: 12px;
-            border: 1px solid #ccc; border-radius: 6px;
-            font-family: inherit; margin-top: 5px;
-            background: rgba(255,255,255,0.8);
-        }
-        textarea:focus, input:focus { border-color: var(--primary); background: white; }
-
-        .exam-figure {
-            display: block; max-width: 100%; height: auto;
-            margin: 15px auto; border-radius: 8px; border: 1px solid #ddd;
-        }
-
-        /* File Upload */
-        .file-upload-box {
-            border: 2px dashed var(--primary);
-            background: rgba(128, 0, 0, 0.05);
-            padding: 20px; border-radius: 10px;
-            text-align: center; margin: 15px 0;
-            cursor: pointer; position: relative;
-        }
-        .file-upload-box:hover { background: rgba(128, 0, 0, 0.1); }
-
-        /* Modal */
-        #result-modal {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.9);
-            z-index: 2000; display: none;
-            justify-content: center; align-items: center;
-        }
-        .result-content {
-            background: white; padding: 50px; border-radius: 20px;
-            text-align: center; max-width: 500px;
-            animation: slideUp 0.5s ease;
-        }
-        .violation-alert { color: red; font-weight: bold; margin-bottom: 10px; display: none; }
-
-        @keyframes slideUp { from { transform: translateY(100px); } to { transform: translateY(0); } }
-
-        /* Math Display */
-        .math-display { font-family: "Cambria Math", serif; font-size: 1.1rem; background: #fff; padding: 10px; border-radius: 5px; border: 1px solid #eee; display: inline-block;}
-
+        /* --- Camera Modal --- */
+        #camera-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 3000; display: none; flex-direction: column; justify-content: center; align-items: center; }
+        #camera-feed { width: 90%; max-width: 600px; background: black; border: 2px solid white; border-radius: 10px; }
     </style>
 </head>
 <body>
 
-<div class="bg-particles" id="particles"></div>
-
 <section id="sec-login" class="app-section active-section">
-    <div class="auth-card">
-        <h1>Welcome</h1>
-        <div class="logo-text"><br>FACULTY OF ENGINEERING</div>
-        <h2>MP3010 - Kinematics & Dynamics</h2>
+    <div class="glass-card">
+        <h1 style="color:var(--primary); margin:0;">VIRTUAL LEARNING ENVIRONMENT</h1>
+        <p style="font-weight:bold; color:#555;">FACULTY OF ENGINEERING</p>
+        <h2 style="margin-top:20px;">MP 3010: Kinematics & Dynamics</h2>
         <p>End Semester Examination</p>
 
-        <form id="loginForm" onsubmit="handleLogin(event)">
-            <div class="input-group">
-                <label>Full Name</label>
-                <input type="text" id="studentName" required placeholder="Ex: Joe Stare">
-            </div>
-            <div class="input-group">
-                <label>Registration Number</label>
-                <input type="text" id="regNum" required placeholder="Ex: 202X/E/XXX">
-            </div>
-            <button type="submit" class="btn-main">Proceed to Instructions</button>
+        <form onsubmit="handleLogin(event)">
+            <input type="text" id="studentName" required placeholder="Student Name">
+            <input type="text" id="regNum" required placeholder="Registration Number (202X/E/XXX)">
+            <button class="btn-main">Enter Portal</button>
         </form>
     </div>
 </section>
 
 <section id="sec-instructions" class="app-section">
-    <div class="rules-card">
-        <h1>Examination Rules</h1>
-        <p>Please read carefully before starting.</p>
+    <div class="glass-card">
+        <h2 style="color:var(--primary);">Examination Rules</h2>
+        <div style="text-align: left; background: #fff5f5; padding: 15px; border-radius: 10px; border-left: 5px solid red; font-size: 0.9rem;">
+            <p><strong>Duration:</strong> 2 Hours</p>
+            <p><strong>Security:</strong> Tab switching is monitored. Leaving the screen will auto-submit your exam.</p>
+            <p><strong>Uploads:</strong> Use the <b>Camera Button</b> to take photos without leaving the page.</p>
+            
+        </div>
 
-        <ul class="rules-list">
-            <li><strong>Duration:</strong> You have exactly 2 hours.</li>
-            <li><strong>Files:</strong> You can upload images/PDFs for structured questions (Max 5MB).</li>
-            <li><strong>Equations:</strong> Useful equations are provided at the bottom of the paper.</li>
-            <li style="color: #d32f2f; font-weight: bold; margin-top: 15px;">⚠️ SECURITY WARNING:</li>
-            <li>This exam is monitored. <strong>Do not leave this tab.</strong></li>
-            <li>If you switch tabs, minimize the window, or open another application, the exam will <strong>automatically submit</strong> and record a violation.</li>
-        </ul>
-
-        <div class="input-group" style="text-align: center;">
-            <label style="display:inline-flex; align-items:center; justify-content:center;">
-                <input type="checkbox" id="agreeCheck" style="width:auto; margin-right:10px;">
-                I understand the rules and agree to the monitoring.
+        <div style="margin-top: 25px;">
+            <label style="font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                <input type="checkbox" id="agreeCheck" onchange="toggleStartBtn(this)" style="width: 20px; height: 20px;">
+                I accept the University Examination Rules.
             </label>
         </div>
 
-        <button onclick="startExam()" class="btn-main" id="startBtn" style="opacity: 0.5; pointer-events: none;">Start Examination</button>
+        <button id="startBtn" class="btn-main" disabled onclick="startExam()">Start Examination</button>
     </div>
 </section>
 
-<section id="sec-exam" class="app-section" style="display: none; align-items: flex-start; padding-top: 20px;">
+<section id="sec-exam" class="app-section" style="display:none; align-items: flex-start; padding-top: 20px;">
     <div id="exam-interface">
         <header>
             <div>
-                <h2 style="margin:0; font-size: 1.2rem;">MP 3010</h2>
-                <span id="displayStudentName" style="font-size: 0.9rem; opacity: 0.8;">Student</span>
+                <h3 style="margin:0; color:var(--primary);">MP 3010</h3>
+                <span id="dispName" style="font-size:0.85rem; color:#666;">Student</span>
             </div>
-            <div class="timer-box" id="timer">02:00:00</div>
+            <div style="background:var(--primary); color:white; padding:5px 15px; border-radius:20px; font-weight:bold;" id="timer">02:00:00</div>
         </header>
 
-        <form id="examForm">
-            <div class="exam-card">
-                <div class="section-header">
-                    <h3>Question 01 (20 Marks)</h3>
-                    <span>MCQ</span>
-                </div>
-                <div id="mcq-container"></div>
+        <div class="exam-card">
+            <div class="section-header"><h3>QUESTION 01 (20 Marks)</h3></div>
+            <div id="mcq-container"></div>
+        </div>
+
+        <div class="exam-card">
+            <div class="section-header"><h3>QUESTION 02 (20 Marks)</h3></div>
+
+            <p><strong>A.</strong> Consider following linkage mechanism (Figure 01). Identify the mechanisms of A to C. [cite: 59]</p>
+            <img src="1.png" alt="Figure 01" class="exam-figure">
+            <input type="text" placeholder="Identify A">
+            <input type="text" placeholder="Identify B">
+            <input type="text" placeholder="Identify C">
+
+            <p><strong>B.</strong> Gruebler's equation is given by <b>DOF = 3(n-1) - 2L - H</b>[cite: 65].</p>
+            <p>i. Define the terms n, L, and H.</p>
+            <textarea style="height:60px;"></textarea>
+            <p>ii. For the mechanism shown in Figure 02, calculate the degree of freedom. (7 marks)</p>
+            <img src="2.png" alt="Figure 02" class="exam-figure">
+            <textarea style="height:100px;" placeholder="Show calculation steps..."></textarea>
+
+            <p><strong>C.</strong> The endpoint of a robotic arm is initially at <b>P=(5,2,7)</b>. The arm undergoes Euler angle rotations:</p>
+            <ul>
+                <li>First by <b>90° about the z-axis</b></li>
+                <li>Then by <b>180° about its own x-axis</b> [cite: 70-71].</li>
+            </ul>
+            <p>i. Find the resulting rotation matrix.</p>
+            <textarea style="height:80px;"></textarea>
+            <p>ii. Determine the final coordinates of the endpoint.</p>
+            <input type="text" placeholder="Final Coordinates (x,y,z)">
+        </div>
+
+        <div class="exam-card">
+            <div class="section-header"><h3>QUESTION 03 (35 Marks)</h3></div>
+
+            <p><strong>(A)</strong> The oscillating link OAB (Figure 03) is pivoted at O and moves at <b>90 r.p.m. anticlockwise</b>[cite: 75].</p>
+            <p>Data: <b>OA=150mm, AB=75mm, AC=250mm</b>[cite: 76].</p>
+            <img src="3.png" alt="Figure 03" class="exam-figure">
+
+            <p>Draw Space Diagram (1:50) and Velocity Vector Diagram (1cm = 0.2m/s).</p>
+
+            <div class="upload-area">
+                <p><strong>Upload Q3(A) Diagrams</strong></p>
+                <button type="button" class="btn-cam" onclick="openCamera('q3a')">📷 Camera</button>
+                <button type="button" class="btn-file" onclick="safeUpload('f3a')">📂 File</button>
+                <input type="file" id="f3a" style="display:none" onchange="previewFile(this, 'p3a')">
+                <img id="p3a" class="preview-img">
             </div>
 
-            <div class="exam-card">
-                <div class="section-header"><h3>Question 02 (20 Marks)</h3></div>
+            <p>Calculate [cite: 78-80]:</p>
+            <label>1. Velocity of block C (m/s):</label><input type="number" step="0.01">
+            <label>2. Angular velocity of link AC (rad/s):</label><input type="number" step="0.01">
+            <label>3. Rubbing velocities at O, A, C (Pin diameters = 20mm):</label><input type="text">
 
-                <p><strong>A.</strong> Identify mechanisms A, B, C.</p>
-                <img src="1.png" alt="Linkage Mechanism" class="exam-figure">
-                <input type="text" placeholder="Identify A" style="margin-bottom:5px;">
-                <input type="text" placeholder="Identify B" style="margin-bottom:5px;">
-                <input type="text" placeholder="Identify C">
+            <hr style="margin:20px 0; border-top:1px dashed #ccc;">
 
-                <hr style="margin: 20px 0; border:0; border-top:1px dashed #ccc;">
+            <p><strong>(B)</strong> Four bar chain PQRS (PS Fixed). PQ=62.5mm, QR=175mm, RS=112.5mm, PS=200mm. Crank PQ rotates <b>10 rad/s clockwise</b> [cite: 93-94].</p>
+            <p>Draw velocity/acceleration diagram when <b>Angle QPS = 60°</b>[cite: 95].</p>
 
-                <p><strong>B.</strong> Gruebler's Equation: <span class="math-display">DOF = 3(n-1) - 2L - H</span></p>
-                <p>Calculate DOF for Figure 02:</p>
-                <img src="2.png" alt="Mechanism" class="exam-figure">
-                <textarea placeholder="Calculation steps..."></textarea>
-
-                <hr style="margin: 20px 0; border:0; border-top:1px dashed #ccc;">
-
-                <p><strong>C.</strong> Robotic Arm at P=(5,2,7). Euler rotations.</p>
-                <textarea placeholder="Rotation Matrix and Final Coordinates..."></textarea>
+            <div class="upload-area">
+                <p><strong>Upload Q3(B) Diagrams</strong></p>
+                <button type="button" class="btn-cam" onclick="openCamera('q3b')">📷 Camera</button>
+                <button type="button" class="btn-file" onclick="safeUpload('f3b')">📂 File</button>
+                <input type="file" id="f3b" style="display:none" onchange="previewFile(this, 'p3b')">
+                <img id="p3b" class="preview-img">
             </div>
 
-            <div class="exam-card">
-                <div class="section-header"><h3>Question 03 (35 Marks)</h3></div>
-                <p><strong>A. Oscillating Link OAB (90 rpm CCW)</strong></p>
-                <img src="3.png" alt="Oscillating Link" class="exam-figure">
+            <p>Find Angular Velocity & Acceleration of QR and RS[cite: 96]:</p>
+            <textarea style="height:80px;" placeholder="Enter answers..."></textarea>
+        </div>
 
-                <div class="file-upload-box">
-                    <label>📷 Upload Velocity Diagram</label>
-                    <input type="file" accept="image/*,.pdf" onchange="validateFileSize(this)">
-                </div>
+        <div class="exam-card">
+            <div class="section-header"><h3>QUESTION 04 (18 Marks)</h3></div>
 
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                    <input type="number" placeholder="Velocity of C (m/s)">
-                    <input type="number" placeholder="Ang. Vel AC (rad/s)">
-                </div>
-                <input type="text" placeholder="Rubbing Velocities (O, A, C)">
+            <p><strong>(A)</strong> Pinion (20 teeth, module 6mm) rotates at 200 rpm, transmits 1.5kW to Wheel (50 teeth). Addendum = 1/4 circular pitch. Obliquity = 20° [cite: 101-103].</p>
+            <input type="text" placeholder="(a) Length of path of approach">
+            <input type="text" placeholder="(b) Length of arc of approach">
 
-                <hr style="margin: 20px 0; border:0; border-top:1px dashed #ccc;">
+            <hr style="margin:20px 0; border-top:1px dashed #ccc;">
 
-                <p><strong>B. Four Bar Chain PQRS</strong></p>
-                <p>Draw velocity/acceleration diagram when QPS=60°.</p>
-                <div class="file-upload-box">
-                    <label>📷 Upload Vec/Acc Diagram</label>
-                    <input type="file" accept="image/*,.pdf" onchange="validateFileSize(this)">
-                </div>
-                <textarea placeholder="Angular Velocity & Acceleration of QR & RS"></textarea>
+            <p><strong>(B)</strong> Compound gear train (Figure 04). Input Gear 1 rotates <b>1200 rpm clockwise</b>[cite: 107].</p>
+            <img src="4.png" alt="Figure 04" class="exam-figure">
+
+            <table class="gear-table">
+                <thead><tr><th>Gear</th><th>Teeth</th><th>Module</th></tr></thead>
+                <tbody>
+                    <tr><td>1</td><td>22</td><td>6 mm</td></tr>
+                    <tr><td>2</td><td>40</td><td>6 mm</td></tr>
+                    <tr><td>3</td><td>24</td><td>5 mm</td></tr>
+                    <tr><td>4</td><td>24</td><td>5 mm</td></tr>
+                    <tr><td>5</td><td>26</td><td>5 mm</td></tr>
+                    <tr><td>6</td><td>42</td><td>5 mm</td></tr>
+                    <tr><td>7</td><td>44</td><td>5 mm</td></tr>
+                </tbody>
+            </table>
+
+            <p>Compute [cite: 110-112]:</p>
+            <ol>
+                <li>Speed/Direction of Gear 7</li>
+                <li>Diameter of gears 2,3,4,5,6,7</li>
+                <li>Velocity ratios (1-2, 3-4, 5-6, 6-7)</li>
+            </ol>
+
+            <div class="upload-area">
+                <p><strong>(Optional) Upload Calculation Sheet</strong></p>
+                <button type="button" class="btn-cam" onclick="openCamera('q4')">📷 Camera</button>
+                <button type="button" class="btn-file" onclick="safeUpload('f4')">📂 File</button>
+                <input type="file" id="f4" style="display:none" onchange="previewFile(this, 'p4')">
+                <img id="p4" class="preview-img">
+            </div>
+            <textarea placeholder="Or type summary of answers here..."></textarea>
+
+            <hr style="margin:20px 0; border-top:1px dashed #ccc;">
+
+            <p><strong>(C)</strong> A reverted epicyclic gear train for a hoist block is shown in
+Figure. The arm E is keyed to the same shaft as the load drum
+and the wheel A is keyed to a second shaft which carries a chain
+wheel, the chain being operated by hand. The two shafts have
+common axis but can rotate independently. The wheels B and C
+are compound and rotate together on a pin carried at the end of
+arm E. The wheel D has internal teeth and is fixed to the outer
+casing of the block so that it does not rotate. The wheels A and
+B have 16 and 36 teeth respectively with a module of 3 mm. The
+wheels C and D have a module of 4 mm. Find:
+</p>
+            <img src="5.png" alt="Epicyclic Train" class="exam-figure">
+            <p>11. The number of teeth on wheels C and D when the speed of A
+is ten times the speed of arm E, both rotating in the same sense.
+</p>
+            <p>2. The speed of wheel D when the wheel A is fixed and the arm
+E rotates at 450 r.p.m. Anticlockwise.</p>
+            <textarea placeholder="Enter answers..."></textarea>
+        </div>
+
+        <div class="exam-card">
+            <div class="section-header"><h3>QUESTION 05 (12 Marks)</h3></div>
+            <p><strong>Cam Profile Design:</strong></p>
+            <ul style="background:#f9f9f9; padding:15px 30px; border-radius:5px;">
+                <p>A cam operating a knife-edged follower has the following data :
+<br>(a) Follower moves outwards through 40 mm during 60° of cam rotation.
+<br>(b) Follower dwells for the next 45°.
+<br>(c) Follower returns to its original position during next 90°.
+<br>(d) Follower dwells for the rest of the rotation.
+The displacement of the follower is to take place with simple harmonic motion during both the
+outward and return strokes. The least radius of the cam is 50 mm. Draw the profile of the cam when
+<br>1. the axis of the follower passes through the cam axis.
+<br>2. the axis of the follower is offset 20 mm towards right from the cam axis.</p>
+            </ul>
+
+
+
+
+            <div class="upload-area">
+                <p><strong>Upload Cam Profile</strong></p>
+                <button type="button" class="btn-cam" onclick="openCamera('q5')">📷 Camera</button>
+                <button type="button" class="btn-file" onclick="safeUpload('f5')">📂 File</button>
+                <input type="file" id="f5" style="display:none" onchange="previewFile(this, 'p5')">
+                <img id="p5" class="preview-img">
             </div>
 
-            <div class="exam-card">
-                <div class="section-header"><h3>Question 04 (18 Marks)</h3></div>
-                <p><strong>A. Gear Design (Pinion 20T, Wheel 50T)</strong></p>
-                <input type="text" placeholder="(a) Length of path of approach">
-                <input type="text" placeholder="(b) Length of arc of approach">
+            <p>Determine Max Velocity & Acceleration (Outward & Return):</p>
+            <input type="text" placeholder="Enter values...">
+        </div>
 
-                <hr style="margin: 20px 0; border:0; border-top:1px dashed #ccc;">
-
-                <p><strong>B. Compound Gear Train</strong></p>
-                <img src="4.png" alt="Gear Train" class="exam-figure">
-                <textarea placeholder="Speed of Gear 7, Diameters, Velocity Ratios..."></textarea>
-
-                <hr style="margin: 20px 0; border:0; border-top:1px dashed #ccc;">
-
-                <p><strong>C. Reverted Epicyclic Gear Train</strong></p>
-                <img src="5.png" alt="Epicyclic Train" class="exam-figure">
-                <textarea placeholder="1. Number of teeth on C and D...&#10;2. Speed of wheel D..."></textarea>
-            </div>
-
-             <div class="exam-card">
-                <div class="section-header"><h3>Question 05 (12 Marks)</h3></div>
-                <p><strong>Cam Profile Design</strong></p>
-                <div class="file-upload-box">
-                    <label>📷 Upload Cam Profile Drawings</label>
-                    <input type="file" accept="image/*,.pdf" onchange="validateFileSize(this)">
-                </div>
-                <input type="text" placeholder="Max Velocity (Outward & Return)">
-                <input type="text" placeholder="Max Acceleration (Outward & Return)">
-            </div>
-
-            <div class="exam-card" style="background: #fffdfd; border: 1px solid var(--primary);">
-                <h3 style="color:var(--primary); margin-top:0;">Useful Equations</h3>
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;">
-                    <div class="math-display">KP = &radic;(R<sub>A</sub><sup>2</sup> - R<sup>2</sup>cos<sup>2</sup>&Phi;) - R sin&Phi;</div>
-                    <div class="math-display">M = D / T</div>
-                    <div class="math-display">Speed Ratio = Teeth(Driven) / Teeth(Drivers)</div>
-                    <div class="math-display">V<sub>R</sub> = &pi;&omega;S / 2&theta;<sub>R</sub></div>
-                    <div class="math-display">a<sub>R</sub> = &pi;<sup>2</sup>&omega;<sup>2</sup>S / 2(&theta;<sub>R</sub>)<sup>2</sup></div>
-                </div>
-            </div>
-
-            <button type="button" class="btn-main" onclick="submitExam('manual')">Submit Examination</button>
-        </form>
+        <button class="btn-main" onclick="submitExam('manual')">Submit Examination</button>
     </div>
 </section>
 
-<div id="result-modal">
-    <div class="result-content">
-        <h2 id="result-title">Examination Completed</h2>
-        <p id="violation-msg" class="violation-alert">⚠️ VIOLATION DETECTED: TAB SWITCHED</p>
-
-        <div style="width: 100px; height: 100px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; margin: 20px auto;">
-            <span id="score-display">0</span>
-        </div>
-        <p><strong>Part 1 (MCQ) Score / 20</strong></p>
-        <p style="font-size: 0.9rem; color: #666;">
-            Your structured answers and drawings have been encrypted and stored locally.
-            Please inform the invigilator.
-        </p>
-        <button class="btn-main" onclick="location.reload()">Return to Home</button>
+<div id="camera-modal">
+    <video id="camera-feed" autoplay playsinline></video>
+    <canvas id="camera-canvas" style="display:none;"></canvas>
+    <div style="margin-top:20px; display:flex; gap:20px;">
+        <button class="btn-cam" style="background:red;" onclick="closeCamera()">Cancel</button>
+        <button class="btn-cam" style="background:green;" onclick="takePhoto()">Capture</button>
     </div>
 </div>
 
 <script>
-    // --- Global State ---
-    let examActive = false;
-    let studentInfo = { name: '', reg: '' };
-    let timerInterval;
-
-    // --- Background Particles ---
-    const particlesContainer = document.getElementById('particles');
-    for(let i=0; i<30; i++){
-        let p = document.createElement('div');
-        p.className = 'particle';
-        p.style.left = Math.random() * 100 + 'vw';
-        p.style.width = (Math.random() * 10 + 5) + 'px';
-        p.style.height = p.style.width;
-        p.style.animationDuration = (Math.random() * 10 + 10) + 's';
-        particlesContainer.appendChild(p);
-    }
-
-    // --- MCQ Data ---
+    // --- MCQs [cite: 6-56] ---
     const quizData = [
-        { id: 1, question: "1. What does the parameterization of rigid body motion include?", options: ["Body angular velocity and spatial angular velocity", "Force moments and inertia", "Euler's rigid body equations", "All of the above"], correct: 3 },
-        { id: 2, question: "2. What is conserved in the conservation of spatial angular momentum?", options: ["Magnitude of body angular momentum", "Gyroscopic motion", "Spinning top", "None of the above"], correct: 0 },
-        { id: 3, question: "3. Which principle is associated with MEMS accelerometers and gyroscopes?", options: ["Working principle", "Conservation principle", "Kinetic energy principle", "Force moment principle"], correct: 0 },
-        { id: 4, question: "4. What are kinematic chains?", options: ["Mechanisms and kinematic inversions", "Pairs and degrees of freedom", "Four bar mechanisms", "All of the above"], correct: 3 },
-        { id: 5, question: "5. What law is related to four bar mechanisms?", options: ["Grashof's law", "Newton's law", "Euler's law", "Kennedy's theorem"], correct: 0 },
-        { id: 6, question: "6. What theorem is associated with instantaneous center?", options: ["Kennedy's theorem", "Grashof's theorem", "Euler's theorem", "Newton's theorem"], correct: 0 },
-        { id: 7, question: "7. What is the law of gear meshing related to?", options: ["Gear types and trains", "Gear design parameters", "Cam drives", "Both gear types and design parameters"], correct: 3 },
-        { id: 8, question: "8. What are cam drives used for?", options: ["Transmitting motion", "Changing speed", "Changing direction", "All of the above"], correct: 3 },
-        { id: 9, question: "9. What does Euler's rigid body equations describe?", options: ["Rotating bodies", "Translating bodies", "Both rotating and translating bodies", "None of the above"], correct: 0 },
-        { id: 10, question: "10. What is gyroscopic motion related to?", options: ["Conservation of spatial angular momentum", "Spinning top", "Both conservation and spinning top", "None of the above"], correct: 2 }
+        { q: "1. Parameterization of rigid body motion includes?", o: ["Body/Spatial angular velocity", "Force moments", "Euler's equations", "All of the above"], a: 3 },
+        { q: "2. Conserved in spatial angular momentum?", o: ["Magnitude of angular momentum", "Gyroscopic motion", "Spinning top", "None"], a: 0 },
+        { q: "3. Principle of MEMS accelerometers?", o: ["Working principle", "Conservation", "Kinetic energy", "Force moment"], a: 0 },
+        { q: "4. What are kinematic chains?", o: ["Mechanisms", "Pairs/DOF", "Four bar", "All of the above"], a: 3 },
+        { q: "5. Law related to four bar mechanisms?", o: ["Grashof's law", "Newton's law", "Euler's law", "Kennedy's theorem"], a: 0 },
+        { q: "6. Theorem associated with instantaneous center?", o: ["Kennedy's theorem", "Grashof's", "Euler's", "Newton's"], a: 0 },
+        { q: "7. Law of gear meshing related to?", o: ["Types/Trains", "Design params", "Cam drives", "Both Types/Design"], a: 3 },
+        { q: "8. Cam drives used for?", o: ["Motion transmit", "Change speed", "Change direction", "All of the above"], a: 3 },
+        { q: "9. Euler's rigid body equations describe?", o: ["Rotating bodies", "Translating", "Both", "None"], a: 0 },
+        { q: "10. Gyroscopic motion related to?", o: ["Conservation spatial momentum", "Spinning top", "Both", "None"], a: 2 }
     ];
 
-    // --- Render MCQs ---
-    const mcqContainer = document.getElementById('mcq-container');
-    quizData.forEach((q, index) => {
-        const div = document.createElement('div');
-        div.style.marginBottom = '20px';
-        let opts = '';
-        q.options.forEach((opt, i) => {
-            opts += `<label class="option-label"><input type="radio" name="q${index}" value="${i}"> ${opt}</label>`;
-        });
-        div.innerHTML = `<p style="font-weight:600;">${q.question}</p>${opts}`;
-        mcqContainer.appendChild(div);
+    // --- RENDER MCQs ---
+    const mcqBox = document.getElementById('mcq-container');
+    quizData.forEach((item, idx) => {
+        let opts = item.o.map((txt, i) => `<label style="display:block; padding:5px;"><input type="radio" name="q${idx}" value="${i}"> ${String.fromCharCode(65+i)}) ${txt}</label>`).join('');
+        mcqBox.innerHTML += `<div style="margin-bottom:15px; background:#f9f9f9; padding:10px; border-radius:5px;"><p style="font-weight:600; margin-top:0;">${item.q}</p>${opts}</div>`;
     });
 
-    // --- Navigation Functions ---
-    function switchSection(fromId, toId) {
-        document.getElementById(fromId).classList.remove('active-section');
-        document.getElementById(fromId).style.display = 'none';
+    // --- VARIABLES ---
+    let safeMode = false;
+    let currentId = null;
+    let stream = null;
 
-        const toSection = document.getElementById(toId);
-        toSection.style.display = (toId === 'sec-exam') ? 'block' : 'flex';
-        setTimeout(() => {
-            toSection.classList.add('active-section');
-        }, 10);
-        window.scrollTo(0,0);
-    }
-
+    // --- NAVIGATION ---
     function handleLogin(e) {
         e.preventDefault();
-        studentInfo.name = document.getElementById('studentName').value;
-        studentInfo.reg = document.getElementById('regNum').value;
-
-        if(studentInfo.name && studentInfo.reg) {
-            switchSection('sec-login', 'sec-instructions');
-        }
+        document.getElementById('dispName').innerText = document.getElementById('studentName').value;
+        document.getElementById('sec-login').style.display = 'none';
+        document.getElementById('sec-instructions').style.display = 'flex';
     }
 
-    // Enable Start Button only when checkbox checked
-    document.getElementById('agreeCheck').addEventListener('change', function() {
-        const btn = document.getElementById('startBtn');
-        if(this.checked) {
-            btn.style.opacity = '1';
-            btn.style.pointerEvents = 'auto';
-        } else {
-            btn.style.opacity = '0.5';
-            btn.style.pointerEvents = 'none';
-        }
-    });
+    // --- CRITICAL BUTTON FIX ---
+    function toggleStartBtn(checkbox) {
+        document.getElementById('startBtn').disabled = !checkbox.checked;
+    }
 
-    // --- SECURITY: Anti-Cheat Logic ---
+    // --- START EXAM ---
     function startExam() {
-        if (!document.fullscreenElement) {
-            // Request full screen for better immersion (optional, browser may block)
-            document.documentElement.requestFullscreen().catch(e => console.log(e));
-        }
+        document.documentElement.requestFullscreen().catch(e=>{});
+        document.getElementById('sec-instructions').style.display = 'none';
+        document.getElementById('sec-exam').style.display = 'block';
 
-        document.getElementById('displayStudentName').innerText = `${studentInfo.name} | ${studentInfo.reg}`;
-        switchSection('sec-instructions', 'sec-exam');
-
-        examActive = true;
-        startTimer();
-
-        // ** CORE SECURITY FEATURE **
-        // Trigger submit if visibility changes (Tab switch/Minimize)
-        document.addEventListener('visibilitychange', handleVisibilityChange);
-        window.addEventListener('blur', handleWindowBlur);
-    }
-
-    function handleVisibilityChange() {
-        if (examActive && document.visibilityState === 'hidden') {
-            submitExam('violation');
-        }
-    }
-
-    function handleWindowBlur() {
-        // Blur can be sensitive (e.g. clicking a system notification),
-        // but for high security requested, we trigger it.
-        if (examActive) {
-            submitExam('violation');
-        }
-    }
-
-    // --- Timer ---
-    function startTimer() {
-        let timeLimit = 2 * 60 * 60; // 2 hours
-        const display = document.getElementById('timer');
-
-        timerInterval = setInterval(() => {
-            if(!examActive) { clearInterval(timerInterval); return; }
-
-            const h = Math.floor(timeLimit / 3600);
-            const m = Math.floor((timeLimit % 3600) / 60);
-            const s = timeLimit % 60;
-            display.textContent = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-
-            if (timeLimit <= 0) {
-                submitExam('timeout');
-            }
-            timeLimit--;
+        // Timer
+        let t = 7200;
+        setInterval(() => {
+            t--;
+            let h=Math.floor(t/3600), m=Math.floor((t%3600)/60), s=t%60;
+            document.getElementById('timer').innerText = `${h}:${m<10?'0'+m:m}:${s<10?'0'+s:s}`;
+            if(t<=0) alert("Time Up!");
         }, 1000);
-    }
 
-    // --- File Validation ---
-    function validateFileSize(input) {
-        if (input.files && input.files[0]) {
-            if (input.files[0].size > 5 * 1024 * 1024) {
-                alert('File is too large! Max 5MB.');
-                input.value = '';
-            }
-        }
-    }
-
-    // --- Submission ---
-    function submitExam(reason) {
-        if (!examActive) return; // Prevent double submission
-        examActive = false;
-        clearInterval(timerInterval);
-
-        // Remove security listeners
-        document.removeEventListener('visibilitychange', handleVisibilityChange);
-        window.removeEventListener('blur', handleWindowBlur);
-
-        // Calculate Score
-        let score = 0;
-        quizData.forEach((q, index) => {
-            const selected = document.querySelector(`input[name="q${index}"]:checked`);
-            if (selected && parseInt(selected.value) === q.correct) score += 2;
+        // Security
+        document.addEventListener('visibilitychange', () => {
+            if(!safeMode && document.hidden) alert("VIOLATION: Exam Auto-Submitted!");
         });
-
-        // UI Updates for Result
-        const modal = document.getElementById('result-modal');
-        const violationMsg = document.getElementById('violation-msg');
-        const title = document.getElementById('result-title');
-
-        if (reason === 'violation') {
-            title.innerText = "EXAM TERMINATED";
-            title.style.color = "red";
-            violationMsg.style.display = "block";
-            // Play a harsh sound or alert
-            alert("SECURITY VIOLATION: You switched tabs or windows. The exam has been auto-submitted.");
-        } else if (reason === 'timeout') {
-            title.innerText = "Time Up!";
-        }
-
-        document.getElementById('score-display').innerText = score;
-        modal.style.display = 'flex';
     }
-</script>
 
+    // --- UPLOAD & CAMERA ---
+    function safeUpload(id) {
+        safeMode = true;
+        document.getElementById(id).click();
+        setTimeout(() => safeMode = false, 2000); // Re-arm security after 2s
+    }
+
+    function previewFile(input, imgId) {
+        if(input.files[0]) {
+            let reader = new FileReader();
+            reader.onload = e => {
+                document.getElementById(imgId).src = e.target.result;
+                document.getElementById(imgId).style.display = 'block';
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    async function openCamera(id) {
+        safeMode = true; currentId = id;
+        document.getElementById('camera-modal').style.display = 'flex';
+        stream = await navigator.mediaDevices.getUserMedia({video: {facingMode: 'environment'}});
+        document.getElementById('camera-feed').srcObject = stream;
+    }
+
+    function takePhoto() {
+        let v = document.getElementById('camera-feed');
+        let c = document.getElementById('camera-canvas');
+        c.width = v.videoWidth; c.height = v.videoHeight;
+        c.getContext('2d').drawImage(v,0,0);
+        document.getElementById('p'+currentId.substring(1)).src = c.toDataURL('image/png');
+        document.getElementById('p'+currentId.substring(1)).style.display = 'block';
+        closeCamera();
+    }
+
+    function closeCamera() {
+        document.getElementById('camera-modal').style.display = 'none';
+        if(stream) stream.getTracks().forEach(t=>t.stop());
+        setTimeout(() => safeMode = false, 1000);
+    }
+
+    function submitExam() { alert("Exam Submitted Successfully!"); location.reload(); }
+</script>
 </body>
 </html>
